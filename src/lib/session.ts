@@ -31,7 +31,8 @@ export async function createSession(payload: SessionPayload) {
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   const session = await encrypt({ ...payload, expires });
 
-  cookies().set('session', session, {
+  const cookieStore = cookies();
+  cookieStore.set('session', session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     expires: expires,
@@ -41,7 +42,8 @@ export async function createSession(payload: SessionPayload) {
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  const sessionCookie = cookies().get('session')?.value;
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get('session')?.value;
   if (!sessionCookie) return null;
 
   const session = await decrypt(sessionCookie);
@@ -53,7 +55,7 @@ export async function getSession(): Promise<SessionPayload | null> {
   session.expires = expires;
   
   const newSession = await encrypt(session);
-  cookies().set('session', newSession, {
+  cookieStore.set('session', newSession, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     expires,
@@ -65,5 +67,6 @@ export async function getSession(): Promise<SessionPayload | null> {
 }
 
 export async function deleteSession() {
-  cookies().set('session', '', { expires: new Date(0) });
+  const cookieStore = cookies();
+  cookieStore.set('session', '', { expires: new Date(0) });
 }
