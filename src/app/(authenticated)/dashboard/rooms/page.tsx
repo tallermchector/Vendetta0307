@@ -14,29 +14,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Building, ArrowUpCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Building, ArrowUpCircle, Swords, Shell, Martini, DollarSign, Clock } from "lucide-react";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import type { Propiedad } from "@prisma/client";
 import { protectPage } from "@/lib/auth";
 
+// @BestPractice: This map accurately links building names from the database
+// to their corresponding level fields in the `Propiedad` model.
 const buildingFieldMap: Record<string, keyof Propiedad> = {
-  'Oficina': 'oficina',
-  'Escuela de Gángsters': 'escuela',
+  'Oficina del Jefe': 'oficina',
+  'Escuela de especialización': 'escuela',
   'Armería': 'armeria',
-  'Fábrica de Municiones': 'municion',
+  'Almacén de munición': 'municion',
   'Cervecería': 'cerveceria',
   'Taberna': 'taberna',
-  'Centro de Contrabando': 'contrabando',
-  'Almacén de Armas': 'almacenArm',
-  'Depósito de Munición': 'deposito',
-  'Almacén de Alcohol': 'almacenAlc',
-  'Caja Fuerte': 'caja',
-  'Campo de Tiro': 'campo',
-  'Puesto de Seguridad': 'seguridad',
-  'Torreta de Defensa': 'torreta',
-  'Operación Minera': 'minas',
+  'Contrabando': 'contrabando',
+  'Almacén de armas': 'almacenArm',
+  'Depósito de munición': 'deposito',
+  'Almacén de alcohol': 'almacenAlc',
+  'Caja fuerte': 'caja',
+  'Campo de entrenamiento': 'campo',
+  'Seguridad': 'seguridad',
+  'Torreta de fuego automático': 'torreta',
+  'Minas ocultas': 'minas',
 };
+
+// Helper function to format seconds into a readable string (e.g., 1h 30m 15s)
+function formatDuration(totalSeconds: number): string {
+  if (totalSeconds <= 0) return "0s";
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  const parts = [];
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  if (seconds > 0 || parts.length === 0) parts.push(`${seconds}s`);
+
+  return parts.join(' ');
+}
+
+// Helper component to display a single resource cost
+function ResourceCost({ icon: Icon, value, label }: { icon: React.ElementType, value: number, label: string }) {
+  if (value === 0) return null;
+  return (
+    <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={label}>
+      <Icon className="h-3.5 w-3.5 text-primary/80" />
+      <span>{value.toLocaleString()}</span>
+    </div>
+  );
+}
+
 
 export default async function RoomsPage() {
   const user = await protectPage();
@@ -47,8 +78,6 @@ export default async function RoomsPage() {
     }
   });
   
-  // Por ahora, gestionamos la primera propiedad del usuario.
-  // En el futuro, se podría seleccionar la propiedad activa desde la UI.
   const playerProperty = user.propiedades?.[0];
 
   if (!playerProperty) {
@@ -76,7 +105,7 @@ export default async function RoomsPage() {
             <div>
               <CardTitle>Gestión de Habitaciones</CardTitle>
               <CardDescription>
-                Amplía y gestiona los edificios de tu propiedad actual.
+                Amplía y gestiona los edificios de tu propiedad: {playerProperty.nombre}.
               </CardDescription>
             </div>
           </div>
@@ -85,18 +114,31 @@ export default async function RoomsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[120px] hidden sm:table-cell">Imagen</TableHead>
-                <TableHead>Edificio</TableHead>
-                <TableHead>Nivel</TableHead>
-                <TableHead className="hidden md:table-cell">Descripción</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead className="w-[100px] hidden sm:table-cell">Imagen</TableHead>
+                <TableHead>Edificio y Nivel</TableHead>
+                <TableHead className="hidden lg:table-cell">Descripción</TableHead>
+                <TableHead className="w-[180px]">Costo de Ampliación</TableHead>
+                <TableHead className="text-right w-[120px]">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {buildingCatalog.map((building) => {
                 const buildingKey = buildingFieldMap[building.nombre];
-                const level = buildingKey ? playerProperty[buildingKey] : 0;
+                const level = buildingKey ? (playerProperty[buildingKey] as number) : 0;
+                const nextLevel = level + 1;
 
+                // Calculate cost for the next level
+                const costFactor = Math.pow(building.fac_costo, level);
+                const costArmas = Math.floor(building.c_armas * costFactor);
+                const costMunicion = Math.floor(building.c_municion * costFactor);
+                const costAlcohol = Math.floor(building.c_alcohol * costFactor);
+                const costDolares = Math.floor(building.c_dolares * costFactor);
+
+                // Calculate time for the next level
+                const baseDurationSeconds = (parseInt(building.t_horas) * 3600) + (parseInt(building.t_minutos) * 60) + parseInt(building.t_segundos);
+                const durationFactor = Math.pow(building.fac_dura, level);
+                const nextDurationSeconds = Math.floor(baseDurationSeconds * durationFactor);
+                
                 return (
                   <TableRow key={building.id_edificio}>
                     <TableCell className="hidden sm:table-cell">
@@ -105,15 +147,31 @@ export default async function RoomsPage() {
                         alt={`Imagen de ${building.nombre}`}
                         width={80}
                         height={80}
-                        className="rounded-md object-cover"
+                        className="rounded-md object-cover border"
                       />
                     </TableCell>
-                    <TableCell className="font-medium">{building.nombre}</TableCell>
                     <TableCell>
-                      <span className="font-bold text-lg">{level}</span>
+                      <div className="font-medium text-base">{building.nombre}</div>
+                      <div className="text-sm font-bold text-primary">Nivel {level}</div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell text-muted-foreground">
+                    <TableCell className="hidden lg:table-cell text-muted-foreground text-xs">
                       {building.descripcion}
+                    </TableCell>
+                    <TableCell>
+                        <div className="flex flex-col gap-1.5">
+                            <div className="font-semibold text-xs text-foreground">Al Nivel {nextLevel}:</div>
+                            <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                                <ResourceCost icon={Swords} value={costArmas} label="Armas" />
+                                <ResourceCost icon={Shell} value={costMunicion} label="Munición" />
+                                <ResourceCost icon={Martini} value={costAlcohol} label="Alcohol" />
+                                <ResourceCost icon={DollarSign} value={costDolares} label="Dólares" />
+                            </div>
+                            <Separator className="my-1 bg-border/60" />
+                            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                                <Clock className="h-3.5 w-3.5" />
+                                <span>{formatDuration(nextDurationSeconds)}</span>
+                            </div>
+                        </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm">
