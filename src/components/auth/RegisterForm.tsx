@@ -86,7 +86,7 @@ export default function RegisterForm() {
     <Card className="w-full max-w-md border-border/60">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-headline">Crea una cuenta</CardTitle>
-        <CardDescription>Tu viaje en Vendetta 01 comienza aquí.</CardDescription>
+        <CardDescription>Tu viaje en Vendetta Latino comienza aquí.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

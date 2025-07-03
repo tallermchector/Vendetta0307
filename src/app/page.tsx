@@ -8,7 +8,7 @@ export default function Home() {
       <div className="absolute top-0 left-0 w-full h-full bg-primary/[0.03] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
       <div className="z-10 flex flex-col items-center">
         <h1 className="text-6xl md:text-8xl font-bold font-headline text-transparent bg-clip-text bg-gradient-to-b from-neutral-50 to-neutral-400">
-          Vendetta 01
+          Vendetta Latino
         </h1>
         <p className="mt-4 max-w-lg text-lg text-muted-foreground">
           Entra en un mundo de intriga y conflicto. Tu historia comienza ahora.

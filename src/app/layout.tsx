@@ -15,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
 
 
 export const metadata: Metadata = {
-  title: 'Vendetta 01',
+  title: 'Vendetta Latino',
   description: 'Entra en un mundo de intriga y conflicto.',
 };
 
