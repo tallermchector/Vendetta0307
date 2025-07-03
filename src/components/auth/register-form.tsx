@@ -31,15 +31,15 @@ const formSchema = z
   .object({
     username: z
       .string()
-      .min(3, { message: "Username must be at least 3 characters." }),
-    email: z.string().email({ message: "Please enter a valid email address." }),
+      .min(3, { message: "El nombre de usuario debe tener al menos 3 caracteres." }),
+    email: z.string().email({ message: "Por favor, introduce una dirección de correo electrónico válida." }),
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters." }),
+      .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match.",
+    message: "Las contraseñas no coinciden.",
     path: ["confirmPassword"],
   });
 
@@ -62,14 +62,14 @@ export function RegisterForm() {
       const result = await register(values);
       if (result?.error) {
         toast({
-          title: "Registration Failed",
+          title: "Error en el Registro",
           description: result.error,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Registration Successful",
-          description: "Please check your email to verify your account.",
+          title: "Registro Exitoso",
+          description: "Por favor, revisa tu correo electrónico para verificar tu cuenta.",
         });
         // Here you would typically redirect the user
       }
@@ -79,9 +79,9 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-sm border-border">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-headline">Create Account</CardTitle>
+        <CardTitle className="text-3xl font-headline">Crear Cuenta</CardTitle>
         <CardDescription>
-          Join the ranks. It&apos;s quick and easy.
+          Únete a las filas. Es rápido y fácil.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -92,12 +92,12 @@ export function RegisterForm() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Nombre de Usuario</FormLabel>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input
-                        placeholder="your_gamertag"
+                        placeholder="tu_gamertag"
                         {...field}
                         className="pl-10"
                       />
@@ -112,13 +112,13 @@ export function RegisterForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Correo Electrónico</FormLabel>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="tu@ejemplo.com"
                         {...field}
                         className="pl-10"
                       />
@@ -133,7 +133,7 @@ export function RegisterForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Contraseña</FormLabel>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -154,7 +154,7 @@ export function RegisterForm() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>Confirmar Contraseña</FormLabel>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -176,10 +176,10 @@ export function RegisterForm() {
               disabled={isPending}
             >
               {isPending ? (
-                "Signing Up..."
+                "Registrando..."
               ) : (
                 <>
-                  Sign Up <UserPlus className="ml-2 h-4 w-4" />
+                  Regístrate <UserPlus className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -188,12 +188,12 @@ export function RegisterForm() {
       </CardContent>
       <CardFooter className="flex flex-col">
         <div className="text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+          ¿Ya tienes una cuenta?{" "}
           <Link
             href="/login"
             className="font-semibold text-primary hover:underline"
           >
-            Log In
+            Iniciar Sesión
           </Link>
         </div>
       </CardFooter>

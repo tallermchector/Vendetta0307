@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import React from "react";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
+  email: z.string().email({ message: "Por favor, introduce una dirección de correo electrónico válida." }),
 });
 
 export function ForgotPasswordForm() {
@@ -53,9 +53,9 @@ export function ForgotPasswordForm() {
         });
       } else {
         toast({
-          title: "Success",
+          title: "Éxito",
           description:
-            "If an account with that email exists, a password reset link has been sent.",
+            "Si existe una cuenta con ese correo electrónico, se ha enviado un enlace para restablecer la contraseña.",
         });
       }
     });
@@ -64,9 +64,9 @@ export function ForgotPasswordForm() {
   return (
     <Card className="w-full max-w-sm border-border">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-headline">Reset Password</CardTitle>
+        <CardTitle className="text-3xl font-headline">Restablecer Contraseña</CardTitle>
         <CardDescription>
-          Enter your email to receive a password reset link.
+          Introduce tu correo electrónico para recibir un enlace de restablecimiento de contraseña.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -77,13 +77,13 @@ export function ForgotPasswordForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Correo Electrónico</FormLabel>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="tu@ejemplo.com"
                         {...field}
                         className="pl-10"
                       />
@@ -99,10 +99,10 @@ export function ForgotPasswordForm() {
               disabled={isPending}
             >
               {isPending ? (
-                "Sending..."
+                "Enviando..."
               ) : (
                 <>
-                  Send Reset Link <KeyRound className="ml-2 h-4 w-4" />
+                  Enviar Enlace <KeyRound className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -111,7 +111,7 @@ export function ForgotPasswordForm() {
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button variant="link" asChild className="text-sm text-muted-foreground">
-          <Link href="/login">Back to Log In</Link>
+          <Link href="/login">Volver a Iniciar Sesión</Link>
         </Button>
       </CardFooter>
     </Card>

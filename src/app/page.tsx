@@ -9,12 +9,11 @@ export default function Home() {
           Vendetta Latino
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground mb-8">
-          Welcome to the next generation of strategic gaming. Register or log in
-          to begin your conquest.
+          Bienvenido a la nueva generación de juegos de estrategia. Regístrate o inicia sesión para comenzar tu conquista.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button asChild size="lg" className="font-headline">
-            <Link href="/login">Log In</Link>
+            <Link href="/login">Iniciar Sesión</Link>
           </Button>
           <Button
             asChild
@@ -22,7 +21,7 @@ export default function Home() {
             size="lg"
             className="font-headline"
           >
-            <Link href="/register">Register</Link>
+            <Link href="/register">Regístrate</Link>
           </Button>
         </div>
       </div>

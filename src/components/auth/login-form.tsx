@@ -28,8 +28,8 @@ import { useToast } from "@/hooks/use-toast";
 import React from "react";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(1, { message: "Password is required." }),
+  email: z.string().email({ message: "Por favor, introduce una dirección de correo electrónico válida." }),
+  password: z.string().min(1, { message: "La contraseña es obligatoria." }),
 });
 
 export function LoginForm() {
@@ -49,14 +49,14 @@ export function LoginForm() {
       const result = await login(values);
       if (result?.error) {
         toast({
-          title: "Login Failed",
+          title: "Error de Inicio de Sesión",
           description: result.error,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Login Successful",
-          description: "Welcome back!",
+          title: "Inicio de Sesión Exitoso",
+          description: "¡Bienvenido de nuevo!",
         });
         // Here you would typically redirect the user
         // e.g. router.push('/dashboard')
@@ -67,9 +67,9 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-sm border-border">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-headline">Log In</CardTitle>
+        <CardTitle className="text-3xl font-headline">Iniciar Sesión</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account.
+          Introduce tus credenciales para acceder a tu cuenta.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -80,13 +80,13 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Correo Electrónico</FormLabel>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="tu@ejemplo.com"
                         {...field}
                         className="pl-10"
                       />
@@ -101,7 +101,7 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Contraseña</FormLabel>
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <FormControl>
@@ -123,10 +123,10 @@ export function LoginForm() {
               disabled={isPending}
             >
               {isPending ? (
-                "Logging In..."
+                "Iniciando Sesión..."
               ) : (
                 <>
-                  Log In <LogInIcon className="ml-2 h-4 w-4" />
+                  Iniciar Sesión <LogInIcon className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -135,15 +135,15 @@ export function LoginForm() {
       </CardContent>
       <CardFooter className="flex flex-col items-center justify-center gap-2">
         <Button variant="link" asChild className="text-sm text-muted-foreground">
-          <Link href="/forgot-password">Forgot your password?</Link>
+          <Link href="/forgot-password">¿Olvidaste tu contraseña?</Link>
         </Button>
         <div className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          ¿No tienes una cuenta?{" "}
           <Link
             href="/register"
             className="font-semibold text-primary hover:underline"
           >
-            Sign Up
+            Regístrate
           </Link>
         </div>
       </CardFooter>
