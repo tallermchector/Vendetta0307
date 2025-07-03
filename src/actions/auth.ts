@@ -63,7 +63,6 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
 
 
 export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ success: true; user: { id_usuario: number; usuario: string; email: string; }; } | { error: string; }> {
-    const cookieStore = cookies();
     const validatedFields = loginSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -76,18 +75,17 @@ export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ 
         where: { email },
     });
 
-    if (!user || !user.pass) {
-        return { error: "Credenciales inválidas." };
+    if (!user) {
+        return { error: "El correo electrónico no está registrado." };
     }
 
     const passwordsMatch = await bcrypt.compare(password, user.pass);
 
     if (!passwordsMatch) {
-        return { error: "Credenciales inválidas." };
+        return { error: "La contraseña es incorrecta." };
     }
 
-    // Aquí se establecería la cookie de sesión
-    cookieStore.set('session_token', 'some_jwt_token_here', {
+    cookies().set('session_token', 'some_jwt_token_here', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7, // 1 week
