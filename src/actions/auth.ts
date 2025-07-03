@@ -7,9 +7,10 @@ import { redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { createSession, deleteSession } from '@/lib/session';
 
+// @BestPractice: Use .trim() to remove leading/trailing whitespace from user input.
 const registerSchema = z.object({
-  username: z.string().min(3, { message: "El nombre de usuario debe tener al menos 3 caracteres." }),
-  email: z.string().email({ message: "Por favor, introduce un correo electrónico válido." }),
+  username: z.string().trim().min(3, { message: "El nombre de usuario debe tener al menos 3 caracteres." }),
+  email: z.string().trim().email({ message: "Por favor, introduce un correo electrónico válido." }),
   password: z.string().min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
 });
 
@@ -23,7 +24,7 @@ const forgotPasswordSchema = z.object({
 });
 
 
-export async function registerUser(values: z.infer<typeof registerSchema>): Promise<{ success: true; userId: number; } | { error: string; }> {
+export async function registerUser(values: z.infer<typeof registerSchema>): Promise<{ success: true; } | { error: string; }> {
   const validatedFields = registerSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -31,6 +32,8 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
   }
 
   const { username, email, password } = validatedFields.data;
+  
+  // @Security: Hash the password securely using bcrypt before storing it.
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const existingUserByEmail = await prisma.user.findUnique({
@@ -58,7 +61,11 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
     },
   });
 
-  return { success: true, userId: newUser.id_usuario };
+  // @Security: After successful registration, create a session for the user immediately.
+  // This avoids passing sensitive info like userId in URL params.
+  await createSession({ userId: newUser.id_usuario });
+
+  return { success: true };
 }
 
 
@@ -78,15 +85,19 @@ export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ 
     if (!user) {
         return { error: "El correo electrónico no está registrado." };
     }
-
+    
+    // @Security: Use bcrypt.compare to securely check the password against the stored hash.
     const passwordsMatch = await bcrypt.compare(password, user.pass);
 
     if (!passwordsMatch) {
         return { error: "La contraseña es incorrecta." };
     }
     
+    // @Security: Create a secure, HttpOnly session cookie upon successful login.
     await createSession({ userId: user.id_usuario });
-
+    
+    // @BestPractice: On successful login, simply return a success status.
+    // The client will handle the redirect, and the middleware will protect the target route.
     return { success: true };
 }
 
@@ -100,11 +111,14 @@ export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswor
     
     const user = await prisma.user.findUnique({ where: { email } });
 
+    // @Security: To prevent user enumeration, always return a generic success message
+    // regardless of whether the user exists or not.
     if (!user) {
         return { success: "Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña."};
     }
 
-    // En una aplicación real, aquí se generaría un token y se enviaría un correo electrónico.
+    // In a real application, here you would generate a secure, single-use token,
+    // save its hash to the database with an expiration, and email the user a link.
     console.log(`Password reset link for ${email} would be sent here.`);
 
     return { success: "Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña."};
@@ -112,6 +126,8 @@ export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswor
 
 
 export async function logoutUser() {
+  // @Security: This server action securely deletes the session cookie.
   await deleteSession();
+  // @BestPractice: Redirect the user to the login page after destroying the session.
   redirect('/login');
 }

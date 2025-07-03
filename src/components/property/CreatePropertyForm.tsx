@@ -3,8 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import {
   Form,
   FormControl,
@@ -25,13 +25,12 @@ import {
 import { MapPin, Globe, Satellite, Anchor, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createInitialProperty } from "@/actions/property";
-import { Skeleton } from "@/components/ui/skeleton";
 
 // Using .pipe() allows us to validate as a string first (for required fields)
 // and then coerce and validate as a number. This works well with controlled
 // form inputs that use empty strings for empty number fields.
 const formSchema = z.object({
-  name: z.string().min(3, {message: "Debe tener al menos 3 caracteres."}).default("Propiedad Principal"),
+  name: z.string().trim().min(3, {message: "Debe tener al menos 3 caracteres."}).default("Propiedad Principal"),
   coordX: z.string().min(1, { message: "La coordenada X es requerida."}).pipe(
     z.coerce.number({invalid_type_error: "Debe ser un número"})
     .int()
@@ -52,12 +51,11 @@ const formSchema = z.object({
   ),
 });
 
-function CreatePropertyFormComponent() {
+
+export default function CreatePropertyForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const userId = searchParams.get('userId');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,17 +69,10 @@ function CreatePropertyFormComponent() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!userId) {
-        toast({
-            title: "Error",
-            description: "No se encontró el ID de usuario. Por favor, regístrate de nuevo.",
-            variant: "destructive",
-        });
-        return;
-    }
-    
     startTransition(() => {
-        createInitialProperty({ ...values, userId: parseInt(userId) })
+        // @Security: The action now gets the user ID from the secure session,
+        // so we don't need to pass any arguments here.
+        createInitialProperty(values)
             .then((data) => {
                 if (data.error) {
                     form.setError("root", { message: data.error });
@@ -94,9 +85,9 @@ function CreatePropertyFormComponent() {
                 if (data.success) {
                     toast({
                         title: "¡Propiedad Establecida!",
-                        description: data.success,
+                        description: "Tu base de operaciones está lista.",
                     });
-                    router.push('/login');
+                    router.push('/dashboard');
                 }
             })
             .catch(() => {
@@ -107,22 +98,6 @@ function CreatePropertyFormComponent() {
                 });
             });
     });
-  }
-
-  if (!userId) {
-    return (
-        <Card className="w-full max-w-lg border-border/60">
-             <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-headline">Error de Usuario</CardTitle>
-                <CardDescription>
-                No se pudo identificar al usuario. Por favor, regresa y completa el registro nuevamente.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Button className="w-full" onClick={() => router.push('/register')}>Volver a Registro</Button>
-            </CardContent>
-        </Card>
-    )
   }
 
   return (
@@ -207,49 +182,4 @@ function CreatePropertyFormComponent() {
       </CardContent>
     </Card>
   );
-}
-
-
-// Dado que useSearchParams solo puede usarse en un componente de cliente envuelto en <Suspense>,
-// creamos un componente contenedor.
-export default function CreatePropertyForm() {
-    return (
-        <Suspense fallback={<CreatePropertyFormSkeleton/>}>
-            <CreatePropertyFormComponent />
-        </Suspense>
-    )
-}
-
-function CreatePropertyFormSkeleton() {
-    return (
-         <Card className="w-full max-w-lg border-border/60">
-            <CardHeader className="text-center">
-                <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-                <Skeleton className="h-8 w-3/4 mx-auto mt-4" />
-                <Skeleton className="h-4 w-full mx-auto mt-2" />
-                <Skeleton className="h-4 w-2/3 mx-auto mt-1" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-                <div className="space-y-2">
-                    <Skeleton className="h-5 w-1/3" />
-                    <Skeleton className="h-10 w-full" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                        <Skeleton className="h-5 w-3/4" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                    <div className="space-y-2">
-                        <Skeleton className="h-5 w-3/4" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                     <div className="space-y-2">
-                        <Skeleton className="h-5 w-3/4" />
-                        <Skeleton className="h-10 w-full" />
-                    </div>
-                </div>
-                 <Skeleton className="h-11 w-full !mt-8" />
-            </CardContent>
-        </Card>
-    )
 }

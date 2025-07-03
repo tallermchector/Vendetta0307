@@ -29,8 +29,8 @@ import { registerUser } from "@/actions/auth";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  username: z.string().min(3, { message: "El nombre de usuario debe tener al menos 3 caracteres." }),
-  email: z.string().email({ message: "Por favor, introduce un correo electrónico válido." }),
+  username: z.string().trim().min(3, { message: "El nombre de usuario debe tener al menos 3 caracteres." }),
+  email: z.string().trim().email({ message: "Por favor, introduce un correo electrónico válido." }),
   password: z.string().min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
   confirmPassword: z.string(),
 }).refine(data => data.password === data.confirmPassword, {
@@ -69,7 +69,9 @@ export default function RegisterForm() {
               title: "¡Cuenta Creada!",
               description: "Paso 1/2: Ahora, establece tu propiedad inicial.",
             });
-            router.push(`/register/create-property?userId=${data.userId}`);
+            // @Security: Redirect to the next step without exposing any user data in the URL.
+            // The user's session is already active.
+            router.push(`/register/create-property`);
           }
         })
         .catch(() => {

@@ -4,18 +4,35 @@ import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { protectAction } from '@/lib/auth';
 
+// @BestPractice: Use .pipe() for complex validation, first ensuring the value is a
+// string, then coercing to a number for range checks.
 const createPropertySchema = z.object({
-  userId: z.coerce.number().int().positive(),
-  name: z.string().min(1, { message: 'El nombre de la propiedad es requerido.' }),
-  coordX: z.coerce.number().int().min(1).max(50),
-  coordY: z.coerce.number().int().min(1).max(50),
-  coordZ: z.coerce.number().int().min(1).max(255),
+  name: z.string().trim().min(1, { message: 'El nombre de la propiedad es requerido.' }),
+  coordX: z.string().min(1, { message: "La coordenada X es requerida."}).pipe(
+    z.coerce.number({invalid_type_error: "Debe ser un número"})
+    .int()
+    .min(1, { message: "Rango: 1-50" })
+    .max(50, { message: "Rango: 1-50" })
+  ),
+  coordY: z.string().min(1, { message: "La coordenada Y es requerida."}).pipe(
+    z.coerce.number({invalid_type_error: "Debe ser un número"})
+    .int()
+    .min(1, { message: "Rango: 1-50" })
+    .max(50, { message: "Rango: 1-50" })
+  ),
+  coordZ: z.string().min(1, { message: "El Sector Z es requerido."}).pipe(
+    z.coerce.number({invalid_type_error: "Debe ser un número"})
+    .int()
+    .min(1, { message: "Rango: 1-255" })
+    .max(255, { message: "Rango: 1-255" })
+  ),
 });
 
 export async function createInitialProperty(values: z.infer<typeof createPropertySchema>) {
-  // Although the registration form is public, we still check
-  // if a user somehow is logged in, to avoid misuse.
-  // In a real scenario, you might want more robust logic here.
+  // @Security: Protect this action by ensuring a user is authenticated.
+  // This is crucial because this action performs database writes.
+  const user = await protectAction();
+  const userId = user.id_usuario;
   
   const validatedFields = createPropertySchema.safeParse(values);
 
@@ -23,15 +40,7 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
     return { error: 'Datos inválidos.' };
   }
   
-  const { userId, name, coordX, coordY, coordZ } = validatedFields.data;
-
-  const user = await prisma.user.findUnique({
-      where: { id_usuario: userId }
-  });
-
-  if (!user) {
-      return { error: 'Usuario no encontrado.' };
-  }
+  const { name, coordX, coordY, coordZ } = validatedFields.data;
   
   const existingPropertyForUser = await prisma.propiedad.findFirst({
       where: { id_usuario: userId }
@@ -41,6 +50,7 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
       return { error: 'Este usuario ya tiene una propiedad.' };
   }
 
+  // @Security: Check for coordinate collision to prevent multiple properties in the same location.
   const existingPropertyAtCoords = await prisma.propiedad.findUnique({
     where: {
       coord_x_coord_y_coord_z: {
@@ -56,6 +66,7 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
   }
 
   try {
+    // @BestPractice: Use a transaction to ensure all related records are created or none at all.
     await prisma.$transaction([
       prisma.propiedad.create({
         data: {
@@ -64,6 +75,7 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
           coord_x: coordX,
           coord_y: coordY,
           coord_z: coordZ,
+          // Initialize all building levels to 1 as per requirements.
           oficina: 1,
           escuela: 1,
           armeria: 1,
