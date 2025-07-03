@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decrypt } from '@/lib/session';
-import { cookies } from 'next/headers';
 
 // 1. Specify protected and public routes
 const protectedRoutes = ['/dashboard'];
@@ -15,7 +14,7 @@ export async function middleware(request: NextRequest) {
   const isPublicRoute = publicRoutes.includes(path) || path.startsWith('/register/create-property');
   
   // 3. Decrypt the session from the cookie
-  const cookie = cookies().get('session')?.value;
+  const cookie = request.cookies.get('session')?.value;
   const session = cookie ? await decrypt(cookie) : null;
 
   // 4. Redirect logic
