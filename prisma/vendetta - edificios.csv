@@ -1,16 +1,16 @@
-id_edificio,nombre,descripcion,costo_base,factor_costo
-1,"Oficina","Centro de operaciones para gestionar tus actividades.","{""dolares"": 100, ""alcohol"": 50}",1.6
-2,"Escuela de Gángsters","Forma a nuevos reclutas y mejora sus habilidades.","{""dolares"": 200, ""alcohol"": 100}",1.5
-3,"Armería","Produce y almacena armas para tus hombres.","{""dolares"": 300, ""municion"": 150}",1.7
-4,"Fábrica de Municiones","Fabrica munición esencial para tus armas.","{""dolares"": 250, ""armas"": 100}",1.7
-5,"Cervecería","Produce alcohol para vender o mantener alta la moral.","{""dolares"": 150, ""municion"": 50}",1.4
-6,"Taberna","Un lugar para que tus hombres se relajen y reclutar nuevos miembros.","{""dolares"": 400, ""alcohol"": 300}",1.5
-7,"Centro de Contrabando","Gestiona operaciones ilegales para obtener grandes beneficios.","{""dolares"": 1000, ""armas"": 500}",2.0
-8,"Almacén de Armas","Aumenta la capacidad de almacenamiento de armas.","{""dolares"": 500, ""municion"": 200}",1.8
-9,"Depósito de Munición","Aumenta la capacidad de almacenamiento de munición.","{""dolares"": 500, ""armas"": 200}",1.8
-10,"Almacén de Alcohol","Aumenta la capacidad de almacenamiento de alcohol.","{""dolares"": 500, ""armas"": 100}",1.8
-11,"Caja Fuerte","Protege una parte de tus dólares de los robos.","{""dolares"": 2000}",1.9
-12,"Campo de Tiro","Mejora la precisión y efectividad de tus unidades.","{""armas"": 800, ""municion"": 1200}",2.2
-13,"Puesto de Seguridad","Mejora las defensas de tu propiedad.","{""armas"": 700, ""municion"": 700}",1.9
-14,"Torreta de Defensa","Defensa automatizada contra atacantes.","{""armas"": 1500, ""municion"": 2000}",2.5
-15,"Operación Minera","Genera recursos brutos para tus fábricas.","{""dolares"": 5000}",3.0
+id_edificio,nombre,descripcion,c_armas,c_municion,c_alcohol,c_dolares,fac_costo,t_horas,t_minutos,t_segundos,fac_dura,imagen_url
+1,Oficina,"Centro de operaciones para gestionar tus actividades.",100,50,0,200,1.5,0,30,0,1.2,/img/B1K.gif
+2,Escuela de Gángsters,"Forma a nuevos reclutas y mejora sus habilidades.",150,100,50,300,1.6,1,0,0,1.3,/img/B2K.gif
+3,Armería,"Produce y almacena armas para tus hombres.",200,150,0,400,1.7,0,45,0,1.4,/img/B3K.gif
+4,Fábrica de Municiones,"Fabrica munición esencial para tus armas.",180,250,0,350,1.7,0,40,0,1.4,/img/B4K.gif
+5,Cervecería,"Produce alcohol para vender o mantener alta la moral.",120,80,200,250,1.6,0,35,0,1.3,/img/B5K.gif
+6,Taberna,"Un lugar para que tus hombres se relajen y reclutar nuevos miembros.",100,50,150,200,1.5,0,25,0,1.2,/img/B6K.gif
+7,Centro de Contrabando,"Gestiona operaciones ilegales para obtener grandes beneficios.",500,300,200,1000,2.0,2,0,0,1.8,/img/B7K.gif
+8,Almacén de Armas,"Aumenta la capacidad de almacenamiento de armas.",300,100,0,500,1.8,1,30,0,1.5,/img/B8K.gif
+9,Depósito de Munición,"Aumenta la capacidad de almacenamiento de munición.",250,400,0,500,1.8,1,30,0,1.5,/img/B9K.gif
+10,Almacén de Alcohol,"Aumenta la capacidad de almacenamiento de alcohol.",200,100,300,500,1.8,1,30,0,1.5,/img/B10K.gif
+11,Caja Fuerte,"Protege una parte de tus dólares de los robos.",1000,500,0,2000,2.2,3,0,0,2.0,/img/B11K.gif
+12,Campo de Tiro,"Mejora la precisión y efectividad de tus unidades.",400,600,0,800,1.9,1,15,0,1.6,/img/B12K.gif
+13,Puesto de Seguridad,"Mejora las defensas de tu propiedad.",350,350,0,700,1.8,1,0,0,1.7,/img/B13K.gif
+14,Torreta de Defensa,"Defensa automatizada contra atacantes.",600,800,0,1200,2.1,2,30,0,1.9,/img/B14K.gif
+15,Operación Minera,"Genera recursos brutos para tus fábricas.",800,400,0,1500,2.0,4,0,0,1.8,/img/B15K.gif

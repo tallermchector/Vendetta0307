@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log(`Iniciando el sembrado de datos de edificios...`);
 
-  const csvFilePath = path.join(process.cwd(), 'public', 'vendetta - edificios.csv');
+  const csvFilePath = path.join(process.cwd(), 'prisma', 'vendetta - edificios.csv');
   if (!fs.existsSync(csvFilePath)) {
     console.error(`Error: El archivo ${csvFilePath} no fue encontrado.`);
     return;
@@ -29,7 +29,7 @@ async function main() {
           id_edificio: parseInt(row.id_edificio, 10),
           nombre: row.nombre || '',
           descripcion: row.descripcion || '',
-          costo_base: JSON.parse(row.costo_base || '{}'),
+          costo_base: {},
           c_armas: parseInt(row.c_armas, 10) || 0,
           c_municion: parseInt(row.c_municion, 10) || 0,
           c_alcohol: parseInt(row.c_alcohol, 10) || 0,
