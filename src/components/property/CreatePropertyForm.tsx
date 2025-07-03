@@ -27,11 +27,29 @@ import { useToast } from "@/hooks/use-toast";
 import { createInitialProperty } from "@/actions/property";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Using .pipe() allows us to validate as a string first (for required fields)
+// and then coerce and validate as a number. This works well with controlled
+// form inputs that use empty strings for empty number fields.
 const formSchema = z.object({
   name: z.string().min(3, {message: "Debe tener al menos 3 caracteres."}).default("Propiedad Principal"),
-  coordX: z.coerce.number({invalid_type_error: "Debe ser un número"}).int().min(1, { message: "Rango: 1-50" }).max(50, { message: "Rango: 1-50" }),
-  coordY: z.coerce.number({invalid_type_error: "Debe ser un número"}).int().min(1, { message: "Rango: 1-50" }).max(50, { message: "Rango: 1-50" }),
-  coordZ: z.coerce.number({invalid_type_error: "Debe ser un número"}).int().min(1, { message: "Rango: 1-255" }).max(255, { message: "Rango: 1-255" }),
+  coordX: z.string().min(1, { message: "La coordenada X es requerida."}).pipe(
+    z.coerce.number({invalid_type_error: "Debe ser un número"})
+    .int()
+    .min(1, { message: "Rango: 1-50" })
+    .max(50, { message: "Rango: 1-50" })
+  ),
+  coordY: z.string().min(1, { message: "La coordenada Y es requerida."}).pipe(
+    z.coerce.number({invalid_type_error: "Debe ser un número"})
+    .int()
+    .min(1, { message: "Rango: 1-50" })
+    .max(50, { message: "Rango: 1-50" })
+  ),
+  coordZ: z.string().min(1, { message: "El Sector Z es requerido."}).pipe(
+    z.coerce.number({invalid_type_error: "Debe ser un número"})
+    .int()
+    .min(1, { message: "Rango: 1-255" })
+    .max(255, { message: "Rango: 1-255" })
+  ),
 });
 
 function CreatePropertyFormComponent() {
@@ -43,11 +61,12 @@ function CreatePropertyFormComponent() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    // Initialize number fields with an empty string to avoid uncontrolled input errors.
     defaultValues: {
       name: "Propiedad Principal",
-      coordX: undefined,
-      coordY: undefined,
-      coordZ: undefined,
+      coordX: "",
+      coordY: "",
+      coordZ: "",
     },
   });
 
