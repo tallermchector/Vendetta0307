@@ -13,6 +13,7 @@
     "db:seed": "bun prisma/usuario.ts",
     "db:seed:data": "bun prisma/datos.ts",
     "db:seed:all": "bun run db:seed && bun run db:seed:data",
+    "db:export": "bun prisma/exportardatos.ts",
     "clean": "rm -rf .next node_modules bun.lockb",
     "reinstall": "bun run clean && bun install",
     "build:clean": "bun run clean && bun run build"
