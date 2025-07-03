@@ -32,7 +32,9 @@ export async function createSession(payload: SessionPayload) {
   const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
   const session = await encrypt({ ...payload, expires });
 
+  // @BestPractice: To avoid static analysis errors, get the cookie store first.
   const cookieStore = cookies();
+
   // @Security: Set cookies with HttpOnly, Secure (in prod), SameSite, and Path attributes.
   // - HttpOnly: Prevents client-side script access, mitigating XSS.
   // - Secure: Ensures the cookie is only sent over HTTPS.
@@ -48,8 +50,10 @@ export async function createSession(payload: SessionPayload) {
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
+  // @BestPractice: Get the cookie store first, then access its value.
   const cookieStore = cookies();
   const sessionCookie = cookieStore.get('session')?.value;
+
   if (!sessionCookie) return null;
 
   const session = await decrypt(sessionCookie);
@@ -61,7 +65,9 @@ export async function getSession(): Promise<SessionPayload | null> {
 }
 
 export async function deleteSession() {
+  // @BestPractice: Get the cookie store first before modifying it.
   const cookieStore = cookies();
+  
   // @Security: To log out, invalidate the cookie by setting an expiry date in the past.
   cookieStore.set('session', '', { expires: new Date(0), path: '/' });
 }
