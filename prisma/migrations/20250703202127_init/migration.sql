@@ -89,7 +89,6 @@ CREATE TABLE "Building" (
     "t_minutos" TEXT NOT NULL,
     "t_segundos" TEXT NOT NULL,
     "fac_dura" DOUBLE PRECISION NOT NULL,
-    "puntosxnivel" TEXT NOT NULL,
     "imagen_url" TEXT NOT NULL,
 
     CONSTRAINT "Building_pkey" PRIMARY KEY ("id_edificio")
