@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { FileText, Mail, Move, Swords, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
 
 function StatBadge({
   count,
@@ -30,7 +31,23 @@ function StatBadge({
   );
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  // En un entorno real, obtendríamos el usuario de la sesión.
+  // Para este prototipo, obtenemos el primer usuario como ejemplo.
+  const user = await prisma.user.findFirst({
+    include: {
+        familia: true,
+        perfil: true,
+        propiedades: {
+            take: 1 // Tomamos solo la primera propiedad para la vista general
+        }
+    }
+  });
+
+  const playerProfile = user?.perfil;
+  const family = user?.familia;
+  const property = user?.propiedades[0];
+
   return (
     <div className="flex flex-col gap-6">
       {/* Player Info & Actions Section */}
@@ -46,7 +63,7 @@ export default function DashboardPage() {
               </Avatar>
               <div className="ml-4">
                 <p className="text-sm text-muted-foreground">Jugador</p>
-                <h2 className="text-2xl font-bold font-headline">NOMBRE</h2>
+                <h2 className="text-2xl font-bold font-headline">{user?.usuario || 'Jugador'}</h2>
               </div>
             </Card>
 
@@ -62,8 +79,8 @@ export default function DashboardPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
               <div className="absolute bottom-0 left-0 p-4 text-white">
-                <p className="text-sm font-semibold">Visión General - Edificio</p>
-                <h2 className="text-2xl font-bold font-headline">[40:23:220]</h2>
+                <p className="text-sm font-semibold">Visión General - {property?.nombre || 'Propiedad'}</p>
+                <h2 className="text-2xl font-bold font-headline">{property ? `[${property.coord_x}:${property.coord_y}:${property.coord_z}]` : '[N/A]'}</h2>
               </div>
             </Card>
 
@@ -71,7 +88,7 @@ export default function DashboardPage() {
             <Card className="flex flex-col items-center justify-center p-4">
               <div className="relative h-16 w-16">
                  <Image
-                    src="https://placehold.co/128x128.png"
+                    src={family?.emblema_url || "https://placehold.co/128x128.png"}
                     data-ai-hint="family crest"
                     alt="Emblema de la familia"
                     width={128}
@@ -81,7 +98,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-2 text-center">
                 <p className="text-sm text-muted-foreground">Familia</p>
-                <h2 className="text-xl font-bold font-headline">NOMBRE FAMILIA</h2>
+                <h2 className="text-xl font-bold font-headline">{family?.nombre || 'Sin Familia'}</h2>
               </div>
             </Card>
         </div>
@@ -157,15 +174,15 @@ export default function DashboardPage() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                 <div className="md:border-r md:border-border md:pr-4">
                     <p className="text-xs text-muted-foreground">Puntos (Entrenamiento)</p>
-                    <p className="text-lg font-bold">4,200</p>
+                    <p className="text-lg font-bold">{(playerProfile?.puntos_entrenamiento || 0).toLocaleString()}</p>
                 </div>
                 <div className="md:border-r md:border-border md:pr-4">
                     <p className="text-xs text-muted-foreground">Puntos (Edificios)</p>
-                    <p className="text-lg font-bold">1,250</p>
+                    <p className="text-lg font-bold">{(playerProfile?.puntos_edificios || 0).toLocaleString()}</p>
                 </div>
                 <div className="md:border-r md:border-border md:pr-4">
                     <p className="text-xs text-muted-foreground">Puntos (Tropas)</p>
-                    <p className="text-lg font-bold">8,430</p>
+                    <p className="text-lg font-bold">{(playerProfile?.puntos_tropas || 0).toLocaleString()}</p>
                 </div>
                 <div className="md:border-r md:border-border md:pr-4">
                     <p className="text-xs text-muted-foreground">Edificios</p>
@@ -173,7 +190,7 @@ export default function DashboardPage() {
                 </div>
                  <div className="col-span-2 md:col-span-1 border-t-2 border-border pt-4 mt-4 md:border-t-0 md:border-l-2 md:pt-0 md:mt-0 md:pl-4">
                     <p className="text-xs text-muted-foreground">Lealtad</p>
-                    <p className="text-lg font-bold">98%</p>
+                    <p className="text-lg font-bold">{playerProfile?.lealtad || 100}%</p>
                 </div>
             </div>
         </Card>
