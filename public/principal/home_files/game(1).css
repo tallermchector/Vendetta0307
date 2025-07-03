@@ -1,0 +1,317 @@
+* {
+	FONT-SIZE: 10pt; FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif
+}
+BODY {
+	PADDING-RIGHT: 0px; 
+	MARGIN-TOP: 1px; 
+	PADDING-LEFT: 0px; 
+	BACKGROUND-ATTACHMENT: fixed; 
+	PADDING-BOTTOM: 0px; 
+	MARGIN-LEFT: 1px; 	
+	COLOR: #ffffff; 
+	SCROLLBAR-ARROW-COLOR: #333333; 
+	PADDING-TOP: 0px; 
+	BACKGROUND-REPEAT: repeat; 
+	SCROLLBAR-BASE-COLOR: #000022; 
+	background-color: #111;
+}
+BODY.login {
+	PADDING-RIGHT: 0px; 
+	MARGIN-TOP: 1px; 
+	PADDING-LEFT: 0px; 
+	BACKGROUND-ATTACHMENT: scroll; 
+	BACKGROUND-IMAGE: url('../resources/img/bg.jpg'); 
+	PADDING-BOTTOM: 0px; 
+	MARGIN-LEFT: 1px; 
+	COLOR: #ffffff; 
+	SCROLLBAR-ARROW-COLOR: #333333; 
+	PADDING-TOP: 0px; 
+	BACKGROUND-REPEAT: repeat; 
+	SCROLLBAR-BASE-COLOR: #000022; 
+	background-color: #111;
+}
+.tooltip {
+	PADDING-RIGHT: 2px; 
+	PADDING-LEFT: 2px; 
+	FONT-SIZE: 12px; 
+	PADDING-BOTTOM: 2px; 	
+	COLOR: #000000; 
+	PADDING-TOP: 2px; 
+	FONT-FAMILY: Tahoma, Arial, Helvetica, sans-serif; 
+	BACKGROUND-COLOR: #ffffe1
+}
+TABLE.tooltip {
+	PADDING-RIGHT: 2px; 
+	PADDING-LEFT: 2px; 
+	FONT-SIZE: 12px; 
+	PADDING-BOTTOM: 2px; 
+	COLOR: #000000; 
+	PADDING-TOP: 2px; 
+	FONT-FAMILY: Tahoma, Arial, Helvetica, sans-serif; 
+	BACKGROUND-COLOR: #ffffe1
+}
+.tooltip_title {
+	FONT-WEIGHT: bold; 	
+	FONT-SIZE: 14px; 
+	COLOR: #ffffff; 
+	BACKGROUND-COLOR: #090909
+}
+.tooltip_shadow {
+	BACKGROUND-COLOR: #090909
+}
+TABLE {
+	BORDER-COLLAPSE: collapse; 
+	border-spacing: 0; 
+	padding: 1px
+}
+TH {
+	PADDING-RIGHT: 5px; 
+	PADDING-LEFT: 5px; 
+	PADDING-BOTTOM: 5px; 
+	PADDING-TOP: 5px
+}
+thx {
+	FILTER: alpha(opacity=90); 
+	-moz-opacity: 0.9
+}
+TH {
+	FONT-WEIGHT: normal; 
+	FONT-SIZE: 10pt; 
+	BACKGROUND: #222; 
+	COLOR: #ffcccc; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	TEXT-ALIGN: center
+}
+TH.asdasda {
+	BACKGROUND: #020202
+}
+TH.a {
+	FONT-SIZE: 10pt; 
+	COLOR: #ffcccc; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif
+}
+TH.fl1 {
+	COLOR: #ff0000
+}
+TH.fl2 {
+	COLOR: #ffff00
+}
+TH.fl3 {
+	COLOR: #00ff00
+}
+TH.gl {
+	FONT-WEIGHT: normal; 
+	FONT-SIZE: 10pt; 
+	COLOR: #000000; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #ffe569; 
+	TEXT-ALIGN: center
+}
+TH.gb {
+	FONT-WEIGHT: normal; 
+	FONT-SIZE: 10pt; 
+	COLOR: #000000; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #ee7000; 
+	TEXT-ALIGN: center
+}
+TH.gb:active {
+	FONT-WEIGHT: normal; 
+	FONT-SIZE: 10pt; 
+	COLOR: #000000; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #ff7000; 
+	TEXT-ALIGN: center
+}
+TH.gl:active {
+	FONT-WEIGHT: normal; 
+	FONT-SIZE: 10pt; COLOR: #000000; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #ff7000; 
+	TEXT-ALIGN: center
+}
+TH.td {
+	FILTER: none; 
+	-moz-opacity: 1
+}
+.a {
+	COLOR: #eeeeee; 
+	TEXT-ALIGN: left
+}
+TD {
+	FONT-SIZE: 10pt; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 	
+	TEXT-ALIGN: center; 
+	FONT-VARIANT: small-caps
+}
+TD.f {
+	FONT-WEIGHT: bold; 
+	FONT-SIZE: 10pt; 
+	COLOR: #000000; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #ff3f3f; 
+	TEXT-ALIGN: center
+}
+TD.g {
+	FONT-WEIGHT: bold; 
+	COLOR: #000000; 
+	BACKGROUND-COLOR: #00ff00; 
+	TEXT-ALIGN: center
+}
+TD.loginc {
+	FONT-WEIGHT: bold; 
+	FONT-SIZE: 10pt; 
+	COLOR: #ffffff; 	
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #6C0000; 
+	TEXT-ALIGN: center
+}
+TD.c {
+	FONT-WEIGHT: bold; 
+	FONT-SIZE: 10pt; 
+	COLOR: #ffcccc; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #6C0000; 
+	TEXT-ALIGN: center
+}
+TD.button {
+	FONT-WEIGHT: bold; 
+	FONT-SIZE: 13pt; 
+	COLOR: #ffcccc; 
+	FONT-FAMILY: Tahoma, Arial,Helvetica,sans-serif; 
+	BACKGROUND-COLOR: #6C0000; 
+	TEXT-ALIGN: center;
+	WIDTH: 45px;
+	HEIGHT: 25px;
+	CURSOR: pointer;
+	BORDER-RADIUS: 5px;
+}
+TD.button.select {
+	COLOR: #6C0000; 
+	BACKGROUND-COLOR: #ffcccc; 
+}
+TD.button:hover {
+	COLOR: #fff400; 
+	BACKGROUND-COLOR: #222222; 
+}
+TD.button.hightlighthc {
+	BACKGROUND-COLOR: #878787
+}
+TD.button.admin {
+	COLOR:Maroon;
+	BACKGROUND-COLOR:yellow;
+}
+TD.button.admin:hover {
+	COLOR: #fff400; 
+	BACKGROUND-COLOR: #222222; 
+}
+TD.th {
+	FONT-WEIGHT: normal; 
+	BACKGROUND: #222222; 
+	COLOR: #eeeeee; 
+	TEXT-ALIGN: center
+}
+TD.thx {
+	FONT-WEIGHT: normal; 
+	BACKGROUND: #111111; 
+	FILTER: alpha(opacity=85); 
+	COLOR: #eeeeee; 
+	TEXT-ALIGN: center; 
+	-moz-opacity: 0.85
+}
+A {
+	FONT-WEIGHT: bold; 
+	FONT-SIZE: 10pt; 
+	COLOR: #ffffff; 
+	TEXT-DECORATION: none
+}
+A.high {
+	COLOR: #fff400
+}
+A:hover {
+	COLOR: #fff400
+}
+B {
+	COLOR: #ffffff
+}
+B.c {
+	COLOR: #ffffff
+}
+B.loginwrong {
+	FONT-SIZE: 11px; COLOR: #ff0000; FONT-FAMILY: Verdana, Arial, sans-serif; TEXT-DECORATION: none
+}
+.valuemail {
+	FONT-SIZE: 8pt
+}
+A.nav {
+	FONT-SIZE: 11px; COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, sans-serif; TEXT-DECORATION: none
+}
+A.nav:link {
+	COLOR: #dfdbc9
+}
+A.sec_nav:visited {
+	COLOR: #dfdbc9
+}
+A.sec_nav:active {
+	COLOR: #dfdbc9
+}
+A.sec_nav:focus {
+	COLOR: #dfdbc9
+}
+A.nav:hover {
+	COLOR: #c17670
+}
+.signupnow {
+	FONT-WEIGHT: bold; FONT-SIZE: 26px; COLOR: #fff; FONT-FAMILY: Arial, Helvetica, sans-serif; FONT-VARIANT: small-caps
+}
+.loginbox {
+	BORDER-RIGHT: #333333 1px solid; BORDER-TOP: #333333 1px solid; FONT-SIZE: 10px; BORDER-LEFT: #333333 1px solid; WIDTH: 100px; BORDER-BOTTOM: #333333 1px solid; FONT-FAMILY: Verdana, Helvetica ,sans-serif; BACKGROUND-COLOR: #f1ebda
+}
+.content_text {
+	FONT-SIZE: 10px; COLOR: #ffffff; FONT-FAMILY: Verdana, Arial, Helvetica, sans-serif; TEXT-ALIGN: left; FONT-VARIANT: normal
+}
+BODY {
+	PADDING-RIGHT: 0px; PADDING-LEFT: 0px; PADDING-BOTTOM: 0px; MARGIN: 0px; COLOR: #dfdbc9; PADDING-TOP: 0px; BACKGROUND-COLOR: #000
+}
+.valigntop {
+	VERTICAL-ALIGN: top
+}
+.time {
+	COLOR: #fff; 
+}
+.positive {
+	FONT-WEIGHT: bold; COLOR: #00c000; FONT-FAMILY: Verdana
+}
+.negative {
+	FONT-WEIGHT: bold; COLOR: #c00000; FONT-FAMILY: Verdana
+}
+.positivec {
+	COLOR: #00c000; 
+}
+.negativec {
+	COLOR: #c00000; 
+}
+.hightlighthc {
+	BACKGROUND-COLOR: #878787
+}
+.hightlightha {
+	BACKGROUND-COLOR: #545454
+}
+.blanket {
+	BACKGROUND-COLOR: black;
+	padding: 4;
+}
+.footna {
+	margin: 5px 0 0 0;
+	display:inline-block;
+}
+.turtle {
+	color: Turquoise;
+}
+DIV.div_page    { width: 910px; height: 100%; margin: 0; padding: 0; display: block; }
+DIV.div_side    { width:  53px; height: 100%; margin: 0; padding: 0; float: left; overflow: hidden;	}
+DIV.div_central { width: 800px; height: 100%; margin: 0; padding: 0; float: left; overflow: hidden;	}
+DIV.div_nav     { width: 140px; height: 100%-141px; margin: 0; padding: 0; float: left; overflow: hidden;	}
+DIV.div_main    { width: 660px; height: 100%-141px; margin: 0; padding: 0; float: left; overflow: hidden;	}
+.dotF { height: 12px; width: 12px; background-color: #ffcccc; border-radius: 50%; display: inline-block; CURSOR: pointer; }
+.dotE {	height: 12px; width: 12px; border: 1px solid #ffcccc; border-radius: 50%; display: inline-block; CURSOR: pointer; }

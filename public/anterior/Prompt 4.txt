@@ -1,0 +1,57 @@
+1. Nombre del Proyecto
+El archivo SQL se refiere a la base de datos como vendetta_plus_old.
+Varias URL y comentarios hacen referencia a "vendetta".
+El término "mob" aparece en todas las tablas, lo que podría hacer referencia a una temática mafiosa o de bandas organizadas.
+Inferencia:
+El nombre del proyecto/juego parece ser “Vendetta Plus” o simplemente “Vendetta”.
+
+2. Stack Tecnológico
+Lenguaje de programación:
+El archivo gameconfig.php está escrito en PHP.
+Base de datos:
+El archivo vendetta_plus_old.sql es un volcado de una base de datos MySQL, compatible con phpMyAdmin.
+Otros detalles:
+Uso de arrays y estructuras típicas de PHP para la configuración.
+Tablas y comentarios en español.
+Stack principal:
+
+Backend: PHP
+Base de datos: MySQL
+(Probablemente frontend clásico PHP, aunque puede haber algo de JS).
+3. Descripción General y Mecánicas Fundamentales
+a) Objetivo principal del juego
+El juego es un “MMO de estrategia mafiosa” o “juego de mafias por turnos”.
+Los jugadores gestionan edificios, recursos y tropas, entrenan habilidades, forman clanes (“familias”) y compiten entre sí.
+Se pueden construir y mejorar habitaciones (oficina, armería, taberna, etc.), entrenar tropas especializadas, realizar misiones, comerciar, participar en guerras y enviar mensajes a otros jugadores.
+b) Mecánicas según la base de datos y configuración
+Edificios y habitaciones:
+
+Cada usuario puede poseer varios edificios, cada uno con coordenadas únicas y habitaciones especializadas (oficina, armería, escuela, cervecería, etc.).
+Las habitaciones otorgan diferentes ventajas: producción de recursos, entrenamiento, almacenamiento, defensa, etc.
+Recursos:
+
+Recursos principales: armas (“arm”), munición (“mun”), alcohol (“alc”), dólares (“dol”).
+Las habitaciones y ciertas acciones producen o consumen recursos.
+Tropas y entrenamientos:
+
+Diversos tipos de tropas: matón, portero, pistolero, espía, mercenario, etc., cada una con atributos de ataque, defensa, capacidad, velocidad, salario y requisitos para su entrenamiento o producción.
+Entrenamientos mejoran habilidades específicas (espionaje, combate, administración, extorsión, etc.).
+Familias (clanes):
+
+Los jugadores pueden unirse a familias, que tienen roles y rangos, mensajes internos y pueden declarar guerras a otras familias.
+Batallas y misiones:
+
+Sistema de batallas entre jugadores y familias, con registros de ataques, defensas, resultados y recursos saqueados.
+Misiones con envío de tropas, cálculo de tiempos y recursos implicados.
+Mensajería y chat:
+
+Sistema de mensajería interna y chat entre jugadores.
+Economía y mercado:
+
+Sistema de mercado para comercio de recursos entre jugadores.
+Premium:
+
+Sistema de usuarios premium, probablemente con ventajas u objetos especiales.
+Resumen del flujo de juego:
+El jugador desarrolla su base, construye y mejora habitaciones, produce y gestiona recursos, entrena tropas, se agrupa en familias, participa en guerras/misiones y puede comerciar o comunicarse con otros jugadores.
+

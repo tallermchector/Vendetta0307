@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Vendetta2X</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700">
+  <style>
+    body {
+      background-color: #181818;
+      /* Dark background */
+      color: #e0e0e0;
+      /* Light gray text */
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: #282c34;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      width: 400px;
+      text-align: center;
+    }
+
+    .login-container img {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #444;
+      border-radius: 5px;
+      background-color: #282c34;
+      color: #e0e0e0;
+    }
+
+    .login-form button {
+      background-color: #007bff;
+      /* Primary blue */
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-form button:hover {
+      background-color: #0056b3;
+      /* Darker blue on hover */
+    }
+
+    .login-form a {
+      color: #007bff;
+      /* Primary blue for links */
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .login-form a:hover {
+      text-decoration: underline;
+    }
+
+    .language-flags {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .language-flags img {
+      height: 20px;
+      margin: 0 5px;
+    }
+
+    .login-form .w3-padding {
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-container">
+    <img src="./login_files/Logo.png" alt="Vendetta2X Logo">
+    <form class="login-form" action="https://vendetta2x.servegame.com/index.php" method="POST">
+      <input type="hidden" name="l" value="0">
+      <input type="text" placeholder="Loginname" name="ln" required>
+      <input type="password" placeholder="Password" name="pw" required>
+      <button type="submit">Login</button>
+
+      <div class="language-flags">
+        <a href="https://vendetta2x.servegame.com/index.php?l=0"><img src="./login_files/FlagEN.gif" alt="English"></a>
+        <a href="https://vendetta2x.servegame.com/index.php?l=1"><img src="./login_files/FlagIT.gif" alt="Italian"></a>
+        <a href="https://vendetta2x.servegame.com/index.php?l=2"><img src="./login_files/FlagDE.gif" alt="German"></a>
+        <a href="https://vendetta2x.servegame.com/index.php?l=3"><img src="./login_files/FlagPL.gif" alt="Polish"></a>
+        <a href="https://vendetta2x.servegame.com/index.php?l=4"><img src="./login_files/FlagES.gif" alt="Spanish"></a>
+        <a href="https://vendetta2x.servegame.com/index.php?l=5"><img src="./login_files/FlagFR.gif" alt="French"></a>
+      </div>
+
+      <div class="w3-padding">
+        <a href="https://vendetta2x.servegame.com/version.php?l=0">changelog</a><br>
+        <a href="https://vendetta2x.servegame.com/register.php?l=0">Register</a>
+        <a href="https://vendetta2x.servegame.com/registerstatus.php?l=0">Forgot password?</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="./login_files/timer.js.descarga"></script>
+</body>
+
+</html>

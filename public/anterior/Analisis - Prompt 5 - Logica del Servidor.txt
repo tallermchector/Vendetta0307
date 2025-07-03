@@ -1,0 +1,62 @@
+# Análisis de la Lógica del Servidor (Backend)
+
+Este documento describe el funcionamiento inferido de las mecánicas clave del lado del servidor, basándose en el análisis combinado de `vendetta_plus_old.sql` y `gameconfig.php`.
+
+---
+
+### 1. Sistema de Actualización de Recursos
+
+El método para actualizar los recursos del jugador (armas, munición, alcohol, etc.) parece ser un **cálculo dinámico que se ejecuta cada vez que el jugador interactúa con el servidor (por ejemplo, al cargar una página)**, en lugar de una tarea programada (cron job) que se ejecuta a intervalos fijos.
+
+**Evidencia y Flujo Lógico:**
+
+*   **Pista Clave:** La tabla `resources` en el esquema SQL original (y su equivalente `PlayerResources` en el nuevo esquema de Prisma) contiene un campo de timestamp como `last_update` o `ultima_actualizacion`. Este campo es el indicador principal de este método. Su propósito es registrar la última vez que los recursos del jugador fueron calculados y actualizados.
+
+*   **Flujo de Ejecución Inferido:**
+    1.  **Solicitud del Usuario:** Un jugador realiza una acción que requiere una vista actualizada de sus recursos (cargar el dashboard, entrar a la página de edificios, etc.).
+    2.  **Obtención de Timestamps:** El servidor obtiene dos valores de tiempo:
+        *   El timestamp actual (`now()`).
+        *   El timestamp de `ultima_actualizacion` almacenado en la base de datos para ese usuario.
+    3.  **Cálculo del Tiempo Transcurrido:** Se calcula la diferencia en segundos entre el timestamp actual y el de la última actualización. `tiempo_transcurrido = now() - ultima_actualizacion`.
+    4.  **Cálculo de la Producción:**
+        *   El servidor consulta los niveles de todos los edificios de producción del jugador (ej: Cervecería nivel 5, Fábrica de Municiones nivel 3).
+        *   Utilizando la configuración de `gameconfig.php`, se calcula la producción total por segundo para cada tipo de recurso (ej: `produccion_alcohol_por_segundo`). Este cálculo toma en cuenta el nivel de cada edificio y, posiblemente, otros factores como tecnologías o bonificaciones.
+    5.  **Cálculo de Recursos Generados:** Se multiplican la producción por segundo por el tiempo transcurrido: `recursos_generados = produccion_por_segundo * tiempo_transcurrido`.
+    6.  **Actualización en la Base de Datos:** Se ejecuta una transacción en la base de datos que realiza dos acciones atómicas:
+        *   Añade los `recursos_generados` a los recursos existentes del jugador.
+        *   Actualiza el campo `ultima_actualizacion` al timestamp actual (`now()`).
+
+Este método es muy eficiente para juegos de navegador, ya que solo realiza cálculos para jugadores activos, evitando la carga de un cron job que tendría que actualizar a miles de usuarios inactivos constantemente.
+
+---
+
+### 2. Proceso de Construcción de Edificios
+
+El proceso de construcción o mejora de un edificio es un flujo de trabajo que involucra validaciones, gestión de colas y actualizaciones diferidas en el tiempo.
+
+**Evidencia y Flujo Lógico:**
+
+*   **Pista Clave:** La existencia de una tabla como `b_building` en el archivo SQL. Esta tabla no almacena el estado final de los edificios, sino que actúa como una **tabla de trabajos o cola de construcción**. Sus columnas (`id_usuario`, `id_edificio`, `nivel`, `fecha`) son clave:
+    *   `id_edificio`: Qué se está construyendo.
+    *   `nivel`: A qué nivel se está mejorando.
+    *   `fecha`: El timestamp exacto en que la construcción finalizará.
+
+*   **Flujo de Ejecución Inferido:**
+    1.  **Inicio de la Construcción (Acción del Usuario):**
+        *   El jugador hace clic en "Construir" o "Ampliar".
+        *   El frontend envía una solicitud al servidor con el ID del edificio a construir/mejorar.
+    2.  **Validación en el Servidor:**
+        *   **Requisitos de Recursos:** El servidor consulta `gameconfig.php` para obtener el costo del edificio al nivel deseado. Compara este costo con los recursos actuales del jugador (después de realizar el cálculo dinámico de actualización mencionado en el punto anterior). Si los recursos son insuficientes, devuelve un error.
+        *   **Requisitos de Edificios/Tecnología:** El servidor comprueba si se cumplen otros requisitos (ej: necesitas una Oficina a nivel 5 para construir una Armería).
+        *   **Disponibilidad de la Cola:** El servidor verifica si hay un espacio disponible en la cola de construcción.
+    3.  **Creación del Trabajo de Construcción:**
+        *   Si todas las validaciones pasan, el servidor deduce inmediatamente los recursos de la cuenta del jugador.
+        *   Calcula el tiempo de finalización basándose en fórmulas de `gameconfig.php`. `tiempo_finalizacion = now() + duracion_construccion`.
+        *   Inserta una nueva fila en la tabla `b_building` con el `id_usuario`, `id_edificio`, el `nivel` objetivo y el `tiempo_finalizacion`.
+    4.  **Finalización de la Construcción:**
+        *   Un proceso en el servidor (ya sea un cron job que se ejecuta cada minuto, o más probablemente, una comprobación que se ejecuta en cada solicitud del usuario) revisa la tabla `b_building`.
+        *   Busca todas las entradas donde `fecha` (el tiempo de finalización) sea menor o igual al tiempo actual.
+        *   Para cada trabajo finalizado, el servidor:
+            a. Actualiza la tabla principal de edificios del jugador (`habitaciones` en el esquema antiguo) incrementando el nivel del edificio correspondiente (ej: `UPDATE habitaciones SET oficina = oficina + 1 WHERE id_usuario = ...`).
+            b. Elimina la entrada del trabajo completado de la tabla `b_building`.
+        *   La interfaz del usuario se actualiza en la siguiente carga de página para reflejar el nuevo nivel del edificio.

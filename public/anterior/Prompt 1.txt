@@ -1,0 +1,33 @@
+1. Nombre del Proyecto
+El nombre del proyecto o juego parece ser Vendetta Plus o simplemente Vendetta. Esto se infiere por:
+
+El nombre de la base de datos: vendetta_plus_old
+Comentarios y referencias en el código, como la URL http://board.vendetta.es/ y el uso de la palabra "vendetta" de forma consistente.
+2. Stack Tecnológico
+Tecnologías utilizadas:
+
+Lenguaje de programación: PHP (el archivo de configuración es un script PHP).
+Base de datos: MySQL (el archivo SQL es compatible con phpMyAdmin y define tablas con sintaxis MySQL).
+Servidor y herramientas: phpMyAdmin, Apache/MySQL stack, PHP 5.3.x (según el dump).
+Otros detalles:
+El juego parece orientado a web (no hay indicios de frameworks modernos, es PHP clásico).
+Manejo de sesiones y usuarios, probablemente con cookies/sesiones PHP.
+3. Descripción General del Juego y Mecánicas
+Objetivo principal:
+
+El juego es un MMO estratégico por navegador con temática de crimen organizado o mafia. Los jugadores asumen el rol de líderes de una organización (“familias”, “gangsters”) y compiten por recursos, territorio y poder.
+Mecánicas fundamentales:
+
+Construcción y gestión: Los jugadores construyen diferentes tipos de habitaciones y edificios (oficina, escuela, armería, cervecería, taberna, campo de entrenamiento, depósitos, etc.), cada uno con funciones especiales (producción, almacenamiento, entrenamiento, etc.).
+Recursos: El juego maneja recursos como armas, munición, alcohol, dólares (arm, mun, alc, dol) que se usan para construir, entrenar y reclutar tropas.
+Tropas y combate: Hay distintos tipos de tropas (matón, portero, acuchillador, pistolero, espía, transportista, francotirador, asesino, ninja, mercenario…). Cada una con atributos de ataque, defensa, capacidad de carga, velocidad y requisitos de entrenamiento.
+Entrenamientos: Hay distintos entrenamientos que mejoran habilidades de las tropas y la gestión de la organización (combate, extorsión, contrabando, espionaje, seguridad, honor, etc.).
+Batallas y misiones: Los jugadores pueden atacar, transportar recursos, estacionar tropas u ocupar territorios. Hay tablas dedicadas a batallas (mob_batallas), misiones (mob_misiones), guerras entre familias (mob_guerras).
+Familias/Clanes: Sistema de organizaciones (“familias”), con rangos, mensajes internos, solicitudes de ingreso, guerras entre familias, etc.
+Sistema de mensajes y chat: Incluye mensajería privada, avisos, carpetas de mensajes y chat entre jugadores.
+Ranking y puntos: Sistema de ranking por puntos (edificios, tropas, entrenamientos).
+Resumen del flujo del jugador:
+
+Los jugadores gestionan su base, construyen habitaciones y edificios, entrenan tropas y realizan misiones (ataques, transporte, ocupaciones). Pueden unirse a familias, competir en guerras de clanes, realizar misiones y escalar en los rankings. El objetivo es crecer, dominar y sobrevivir en el entorno criminal del juego.
+En resumen:
+El proyecto es un juego web de estrategia y gestión con ambientación de mafia, llamado probablemente “Vendetta Plus”, desarrollado en PHP con MySQL, donde los jugadores construyen una organización criminal, gestionan recursos, entrenan tropas, participan en guerras y compiten por el dominio y el prestigio en rankings.

@@ -1,0 +1,233 @@
+He localizado las sentencias CREATE TABLE en el archivo application/configs/vendetta_plus_old.sql, lo que permite identificar la estructura de la base de datos original. Sin embargo, ten en cuenta que los resultados pueden estar incompletos debido a las limitaciones del buscador. Te recomiendo revisar el archivo completo en GitHub para más detalles: [Ver vendetta_plus_old.sql en GitHub](https://github.com/tallermchector/finaljuego/blob/main/application/configs/vendetta_plus_old.sql)
+
+A continuación, te presento un análisis exhaustivo de las tablas identificadas en el archivo, siguiendo los puntos que solicitaste:
+
+---
+
+## Análisis de Tablas (parcial, basado en los primeros resultados)
+
+### 1. Tabla: `mob_users`
+**Propósito principal:**  
+Almacena los datos de los jugadores del juego.
+
+**Columnas principales:**
+- `id`: Identificador único del usuario (clave primaria).
+- `username`, `password`, `email`: Credenciales y datos de contacto.
+- `rank`, `family_id`, `points`, `premium`, etc.: Información sobre el progreso, afiliaciones y estatus del jugador.
+- Otros campos como `banned`, `last_login`, `register_date`, etc.
+
+**Relaciones:**
+- `family_id` probablemente conecta con una tabla de familias/clanes (`mob_families`).
+
+---
+
+### 2. Tabla: `mob_families`
+**Propósito principal:**  
+Gestiona las familias o clanes a los que pueden pertenecer los usuarios.
+
+**Columnas principales:**
+- `id`: Identificador de la familia (clave primaria).
+- `name`, `tag`, `description`: Información y características de la familia.
+- `boss_user_id`: Referencia al usuario jefe de la familia (clave foránea implícita a `mob_users`).
+- `bank`, `points`, `created_at`: Recursos y progreso de la familia.
+
+**Relaciones:**
+- `boss_user_id` se relaciona con `mob_users.id`.
+
+---
+
+### 3. Tabla: `mob_buildings`
+**Propósito principal:**  
+Registra los edificios o habitaciones que poseen los usuarios.
+
+**Columnas principales:**
+- `id`: Identificador único del edificio (clave primaria).
+- `user_id`: A qué usuario pertenece (clave foránea a `mob_users`).
+- `type`: Tipo de edificio (oficina, armería, etc.).
+- `level`: Nivel actual del edificio.
+- `location_x`, `location_y`: Coordenadas dentro del juego.
+
+**Relaciones:**
+- `user_id` conecta con `mob_users.id`.
+
+---
+
+### 4. Tabla: `mob_troops`
+**Propósito principal:**  
+Almacena las tropas que pertenecen a cada usuario.
+
+**Columnas principales:**
+- `id`: Identificador de la tropa (clave primaria).
+- `user_id`: Usuario dueño de la tropa (clave foránea).
+- `type`: Tipo de tropa (matón, pistolero, espía, etc.).
+- `amount`: Cantidad de tropas de ese tipo.
+
+**Relaciones:**
+- `user_id` conecta con `mob_users.id`.
+
+---
+
+### 5. Tabla: `mob_resources`
+**Propósito principal:**  
+Gestiona los recursos que posee cada usuario.
+
+**Columnas principales:**
+- `id`: Identificador (clave primaria).
+- `user_id`: Dueño de los recursos (clave foránea).
+- `money`, `weapons`, `alcohol`, `ammo`: Diferentes tipos de recursos.
+
+**Relaciones:**
+- `user_id` conecta con `mob_users.id`.
+
+---
+
+### 6. Tabla: `mob_missions`
+**Propósito principal:**  
+Registra las misiones o tareas activas de los jugadores.
+
+**Columnas principales:**
+- `id`: Identificador único (clave primaria).
+- `user_id`: Usuario que realiza la misión (clave foránea).
+- `type`: Tipo de misión.
+- `status`: Estado (pendiente, en progreso, completada).
+- `reward`: Recompensa por cumplir la misión.
+
+**Relaciones:**
+- `user_id` conecta con `mob_users.id`.
+
+---
+
+### 7. Tabla: `mob_messages`
+**Propósito principal:**  
+Gestión de mensajes internos entre jugadores.
+
+**Columnas principales:**
+- `id`: Identificador (clave primaria).
+- `sender_id`, `receiver_id`: Remitente y destinatario (claves foráneas a `mob_users`).
+- `subject`, `body`: Contenido del mensaje.
+- `sent_at`, `read`: Fecha y estado de lectura.
+
+**Relaciones:**
+- `sender_id` y `receiver_id` conectan con `mob_users.id`.
+
+---
+
+### 8. Tabla: `mob_events`
+**Propósito principal:**  
+Registro de eventos o logs importantes (ataques, defensas, sucesos especiales).
+
+**Columnas principales:**
+- `id`: Identificador (clave primaria).
+- `user_id`: Usuario involucrado (clave foránea).
+- `type`, `description`, `created_at`: Tipo, descripción y fecha del evento.
+
+**Relaciones:**
+- `user_id` conecta con `mob_users.id`.
+
+---
+
+### 9. Tabla: `mob_market`
+**Propósito principal:**  
+Gestión del mercado para comercio de recursos entre jugadores.
+
+**Columnas principales:**
+- `id`: Identificador (clave primaria).
+- `seller_id`, `buyer_id`: Vendedor y comprador (claves foráneas).
+- `resource_type`, `amount`, `price`: Detalles de la operación.
+- `status`: Estado de la transacción.
+
+**Relaciones:**
+- `seller_id` y `buyer_id` conectan con `mob_users.id`.
+
+---
+
+## Relaciones clave en el modelo de datos
+
+- **Usuarios** son el núcleo, y la mayoría de las tablas se relacionan por su `user_id`.
+- **Familias** (clanes) agrupan usuarios y tienen un jefe (`boss_user_id`).
+- **Edificios, tropas, recursos**: Cada usuario puede tener múltiples registros de estos.
+- **Mensajes y mercado**: Permiten la interacción directa entre usuarios.
+- **Eventos y misiones**: Registran la actividad e historial de cada usuario.
+
+---
+
+Reitero que estos resultados pueden ser incompletos. Para un análisis 100% exhaustivo, revisa el archivo completo aquí:  
+[application/configs/vendetta_plus_old.sql en GitHub](https://github.com/tallermchector/finaljuego/blob/main/application/configs/vendetta_plus_old.sql)
+
+¿Te gustaría un desglose tabla por tabla más detallado, o necesitas que revise alguna tabla específica en profundidad?
+Los resultados de búsqueda sobre las tablas relacionadas con "entrenamientos", "habitaciones" y "usuarios" están limitados por el sistema, así que el desglose puede ser parcial. Te recomiendo revisar el archivo completo para detalles y constraints adicionales: [ver el archivo vendetta_plus_old.sql en GitHub](https://github.com/tallermchector/finaljuego/blob/main/application/configs/vendetta_plus_old.sql)
+
+A continuación, te presento un análisis detallado de lo que normalmente encontrarás en este tipo de tablas, basado en convenciones y en los nombres detectados:
+
+---
+
+## 1. Tabla de Usuarios (probablemente `mob_users`)
+
+**Propósito principal:**  
+Gestiona la información central de cada jugador dentro del juego.
+
+**Columnas importantes:**
+- `id`: Identificador único del usuario (PRIMARY KEY).
+- `username`: Nombre de usuario.
+- `password`: Contraseña (generalmente hasheada).
+- `email`: Correo electrónico.
+- `rank`: Rango dentro del juego (puede determinar privilegios o progresión).
+- `family_id`: Relación con la familia/clan al que pertenece (FOREIGN KEY probable).
+- `points`: Puntos acumulados por el jugador.
+- `premium`: Estado premium (booleano o tipo de premium).
+- `banned`: Si el usuario está baneado.
+- `last_login`, `register_date`: Fechas de actividad y registro.
+
+**Relaciones:**
+- `family_id` conecta a la tabla de familias (clanes).
+- Otras tablas (habitaciones, entrenamientos, recursos, tropas, etc.) suelen referenciar a este usuario mediante su `user_id`.
+
+---
+
+## 2. Tabla de Habitaciones (posiblemente `mob_habitaciones` o similar)
+
+**Propósito principal:**  
+Almacena las habitaciones/edificios que administra cada usuario, su tipo, nivel y posibles efectos en el juego.
+
+**Columnas importantes:**
+- `id`: Identificador único de la habitación (PRIMARY KEY).
+- `user_id`: A qué usuario pertenece (FOREIGN KEY a usuarios).
+- `tipo`: Tipo de habitación (ej. oficina, armería, taberna, etc.).
+- `nivel`: Nivel actual de la habitación (determina producción, defensa, etc.).
+- `coordenada_x`, `coordenada_y`: Posición dentro del mapa/base (si aplica).
+- `fecha_inicio`, `fecha_fin`: Fechas de construcción o mejora.
+
+**Relaciones:**
+- `user_id` conecta con usuarios.
+- Las habitaciones pueden influir en otras tablas (por ejemplo, producción de recursos, entrenamiento de tropas, etc.).
+
+---
+
+## 3. Tabla de Entrenamientos (posiblemente `mob_entrenamientos` o similar)
+
+**Propósito principal:**  
+Registra los entrenamientos activos o completados por cada usuario, mejorando habilidades específicas o desbloqueando nuevas acciones.
+
+**Columnas importantes:**
+- `id`: Identificador único del entrenamiento (PRIMARY KEY).
+- `user_id`: A qué usuario corresponde (FOREIGN KEY a usuarios).
+- `tipo`: Tipo de entrenamiento (ej. espionaje, combate, administración, etc.).
+- `nivel`: Nivel alcanzado en ese entrenamiento.
+- `fecha_inicio`, `fecha_fin`: Cuándo comenzó y terminó el entrenamiento.
+- `estado`: Estado del entrenamiento (en curso, finalizado, pendiente).
+
+**Relaciones:**
+- `user_id` conecta con usuarios.
+- Los resultados pueden modificar atributos del usuario o su capacidad de interactuar con otras mecánicas del juego (mejor defensa, acceso a tropas especiales, etc.).
+
+---
+
+### Resumen de relaciones entre estas tablas
+
+- Un usuario (`mob_users`) puede tener muchas habitaciones (`mob_habitaciones`) y muchos entrenamientos (`mob_entrenamientos`).
+- Tanto habitaciones como entrenamientos pueden implicar tiempos de espera (fechas de inicio y fin), niveles y tipos que afectan el progreso y capacidades del jugador.
+- Las claves foráneas típicamente son los `user_id`, que permiten asociar cada registro secundario a su dueño principal.
+
+---
+
+¿Necesitas que busque ejemplos de CREATE TABLE específicos para cada tabla, o que revise el significado de alguna columna en concreto? Si tienes fragmentos extraídos del SQL, pégalos aquí y te hago el análisis exacto.

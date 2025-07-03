@@ -1,0 +1,49 @@
+# Análisis del Prompt 1: Visión General del Proyecto "Vendetta"
+
+**Fecha de Análisis:** 2024-07-28
+**Archivos Fuente:** `public/anterior/configs/vendetta_plus_old.sql`, `public/anterior/configs/gameconfig.php`
+
+---
+
+### **1. Nombre del Proyecto**
+
+El nombre del proyecto se infiere claramente como **"Vendetta"** o una versión extendida como **"Vendetta Plus"**. Esta conclusión se basa en:
+*   El nombre del archivo de volcado de la base de datos: `vendetta_plus_old.sql`.
+*   El contexto proporcionado anteriormente sobre la estructura de idiomas (`/languages/vendetta/es.php`).
+*   La temática general del juego, que gira en torno a la venganza y el conflicto entre facciones.
+
+---
+
+### **2. Stack Tecnológico**
+
+El stack tecnológico utilizado en el proyecto anterior parece ser una combinación clásica de desarrollo web de la época:
+
+*   **Lenguaje de Backend:** **PHP**. La presencia y estructura del archivo `gameconfig.php` es un indicador inequívoco. Este archivo define variables y arrays de configuración que son idiomáticos de PHP.
+*   **Base de Datos:** **MySQL** o un derivado compatible como **MariaDB**. El archivo `.sql` contiene sintaxis `CREATE TABLE` y `INSERT INTO` estándar de MySQL. El uso de `ENGINE=InnoDB` y `DEFAULT CHARSET=utf8` refuerza esta conclusión.
+
+---
+
+### **3. Descripción General del Juego**
+
+**Objetivo Principal:**
+"Vendetta" es un **juego de estrategia y gestión de recursos multijugador masivo en línea (MMORTS)** con una temática de crimen organizado o mafias modernas. El objetivo del jugador es ascender en el poder, expandir su imperio criminal y dominar a otros jugadores.
+
+**Mecánicas Fundamentales:**
+El juego se centra en un ciclo de gestión, construcción y conflicto:
+
+1.  **Gestión de Recursos:** Los jugadores deben recolectar, producir y gestionar cuatro recursos principales, como se define en `gameconfig.php` y en la estructura de la base de datos: Armas, Munición, Alcohol y Dólares. Estos recursos son la sangre vital de la economía del juego.
+
+2.  **Construcción y Desarrollo:** Los jugadores poseen una o más "propiedades" o "habitaciones" donde pueden construir y mejorar una variedad de edificios. Cada edificio (`oficina`, `armeria`, `cerveceria`, `escuela de gángsters`, etc.) tiene un propósito específico:
+    *   Generar recursos.
+    *   Almacenar recursos.
+    *   Reclutar y entrenar unidades (tropas).
+    *   Investigar tecnologías.
+    *   Mejorar las defensas.
+    Los costes de construcción y los tiempos de mejora se definen en `gameconfig.php`, indicando un sistema de progresión basado en niveles.
+
+3.  **Sistema de Unidades:** Aunque no se detalla explícitamente en estos archivos, la existencia de edificios como "Escuela de Gángsters" y "Armería" implica que los jugadores pueden reclutar diferentes tipos de unidades para atacar a otros jugadores, defender sus propiedades y completar misiones.
+
+4.  **Competición y Ranking:** La base de datos incluye campos para `puntos` y `ranking`, lo que confirma que hay un sistema de clasificación global. Los jugadores compiten por acumular la mayor cantidad de puntos, que se obtienen a través de la construcción, el reclutamiento de tropas y, probablemente, el combate.
+
+**Propósito del Juego:**
+El propósito es crear un entorno competitivo y estratégico donde los jugadores deben tomar decisiones inteligentes sobre la gestión de sus recursos y el desarrollo de su imperio para superar a sus rivales. La combinación de desarrollo económico, estrategia militar y, posiblemente, alianzas (sugerido por el concepto de "Familia") crea una experiencia de juego compleja y a largo plazo.

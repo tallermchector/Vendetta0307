@@ -1,30 +1,32 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { MoveRight } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
-      <div className="text-center p-8 max-w-2xl">
-        <h1 className="text-5xl md:text-7xl font-headline font-bold text-primary mb-4">
-          Vendetta Latino
+    <main className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-background overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full bg-primary/[0.03] [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      <div className="z-10 flex flex-col items-center">
+        <h1 className="text-6xl md:text-8xl font-bold font-headline text-transparent bg-clip-text bg-gradient-to-b from-neutral-50 to-neutral-400">
+          Vendetta 01
         </h1>
-        <p className="text-lg md:text-xl text-muted-foreground mb-8">
-          Bienvenido a la nueva generación de juegos de estrategia. Regístrate o inicia sesión para comenzar tu conquista.
+        <p className="mt-4 max-w-lg text-lg text-muted-foreground">
+          Entra en un mundo de intriga y conflicto. Tu historia comienza ahora.
         </p>
-        <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button asChild size="lg" className="font-headline">
-            <Link href="/login">Iniciar Sesión</Link>
-          </Button>
-          <Button
-            asChild
-            variant="secondary"
-            size="lg"
-            className="font-headline"
-          >
-            <Link href="/register">Regístrate</Link>
-          </Button>
+        <div className="mt-8 flex flex-col sm:flex-row items-center gap-4">
+          <Link href="/register" passHref>
+            <Button size="lg" className="w-48 bg-primary hover:bg-primary/90 text-primary-foreground">
+              Únete a la lucha
+              <MoveRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
+          <Link href="/login" passHref>
+            <Button size="lg" variant="outline" className="w-48 border-primary text-primary hover:bg-primary/10 hover:text-primary">
+              Iniciar sesión
+            </Button>
+          </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

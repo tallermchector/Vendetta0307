@@ -1,0 +1,67 @@
+v=getCETorCESTDate(Date.now());
+var smode = document.getElementById('clock').getAttribute('smode');
+var bxlimit = document.getElementById('bx').getAttribute('data-value');
+var ServerTimeOffset = 0;
+var FleetTimeOffset = 0;
+function timercount() {
+	if ( document.getElementById('clock') ) {
+		n=getCETorCESTDate(Date.now()+ServerTimeOffset);
+		if(smode==0) { document.getElementById('clock').innerHTML = n.getFullYear()  + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2) + " " + ('0' + n.getHours()).slice(-2) + ":" + ('0' + n.getMinutes()).slice(-2) + ":" + ('0' + n.getSeconds()).slice(-2); }
+		if(smode==1) { document.getElementById('clock').innerHTML = ('0' + n.getDate()).slice(-2)  + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + n.getFullYear() + " " + ('0' + n.getHours()).slice(-2) + ":" + ('0' + n.getMinutes()).slice(-2) + ":" + ('0' + n.getSeconds()).slice(-2); }
+		if(smode==2) { document.getElementById('clock').innerHTML = ('0' + (n.getMonth()+1)).slice(-2)  + "-" + ('0' + n.getDate()).slice(-2) + "-" + n.getFullYear() + " " + ('0' + n.getHours()).slice(-2) + ":" + ('0' + n.getMinutes()).slice(-2) + ":" + ('0' + n.getSeconds()).slice(-2); }
+	}
+	if ( document.getElementById('clockF') ) {
+		n=getCETorCESTDate(Date.now()+ServerTimeOffset+FleetTimeOffset);
+		if(smode==0) { document.getElementById('clockF').innerHTML = n.getFullYear()  + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + ('0' + n.getDate()).slice(-2) + " " + ('0' + n.getHours()).slice(-2) + ":" + ('0' + n.getMinutes()).slice(-2) + ":" + ('0' + n.getSeconds()).slice(-2); }
+		if(smode==1) { document.getElementById('clockF').innerHTML = ('0' + n.getDate()).slice(-2)  + "-" + ('0' + (n.getMonth()+1)).slice(-2) + "-" + n.getFullYear() + " " + ('0' + n.getHours()).slice(-2) + ":" + ('0' + n.getMinutes()).slice(-2) + ":" + ('0' + n.getSeconds()).slice(-2); }
+		if(smode==2) { document.getElementById('clockF').innerHTML = ('0' + (n.getMonth()+1)).slice(-2)  + "-" + ('0' + n.getDate()).slice(-2) + "-" + n.getFullYear() + " " + ('0' + n.getHours()).slice(-2) + ":" + ('0' + n.getMinutes()).slice(-2) + ":" + ('0' + n.getSeconds()).slice(-2); }
+	}
+	n=getCETorCESTDate(Date.now());
+	for (i = 0; i < bxlimit; i++) { 
+		s=document.getElementById('bx'+i).getAttribute('data-timer')-Math.round((n.getTime()-v.getTime())/1000);
+		m=0; h=0; d=0;
+		if(s<0) {
+			document.getElementById('bx'+i).innerHTML='00:00:00';
+			//self.location = self.location.pathname;
+		} else {
+			if(s>59) { m=Math.floor(s/60); s=s-m*60; }
+			if(m>59) { h=Math.floor(m/60); m=m-h*60; } 
+			if(h>23) { d=Math.floor(h/24); h=h-d*24; }
+			b=('0'+h).slice(-2)+":"+('0'+m).slice(-2)+":"+('0'+s).slice(-2);
+			if(d==0) { document.getElementById('bx'+i).innerHTML=b; }
+			if(d==1) { document.getElementById('bx'+i).innerHTML=d+" "+document.getElementById('bxday').getAttribute('data-value')+", "+b; }
+			if(d>1)  { document.getElementById('bx'+i).innerHTML=d+" "+document.getElementById('bxdays').getAttribute('data-value')+", "+b;}
+		}
+	}
+	window.setTimeout("timercount();",1000);
+} 
+function getCETorCESTDate(DateTime) {
+    var localDate = new Date(DateTime);
+    var utcOffset = localDate.getTimezoneOffset();
+    var cetOffset = utcOffset + 60;
+    var cestOffset = utcOffset + 120;
+    var cetOffsetInMilliseconds = cetOffset * 60 * 1000;
+    var cestOffsetInMilliseconds = cestOffset * 60 * 1000;
+
+    var cestDateStart = new Date(DateTime);
+    var cestDateFinish = new Date(DateTime);
+    var localDateTime = localDate.getTime();
+    var cestDateStartTime;
+    var cestDateFinishTime;
+    var result;
+
+    cestDateStart.setTime(Date.parse('31 March ' + localDate.getFullYear() + ' 02:00:00 GMT+0100'));
+    cestDateFinish.setTime(Date.parse('27 October ' + localDate.getFullYear() + ' 03:00:00 GMT+0200'));
+
+    cestDateStartTime = cestDateStart.getTime();
+    cestDateFinishTime = cestDateFinish.getTime();
+
+    if(localDateTime >= cestDateStartTime && localDateTime <= cestDateFinishTime) {
+        result = new Date(localDateTime + cestOffsetInMilliseconds);
+    } else {
+        result = new Date(localDateTime + cetOffsetInMilliseconds);
+    }
+
+    return result;
+}
+window.onload=timercount;

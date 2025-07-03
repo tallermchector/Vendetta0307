@@ -1,0 +1,33 @@
+function popup(url) {
+	var popup = window.open(url, 'popup', 'width=550, height=500, border=0, resizable=no, menubar=no, locationbar=no, status=no, hotkeys=no');
+	popup.focus();
+}
+function applyCoords(c0, c1, c2) {
+	for(var i = 0; i < document.forms.length; i++) {
+		for(var a = 0; a <document.forms[i].elements.length; a++) {
+			switch(document.forms[i].elements[a].name) {
+				case 'C0':
+					document.forms[i].elements[a].value = c0;
+					break;
+				case 'C1':
+					document.forms[i].elements[a].value = c1;
+					break;
+				case 'C2':
+					document.forms[i].elements[a].value = c2;
+					break;
+			}
+		}
+	}
+}
+function HideShowDiv(classid) {
+	var x = document.getElementsByClassName(classid);
+	if (x[0].style.display === "none") {
+		for (var i = 0; i < x.length; i ++) {
+		    x[i].style.display = 'block';
+		}
+    } else {
+		for (var i = 0; i < x.length; i ++) {
+		    x[i].style.display = 'none';
+		}
+    }
+}      			

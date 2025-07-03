@@ -1,0 +1,60 @@
+# Análisis del Sistema de Idioma (Internacionalización)
+
+Este análisis se basa en el archivo `public/anterior/languages/vendetta/es.php`.
+
+### 1. Estructura de Datos Utilizada
+
+El sistema de internacionalización utiliza un **array asociativo de PHP** llamado `$lang`.
+
+- **Clave-Valor:** Cada elemento del array consiste en una pareja clave-valor.
+  - La **clave** es un string corto y descriptivo (ej: `'lm_login'`, `'lg_username'`, `'rs_metal'`) que actúa como un identificador único para un fragmento de texto.
+  - El **valor** es el texto real en español que se mostrará en la interfaz de usuario (ej: `'Login'`, `'Usuario'`, `'Metal'`).
+
+**Ejemplo de la estructura en el archivo:**
+```php
+$lang = array(
+    'lm_login' => 'Login',
+    'lm_register' => 'Registrarse',
+    'lg_username' => 'Usuario',
+    // ... más de 400 otras claves
+);
+```
+
+### 2. Uso Teórico en la Aplicación
+
+En una aplicación PHP, este sistema permitiría mostrar textos dinámicamente según el idioma cargado. El código del backend o de las plantillas de la interfaz de usuario no contendría texto literal, sino referencias a las claves de este array.
+
+**Flujo de funcionamiento teórico:**
+
+1.  **Carga del Archivo:** Al inicio de la ejecución de una página, la aplicación cargaría el archivo de idioma correspondiente al usuario (en este caso, `es.php`). Esto haría que el array `$lang` estuviera disponible en el ámbito global o en un objeto de configuración.
+
+2.  **Renderizado en la Vista:** En el código HTML mezclado con PHP (la vista), en lugar de escribir el texto directamente, se usaría la clave para acceder al valor correspondiente del array `$lang`.
+
+**Ejemplo teórico de uso en un archivo de vista (ej: `login_view.php`):**
+
+```php
+<?php
+// Suponiendo que /languages/vendetta/es.php ya ha sido incluido.
+?>
+<html>
+<head>
+    <title><?php echo $lang['lm_login']; ?></title>
+</head>
+<body>
+    <h1><?php echo $lang['lm_login']; ?></h1>
+    <form action="login.php" method="post">
+        <label for="username"><?php echo $lang['lg_username']; ?>:</label>
+        <input type="text" id="username" name="username">
+
+        <label for="password"><?php echo $lang['lg_password']; ?>:</label> <!-- Suponiendo que 'lg_password' existe -->
+        <input type="password" id="password" name="password">
+
+        <button type="submit"><?php echo $lang['lm_login']; ?></button>
+    </form>
+</body>
+</html>
+```
+
+**Ventajas de este enfoque:**
+- **Mantenibilidad:** Para cambiar un texto, solo se necesita editar el archivo de idioma, no buscarlo en todo el código.
+- **Escalabilidad:** Para añadir un nuevo idioma (ej: inglés), solo se necesitaría crear un nuevo archivo (ej: `en.php`) con las mismas claves pero con los valores traducidos. La lógica de la aplicación no necesitaría cambios.

@@ -1,0 +1,121 @@
+# Análisis de la Estructura de la Base de Datos (vendetta_plus_old.sql)
+
+A continuación se detalla la estructura y el propósito de las tablas más importantes encontradas en el archivo de volcado de la base de datos. El diseño general sugiere una arquitectura típica de juegos de estrategia en línea (MMORTS) de la época, con una mezcla de tablas normalizadas para entidades y un enfoque denormalizado para los recursos y edificios de los planetas.
+
+---
+
+### **Tabla: `users`**
+
+*   **Propósito Principal:**
+    Esta es la tabla central del sistema de jugadores. Almacena toda la información de la cuenta de un usuario, sus credenciales de acceso, su estado en el juego (baneado o no) y la referencia a su planeta principal.
+
+*   **Columnas Importantes:**
+    *   `id`: (Clave Primaria) Identificador numérico único para cada usuario.
+    *   `username`: Nombre de usuario que el jugador utiliza para ser identificado en el juego.
+    *   `password`: Contraseña del usuario, probablemente almacenada en un formato hash (ej: MD5), común en proyectos PHP de esa época.
+    *   `email`: Correo electrónico del usuario, utilizado para el registro, recuperación de contraseña y notificaciones.
+    *   `id_planet`: (Clave Foránea Implícita) El ID del planeta principal o "capital" del usuario. Se relaciona directamente con la tabla `planets`.
+    *   `galaxy`, `system`, `planet`: Coordenadas del planeta principal. Es una redundancia de datos para un acceso rápido, pero la fuente de verdad debería ser la tabla `planets`.
+    *   `authlevel`: Nivel de autorización del usuario (ej: 0 para jugador, 3 para administrador).
+    *   `bana`, `banaday`: Campos para gestionar baneos. `bana` es un booleano que indica si está baneado, y `banaday` es un timestamp que indica hasta cuándo dura el baneo.
+    *   `ally_id`: (Clave Foránea Implícita) El ID de la alianza a la que pertenece el usuario. Se relaciona con la tabla `alliance`.
+
+*   **Claves y Relaciones:**
+    *   **Clave Primaria:** `id`
+    *   **Relaciones:**
+        *   Uno a Muchos con `planets` (un usuario puede tener varios planetas).
+        *   Muchos a Uno con `alliance` (muchos usuarios pertenecen a una alianza).
+
+---
+
+### **Tabla: `planets`**
+
+*   **Propósito Principal:**
+    Representa una propiedad del jugador (planeta, base, ciudad). Almacena su nombre, ubicación, el nivel de cada edificio/habitación construido, y la cantidad actual de recursos. Esta tabla utiliza un enfoque **denormalizado** para los edificios y recursos, donde cada tipo es una columna, en lugar de usar una tabla pivote.
+
+*   **Columnas Importantes:**
+    *   `id`: (Clave Primaria) Identificador único para cada planeta/propiedad.
+    *   `id_owner`: (Clave Foránea Implícita) El ID del usuario propietario de este planeta. Se relaciona con `users`.
+    *   `name`: El nombre que el jugador le ha dado a su planeta.
+    *   `galaxy`, `system`, `planet`: Coordenadas únicas que definen la ubicación del planeta en el universo del juego.
+    *   `metal`, `crystal`, `deuterium`: Columnas que almacenan la cantidad actual de cada recurso en el planeta. Probablemente son `FLOAT` o `DOUBLE` para permitir decimales.
+    *   `metal_mine`, `crystal_mine`, `deuterium_sintetizer`, etc.: Columnas que representan el **nivel** de cada edificio o mina de producción de recursos en ese planeta.
+    *   `field_current` / `field_max`: Número de espacios de construcción utilizados y el máximo disponible en el planeta.
+    *   `last_update`: Timestamp que registra la última vez que se actualizaron los recursos del planeta. Es crucial para calcular la producción de recursos desde la última visita.
+
+*   **Claves y Relaciones:**
+    *   **Clave Primaria:** `id`
+    *   **Relaciones:**
+        *   Muchos a Uno con `users` (muchos planetas pertenecen a un usuario).
+
+---
+
+### **Tabla: `alliance`**
+
+*   **Propósito Principal:**
+    Gestiona las alianzas o clanes del juego. Almacena el nombre, etiqueta (tag), y la jerarquía de miembros.
+
+*   **Columnas Importantes:**
+    *   `id`: (Clave Primaria) Identificador único de la alianza.
+    *   `ally_name`: Nombre completo de la alianza.
+    *   `ally_tag`: Etiqueta corta (ej: [VNDTA]) que se muestra junto al nombre del jugador.
+    *   `ally_owner`: (Clave Foránea Implícita) El ID del usuario fundador o líder de la alianza.
+    *   `ally_members`: Contador del número de miembros en la alianza.
+
+*   **Claves y Relaciones:**
+    *   **Clave Primaria:** `id`
+    *   **Relaciones:**
+        *   Uno a Muchos con `users` (una alianza tiene múltiples usuarios).
+
+---
+
+### **Tabla: `fleets`**
+
+*   **Propósito Principal:**
+    Tabla de eventos que gestiona todos los movimientos de flotas (tropas) en el juego. Es una de las tablas más activas, registrando ataques, transportes, espionajes, etc.
+
+*   **Columnas Importantes:**
+    *   `fleet_id`: (Clave Primaria) Identificador único para el movimiento de flota.
+    *   `fleet_owner`: (Clave Foránea Implícita) El ID del usuario que envió la flota.
+    *   `fleet_mission`: Un código numérico que representa el tipo de misión (1=Ataque, 3=Transporte, 6=Espionaje, etc.).
+    *   `fleet_amount`: Cantidad total de naves/tropas en la flota.
+    *   `fleet_array`: Una cadena de texto (string) que detalla la composición de la flota (ej: "201,10;202,5;" significa 10 naves de tipo 201 y 5 de tipo 202).
+    *   `fleet_start_time`, `fleet_end_time`: Timestamps que marcan el inicio y la llegada de la flota. Son fundamentales para el motor de eventos del juego.
+    *   `fleet_start_galaxy`, `fleet_end_galaxy`, etc.: Coordenadas de origen y destino del viaje.
+
+*   **Claves y Relaciones:**
+    *   **Clave Primaria:** `fleet_id`
+    *   **Relaciones:**
+        *   Se relaciona con `users` a través de `fleet_owner` y `fleet_target_owner`.
+
+---
+
+### **Tabla: `messages`**
+
+*   **Propósito Principal:**
+    Almacena los mensajes privados enviados entre jugadores y los mensajes automáticos del sistema (informes de batalla, espionaje, etc.).
+
+*   **Columnas Importantes:**
+    *   `message_id`: (Clave Primaria) ID único del mensaje.
+    *   `message_owner`: (Clave Foránea Implícita) ID del usuario que recibe el mensaje (el dueño de la bandeja de entrada).
+    *   `message_sender`: (Clave Foránea Implícita) ID del usuario que envió el mensaje.
+    *   `message_time`: Timestamp de cuándo se envió el mensaje.
+    *   `message_type`: Código numérico para el tipo de mensaje (privado, alianza, informe de batalla).
+    *   `message_text`: El contenido del mensaje.
+
+*   **Claves y Relaciones:**
+    *   **Clave Primaria:** `message_id`
+
+---
+
+### **Tabla: `config`**
+
+*   **Propósito Principal:**
+    Almacena variables de configuración global del juego, permitiendo a los administradores ajustar parámetros sin modificar el código.
+
+*   **Columnas Importantes:**
+    *   `config_name`: (Clave Primaria) El nombre de la variable de configuración (ej: `game_speed`, `fleet_speed`, `initial_metal`).
+    *   `config_value`: El valor asignado a esa variable.
+
+*   **Claves y Relaciones:**
+    *   **Clave Primaria:** `config_name` (es una clave de texto, no numérica).

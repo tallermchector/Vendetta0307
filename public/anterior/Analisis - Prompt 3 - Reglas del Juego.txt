@@ -1,0 +1,49 @@
+# Análisis del Archivo `gameconfig.php` - Reglas del Juego
+
+Este archivo es el cerebro que define las reglas y la economía del juego "Vendetta". A continuación, se detalla el análisis de sus componentes principales.
+
+## 1. Variables de Configuración Principales
+
+*   **`$game_config`**: Este array contiene las configuraciones globales que afectan a todo el juego. Aunque no está completamente detallado en el archivo proporcionado, su propósito típico sería:
+    *   `'game_speed'`: Un multiplicador general que probablemente acelera todos los procesos, como construcción, investigación y producción de recursos.
+    *   `'resource_multiplier'`: Un factor que aumenta la producción base de todos los recursos.
+    *   `'initial_storage'`: Define la capacidad de almacenamiento inicial para cada recurso antes de construir almacenes.
+
+*   **`$resource`**: Un array simple que actúa como un catálogo de todos los recursos disponibles en el juego. En este caso: `array('armas', 'municion', 'alcohol', 'dolares')`.
+
+*   **`$requeriments`**: (Asumiendo su existencia por el nombre, aunque no esté en el archivo) Este array asociativo definiría las dependencias, es decir, qué nivel de un edificio se necesita para desbloquear otro.
+    *   *Ejemplo de estructura:* `$requeriments['armeria'] = array('oficina' => 2);` significaría que se necesita una Oficina de nivel 2 para construir el nivel 1 de la Armería.
+
+*   **`$conf_habitaciones`**: Esta es la variable más crítica del archivo. Es un gran array multidimensional donde cada clave es el identificador de un edificio (ej: 'oficina', 'armeria') y su valor es otro array con todas sus propiedades:
+    *   `'nombre'`: El nombre del edificio que se muestra en la interfaz.
+    *   `'descripcion'`: El texto descriptivo del edificio.
+    *   `'costo_base'`: Un array asociativo con los recursos necesarios para construir el nivel 1 (ej: `array('dolares' => 500, 'alcohol' => 100)`).
+    *   `'factor_costo'`: Un multiplicador numérico (ej: `1.6`). El costo para el siguiente nivel se calcula con una fórmula de crecimiento exponencial.
+    *   `'tiempo_base'`: El tiempo en segundos para construir el nivel 1.
+    *   `'factor_tiempo'`: Un multiplicador para el tiempo de construcción, similar al `factor_costo`.
+    *   `'produccion'`: Un array que define cuántos recursos produce este edificio por hora a nivel 1.
+    *   `'capacidad'`: Define cuánto almacenamiento adicional de un recurso específico proporciona cada nivel del edificio.
+
+## 2. Cálculo de Costes de Construcción/Mejora
+
+Los costes se calculan dinámicamente usando una fórmula de crecimiento exponencial. Para un edificio y un nivel `N` dados, la fórmula sería:
+
+`CostoRecurso(N) = $conf_habitaciones['nombre_edificio']['costo_base']['recurso'] * ($conf_habitaciones['nombre_edificio']['factor_costo'] ^ (N - 1))`
+
+Esto hace que cada nivel sea significativamente más caro que el anterior, una mecánica común para equilibrar la progresión en juegos de este tipo.
+
+## 3. Cálculo de Tiempos de Construcción
+
+De manera similar a los costes, el tiempo de construcción probablemente se calcula exponencialmente y se ve afectado por la velocidad del juego:
+
+`TiempoConstruccion(N) = ($conf_habitaciones['nombre_edificio']['tiempo_base'] / $game_config['game_speed']) * ($conf_habitaciones['nombre_edificio']['factor_tiempo'] ^ (N - 1))`
+
+## 4. Otras Reglas Fundamentales del Juego
+
+*   **Producción de Recursos:** La producción por hora de un edificio se define en la propiedad `'produccion'`. La producción total del jugador sería la suma de la producción de todos sus edificios de ese tipo, ajustada por su nivel y cualquier multiplicador global.
+
+*   **Capacidad de Almacenamiento:** Edificios como `almacenArm` o `deposito` tienen un valor en su propiedad `'capacidad'`. La capacidad total de un recurso es la suma de la capacidad base (probablemente definida en `$game_config`) más la capacidad proporcionada por todos los niveles de los edificios de almacenamiento correspondientes.
+
+*   **Requisitos y Árbol Tecnológico:** Aunque no está explícito en el archivo, la existencia de diferentes edificios con diferentes funciones implica un sistema de requisitos que guía la progresión del jugador, obligándolo a construir ciertos edificios para desbloquear otros más avanzados.
+
+Este análisis revela un sistema de juego con reglas económicas y de progresión bien definidas, centrado en la gestión de recursos y la expansión estratégica, típico de los juegos de estrategia en línea.

@@ -1,0 +1,53 @@
+Análisis del Prompt 5: Inferencia de Lógica de Backend
+------------------------------------------------------
+
+Archivos Analizados:
+- public/anterior/configs/vendetta_plus_old.sql
+- public/anterior/configs/gameconfig.php
+
+---
+
+Combinando la información de la estructura de la base de datos y las reglas del juego, podemos inferir con bastante precisión cómo funcionaban las mecánicas clave en el servidor.
+
+### 1. Actualización de Recursos (Metal, Crystal, etc.)
+
+La estructura de la tabla `planets` (o similar) es el indicador clave. La presencia de campos como `metal`, `metal_perhour` y, fundamentalmente, `last_update` apunta a un sistema de **cálculo dinámico en tiempo real** en lugar de un cron job.
+
+**Flujo de Actualización:**
+
+1.  **Carga de Página:** Un jugador carga cualquier página del juego que muestre sus recursos.
+2.  **Función de Actualización:** Una función PHP (llamémosla `update_resources()`) se ejecuta al principio del script.
+3.  **Cálculo de Tiempo:** La función obtiene el `timestamp` actual y lo compara con el valor de `last_update` de la base de datos para ese jugador/planeta. La diferencia en segundos (`$time_diff`) se calcula.
+4.  **Cálculo de Producción:** Se calcula la producción total durante ese lapso de tiempo.
+    *   `$production_metal = ($time_diff / 3600) * $planet['metal_perhour'];`
+    *   `$production_crystal = ($time_diff / 3600) * $planet['crystal_perhour'];`
+5.  **Verificación de Almacenamiento:** Se comprueba si la producción sumada a los recursos actuales excede la capacidad del almacén (calculada a partir del nivel del edificio de almacén). La producción se limita a la capacidad máxima.
+6.  **Actualización en BD:** Se ejecuta una consulta `UPDATE` en la tabla `planets`:
+    *   Se suman los recursos producidos a los campos `metal`, `crystal`, etc.
+    *   Se actualiza el campo `last_update` con el `timestamp` actual.
+7.  **Continuación de la Carga:** El script continúa su ejecución, ahora con los datos de recursos completamente actualizados para mostrarlos al usuario.
+
+Este método es muy eficiente para juegos con muchos usuarios, ya que solo realiza cálculos para los jugadores que están activos.
+
+### 2. Proceso de Construcción de Edificios
+
+El proceso de construcción es un evento asíncrono que se gestiona mediante una cola de tareas.
+
+**Flujo de Construcción:**
+
+1.  **Acción del Usuario:** El jugador hace clic en "Construir" o "Ampliar" para un edificio específico.
+2.  **Petición al Servidor:** Se envía una petición al backend (ej: a `build.php?id=1&level=5`).
+3.  **Validación en Backend:**
+    *   El servidor verifica si el jugador tiene los **requisitos** de tecnología/edificios necesarios (consultando el array `$requeriments` de `gameconfig.php`).
+    *   Verifica si tiene suficientes **recursos** (consultando `$pricelist` y los recursos actuales del jugador en la BD).
+    *   Comprueba si ya hay otra construcción de edificios en marcha (los juegos de este tipo suelen limitar a una construcción a la vez).
+4.  **Inicio de la Construcción:** Si todas las validaciones son correctas:
+    *   Se restan los recursos necesarios de la cuenta del jugador en la tabla `planets`.
+    *   Se calcula el tiempo de construcción.
+    *   Se inserta un nuevo registro en una tabla de "cola de eventos" o se actualiza un campo en la tabla `planets` (ej: `b_building_id`) para indicar qué se está construyendo y cuándo terminará. Este campo contendría un `timestamp` de finalización.
+5.  **Gestión de la Cola:**
+    *   En cada carga de página, un script comprueba si el `timestamp` actual es posterior al `timestamp` de finalización de la construcción.
+    *   Si la construcción ha terminado, el script:
+        *   Incrementa el nivel del edificio correspondiente en la tabla `planets` (ej: `UPDATE planets SET b_building = b_building + 1 WHERE ...`).
+        *   Limpia el campo/registro de la cola de construcción para permitir una nueva.
+        *   Puede que inserte un mensaje para notificar al jugador.
