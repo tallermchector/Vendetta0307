@@ -6,7 +6,7 @@ export default function Home() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
       <div className="text-center p-8 max-w-2xl">
         <h1 className="text-5xl md:text-7xl font-headline font-bold text-primary mb-4">
-          Vendetta0307
+          Vendetta Latino
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground mb-8">
           Welcome to the next generation of strategic gaming. Register or log in
