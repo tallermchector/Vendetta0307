@@ -89,7 +89,7 @@ model Building {
   c_municion  Int
   c_alcohol   Int
   c_dolares   Int
-  fac_costo Float
+  fac_costo   Float
   t_horas     String
   t_minutos   String
   t_segundos  String

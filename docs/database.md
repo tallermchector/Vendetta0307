@@ -74,18 +74,22 @@ Gestiona los recursos principales del jugador.
 
 ### **Tabla: `Propiedad`**
 
-Representa una propiedad (un territorio, base o complejo) controlada por un jugador.
+Representa una propiedad (un territorio, base o complejo) controlada por un jugador. Almacena los niveles de cada edificio directamente.
 
 | Nombre del Campo | Tipo de Dato       | Descripción y Relaciones                               |
 | ---------------- | ------------------ | ------------------------------------------------------ |
 | `id_propiedad`   | `Int @id @default(autoincrement())` | Identificador único de la propiedad.                   |
-| `id_usuario`     | `Int`              | FK a `User`, el dueño de la propiedad.                     |
+| `id_usuario`     | `Int`              | FK a `User`, el dueño de la propiedad.                 |
 | `usuario`        | `User @relation(fields: [id_usuario], references: [id_usuario])` | Relación con el jugador propietario.                   |
-| `nombre`         | `String`           | Nombre de la propiedad.                                    |
+| `nombre`         | `String`           | Nombre de la propiedad.                                |
 | `coord_x`        | `Int`              | Coordenada X en el mapa del juego.                     |
 | `coord_y`        | `Int`              | Coordenada Y en el mapa del juego.                     |
 | `coord_z`        | `Int`              | Coordenada Z en el mapa del juego.                     |
-| `edificios`      | `PropiedadEdificio[]` | Edificios construidos en esta propiedad.                 |
+| `oficina`        | `Int @default(0)`  | Nivel del edificio "Oficina".                          |
+| `escuela`        | `Int @default(0)`  | Nivel del edificio "Escuela de Gángsters".             |
+| ...              | ...                | (Campos para cada tipo de edificio)                    |
+| `minas`          | `Int @default(0)`  | Nivel del edificio "Operación Minera".                 |
+
 
 _Nota: La combinación de `coord_x`, `coord_y`, `coord_z` debe ser única._
 
@@ -93,27 +97,21 @@ _Nota: La combinación de `coord_x`, `coord_y`, `coord_z` debe ser única._
 
 ### **Tabla: `Building`**
 
-Catálogo de todos los tipos de edificios disponibles en el juego.
+Catálogo de todos los tipos de edificios disponibles en el juego, con sus costos, tiempos y otros atributos.
 
 | Nombre del Campo | Tipo de Dato | Descripción                                           |
 | ---------------- | ------------ | ----------------------------------------------------- |
 | `id_edificio`    | `Int @id`    | Identificador único para el tipo de edificio.         |
 | `nombre`         | `String`     | Nombre del edificio (ej: "Cuartel", "Fábrica").       |
 | `descripcion`    | `String`     | Descripción del propósito del edificio.               |
-| `costo_base`     | `Json`       | Costo en recursos para construir el nivel 1.          |
-| `factor_costo`   | `Float`      | Multiplicador de costo por cada nivel.                |
-
----
-
-### **Tabla: `PropiedadEdificio` (Tabla Pivote)**
-
-Representa una instancia de un edificio en una propiedad específica, con su nivel actual.
-
-| Nombre del Campo | Tipo de Dato  | Descripción y Relaciones                             |
-| ---------------- | ------------- | ---------------------------------------------------- |
-| `id`             | `Int @id @default(autoincrement())` | ID único.                                          |
-| `id_propiedad`   | `Int`         | FK a `Propiedad`.                                       |
-| `id_edificio`    | `Int`         | FK a `Building`.                                     |
-| `nivel`          | `Int`         | Nivel actual del edificio en esta propiedad.           |
-| `propiedad`      | `Propiedad @relation(fields: [id_propiedad], references: [id_propiedad])` | Relación con `Propiedad`.                             |
-| `edificio`       | `Building @relation(fields: [id_edificio], references: [id_edificio])` | Relación con `Building`.                           |
+| `costo_base`     | `Json`       | Costo base inicial en formato JSON (obsoleto o de referencia). |
+| `c_armas`        | `Int`        | Costo en Armas para construir el nivel 1.             |
+| `c_municion`     | `Int`        | Costo en Munición para construir el nivel 1.          |
+| `c_alcohol`      | `Int`        | Costo en Alcohol para construir el nivel 1.           |
+| `c_dolares`      | `Int`        | Costo en Dólares para construir el nivel 1.           |
+| `fac_costo`      | `Float`      | Factor de incremento de costo por nivel.              |
+| `t_horas`        | `String`     | Tiempo de construcción base (horas).                  |
+| `t_minutos`      | `String`     | Tiempo de construcción base (minutos).                |
+| `t_segundos`     | `String`     | Tiempo de construcción base (segundos).               |
+| `fac_dura`       | `Float`      | Factor de incremento de duración por nivel.           |
+| `imagen_url`     | `String`     | URL de la imagen del edificio.                        |

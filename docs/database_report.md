@@ -109,75 +109,66 @@ Este documento es un análisis autogenerado del esquema de Prisma (`prisma/schem
 ---
 
 ### **Modelo: `Propiedad`**
-*   **Propósito Inferido:** Representa una propiedad, base o territorio controlado por un jugador en una ubicación específica del mapa del juego.
+*   **Propósito Inferido:** Representa una propiedad, base o territorio controlado por un jugador. Almacena directamente los niveles de cada edificio construido en ella.
 
 **Estructura de Campos:**
 
-| Campo        | Tipo                | Atributos                       | Descripción                                             |
-| ------------ | ------------------- | ------------------------------- | ------------------------------------------------------- |
-| `id_propiedad`| `Int`               | `@id`, `@default(autoincrement())` | Identificador único de la propiedad.                    |
-| `id_usuario` | `Int`               |                                 | Clave foránea que enlaza con el `User` propietario.     |
-| `usuario`    | `User`              | `@relation(...)`                | Relación con el modelo `User`.                          |
-| `nombre`     | `String`            |                                 | Nombre de la propiedad.                                 |
-| `coord_x`    | `Int`               |                                 | Coordenada X de la propiedad en el mapa.                |
-| `coord_y`    | `Int`               |                                 | Coordenada Y de la propiedad en el mapa.                |
-| `coord_z`    | `Int`               |                                 | Coordenada Z de la propiedad en el mapa (ej: sector).   |
-| `edificios`  | `PropiedadEdificio[]` |                                 | Lista de edificios construidos en esta propiedad.       |
+| Campo        | Tipo     | Atributos                       | Descripción                                           |
+| ------------ | -------- | ------------------------------- | ----------------------------------------------------- |
+| `id_propiedad`| `Int`    | `@id`, `@default(autoincrement())` | Identificador único de la propiedad.                  |
+| `id_usuario` | `Int`    |                                 | Clave foránea que enlaza con el `User` propietario.   |
+| `usuario`    | `User`   | `@relation(...)`                | Relación con el modelo `User`.                        |
+| `nombre`     | `String` |                                 | Nombre de la propiedad.                               |
+| `coord_x`    | `Int`    |                                 | Coordenada X de la propiedad en el mapa.              |
+| `coord_y`    | `Int`    |                                 | Coordenada Y de la propiedad en el mapa.              |
+| `coord_z`    | `Int`    |                                 | Coordenada Z de la propiedad en el mapa (ej: sector). |
+| `oficina`    | `Int`    | `@default(0)`                   | Nivel del edificio "Oficina".                         |
+| `escuela`    | `Int`    | `@default(0)`                   | Nivel del edificio "Escuela de Gángsters".            |
+| `armeria`    | `Int`    | `@default(0)`                   | Nivel del edificio "Armería".                         |
+| `municion`   | `Int`    | `@default(0)`                   | Nivel del edificio "Fábrica de Municiones".           |
+| `cerveceria` | `Int`    | `@default(0)`                   | Nivel del edificio "Cervecería".                      |
+| `taberna`    | `Int`    | `@default(0)`                   | Nivel del edificio "Taberna".                         |
+| `contrabando`| `Int`    | `@default(0)`                   | Nivel del edificio "Centro de Contrabando".           |
+| `almacenArm` | `Int`    | `@default(0)`                   | Nivel del edificio "Almacén de Armas".                |
+| `deposito`   | `Int`    | `@default(0)`                   | Nivel del edificio "Depósito de Munición".            |
+| `almacenAlc` | `Int`    | `@default(0)`                   | Nivel del edificio "Almacén de Alcohol".              |
+| `caja`       | `Int`    | `@default(0)`                   | Nivel del edificio "Caja Fuerte".                     |
+| `campo`      | `Int`    | `@default(0)`                   | Nivel del edificio "Campo de Tiro".                   |
+| `seguridad`  | `Int`    | `@default(0)`                   | Nivel del edificio "Puesto de Seguridad".             |
+| `torreta`    | `Int`    | `@default(0)`                   | Nivel del edificio "Torreta de Defensa".              |
+| `minas`      | `Int`    | `@default(0)`                   | Nivel del edificio "Operación Minera".                |
 
 **Relaciones:**
 *   **Relación con `User`:**
     *   **Tipo:** Muchos a Uno.
     *   **Modelo Relacionado:** `User`.
     *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`.
-*   **Relación con `PropiedadEdificio`:**
-    *   **Tipo:** Uno a Muchos.
-    *   **Modelo Relacionado:** `PropiedadEdificio`.
 
 ---
 
 ### **Modelo: `Building`**
-*   **Propósito Inferido:** Actúa como un catálogo de todos los tipos de edificios disponibles para construir, definiendo sus propiedades base.
+*   **Propósito Inferido:** Actúa como un catálogo de todos los tipos de edificios disponibles para construir, definiendo sus propiedades base como costos, tiempos de construcción y factores de incremento.
 
 **Estructura de Campos:**
 
-| Campo         | Tipo                | Atributos         | Descripción                                                    |
-| ------------- | ------------------- | ----------------- | -------------------------------------------------------------- |
-| `id_edificio` | `Int`               | `@id`             | Identificador único para el tipo de edificio (no autoincremental). |
-| `nombre`      | `String`            |                   | Nombre del edificio (ej: "Cuartel").                           |
-| `descripcion` | `String`            |                   | Descripción del propósito del edificio.                        |
-| `costo_base`  | `Json`              |                   | Objeto JSON con el costo en recursos para construir el nivel 1. |
-| `factor_costo`| `Float`             |                   | Multiplicador aplicado al costo por cada nivel adicional.      |
-| `propiedades` | `PropiedadEdificio[]` |                   | Lista de las instancias de este edificio en varias propiedades. |
+| Campo         | Tipo   | Atributos | Descripción                                                    |
+| ------------- | ------ | --------- | -------------------------------------------------------------- |
+| `id_edificio` | `Int`  | `@id`     | Identificador único para el tipo de edificio (no autoincremental). |
+| `nombre`      | `String`|           | Nombre del edificio (ej: "Cuartel").                           |
+| `descripcion` | `String`|           | Descripción del propósito del edificio.                        |
+| `costo_base`  | `Json` |           | Objeto JSON con el costo base (posiblemente de referencia).    |
+| `c_armas`     | `Int`  |           | Costo inicial en Armas.                                        |
+| `c_municion`  | `Int`  |           | Costo inicial en Munición.                                     |
+| `c_alcohol`   | `Int`  |           | Costo inicial en Alcohol.                                      |
+| `c_dolares`   | `Int`  |           | Costo inicial en Dólares.                                      |
+| `fac_costo`   | `Float`|           | Factor de multiplicación de costo por nivel.                   |
+| `t_horas`     | `String`|           | Tiempo de construcción base (horas).                           |
+| `t_minutos`   | `String`|           | Tiempo de construcción base (minutos).                         |
+| `t_segundos`  | `String`|           | Tiempo de construcción base (segundos).                        |
+| `fac_dura`    | `Float`|           | Factor de multiplicación de duración por nivel.                |
+| `imagen_url`  | `String`|           | URL a la imagen del edificio.                                  |
 
 **Relaciones:**
-*   **Relación con `PropiedadEdificio`:**
-    *   **Tipo:** Uno a Muchos.
-    *   **Modelo Relacionado:** `PropiedadEdificio`.
-
----
-
-### **Modelo: `PropiedadEdificio`**
-*   **Propósito Inferido:** Tabla pivote que conecta una `Propiedad` con un `Building`, almacenando el nivel específico de un tipo de edificio en una propiedad concreta.
-
-**Estructura de Campos:**
-
-| Campo         | Tipo      | Atributos                       | Descripción                                           |
-| ------------- | --------- | ------------------------------- | ----------------------------------------------------- |
-| `id`          | `Int`     | `@id`, `@default(autoincrement())` | ID único para la instancia del edificio en la propiedad. |
-| `id_propiedad`| `Int`     |                                 | Clave foránea que enlaza con `Propiedad`.             |
-| `id_edificio` | `Int`     |                                 | Clave foránea que enlaza con `Building`.              |
-| `nivel`       | `Int`     |                                 | Nivel actual del edificio en esta propiedad.          |
-| `propiedad`   | `Propiedad`| `@relation(...)`                | Relación con el modelo `Propiedad`.                   |
-| `edificio`    | `Building`| `@relation(...)`                | Relación con el modelo `Building`.                    |
-
-**Relaciones:**
-*   **Relación con `Propiedad`:**
-    *   **Tipo:** Muchos a Uno.
-    *   **Modelo Relacionado:** `Propiedad`.
-    *   **Campos de Clave:** `fields: [id_propiedad]`, `references: [id_propiedad]`.
-*   **Relación con `Building`:**
-    *   **Tipo:** Muchos a Uno.
-    *   **Modelo Relacionado:** `Building`.
-    *   **Campos de Clave:** `fields: [id_edificio]`, `references: [id_edificio]`.
+*   Este modelo no tiene relaciones directas con otros modelos.
 
 ---
