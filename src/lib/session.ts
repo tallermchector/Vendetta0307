@@ -47,22 +47,10 @@ export async function getSession(): Promise<SessionPayload | null> {
   if (!sessionCookie) return null;
 
   const session = await decrypt(sessionCookie);
-  if (!session) return null;
-
-  // Refresh the session so it doesn't expire
-  // You might want to remove this if you want sessions to expire strictly
-  const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  session.expires = expires;
   
-  const newSession = await encrypt(session);
-  cookieStore.set('session', newSession, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    expires,
-    sameSite: 'lax',
-    path: '/',
-  });
-
+  // The session is only read here, not refreshed. Refreshing the cookie
+  // on every request is not allowed in Server Components and causes the error.
+  // The cookie will be valid until its original expiration date set on login.
   return session;
 }
 
