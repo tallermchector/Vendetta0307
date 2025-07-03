@@ -51,9 +51,6 @@ export async function getSession(): Promise<SessionPayload | null> {
 
   const session = await decrypt(sessionCookie);
   
-  // @BestPractice: This function is read-only. It validates the existing cookie
-  // but does not refresh it. Refreshing on every request is not allowed in
-  // Server Components and can cause errors in some hosting environments.
   return session;
 }
 

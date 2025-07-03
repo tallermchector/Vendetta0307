@@ -1,5 +1,7 @@
 import 'server-only';
-import { cache } from 'react';
+// @BestPractice: No se utiliza 'cache' aquí porque interfiere con la naturaleza
+// dinámica de `cookies()` durante el flujo de autenticación, causando que se
+// lea un estado de sesión obsoleto.
 import { getSession } from '@/lib/session';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
@@ -9,9 +11,9 @@ export interface SessionPayload {
   expires?: Date;
 }
 
-// @BestPractice: Use `cache` to memoize the user retrieval function.
-// This prevents multiple database queries for the same user in a single request lifecycle.
-export const getCurrentUser = cache(async () => {
+// @BestPractice: Se elimina el `cache` para asegurar que siempre se obtenga la sesión más reciente.
+// Esto es crucial para flujos como login/register donde la sesión cambia en la misma petición.
+export const getCurrentUser = async () => {
   const session = await getSession();
   if (!session?.userId) {
     return null;
@@ -36,7 +38,7 @@ export const getCurrentUser = cache(async () => {
   // @Security: Crucially, never send the password hash to the client.
   const { pass, ...userWithoutPassword } = user;
   return userWithoutPassword;
-});
+};
 
 /**
  * @description A helper function to protect server-side rendered pages.
