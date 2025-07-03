@@ -1,22 +1,52 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
+ 
 export function middleware(request: NextRequest) {
-  // Por ahora, asumimos que una cookie llamada 'session_token' indica una sesión válida.
   const sessionCookie = request.cookies.get('session_token');
+  const { pathname } = request.nextUrl;
+ 
+  const isAuthenticated = !!sessionCookie;
+ 
+  // Define las rutas que son parte del flujo de autenticación (públicas para no autenticados)
+  const authRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/register/create-property'
+  ];
+  
+  // Define las rutas que deben ser protegidas
+  const protectedRoutes = [
+    '/dashboard'
+  ];
+ 
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
 
-  if (!sessionCookie) {
-    // Si no hay cookie de sesión, redirigimos al usuario a la página de login.
-    // Mantenemos los search params por si el usuario intentaba acceder a una URL específica.
-    const loginUrl = new URL('/login', request.url)
-    return NextResponse.redirect(loginUrl);
+  // Si el usuario está autenticado y intenta acceder a una ruta de autenticación, redirigir al dashboard
+  if (isAuthenticated && isAuthRoute) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Si la cookie existe, permitimos que la petición continúe.
+  // Si el usuario NO está autenticado y trata de acceder a una ruta protegida, redirigir a login
+  if (!isAuthenticated && isProtectedRoute) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+ 
   return NextResponse.next();
 }
-
+ 
+// Configuración del matcher para aplicar el middleware
 export const config = {
-  // El matcher asegura que este middleware se ejecute solo en las rutas del dashboard.
-  matcher: '/dashboard/:path*',
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - / (the homepage is public)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|/$).*)',
+  ],
 }
