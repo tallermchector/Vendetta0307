@@ -2,10 +2,10 @@
 
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import prisma from '@/lib/prisma';
+import { createSession, deleteSession } from '@/lib/session';
 
 const registerSchema = z.object({
   username: z.string().min(3, { message: "El nombre de usuario debe tener al menos 3 caracteres." }),
@@ -14,8 +14,8 @@ const registerSchema = z.object({
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email({ message: "Por favor, introduce un correo electrónico válido." }),
+  password: z.string().min(1, { message: "La contraseña es obligatoria." }),
 });
 
 const forgotPasswordSchema = z.object({
@@ -62,7 +62,7 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
 }
 
 
-export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ success: true; user: { id_usuario: number; usuario: string; email: string; }; } | { error: string; }> {
+export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ success: true; } | { error: string; }> {
     const validatedFields = loginSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -84,23 +84,10 @@ export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ 
     if (!passwordsMatch) {
         return { error: "La contraseña es incorrecta." };
     }
+    
+    await createSession({ userId: user.id_usuario });
 
-    cookies().set('session_token', 'some_jwt_token_here', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7, // 1 week
-        path: '/',
-    });
-
-
-    return { 
-        success: true, 
-        user: { 
-            id_usuario: user.id_usuario,
-            usuario: user.usuario,
-            email: user.email,
-        } 
-    };
+    return { success: true };
 }
 
 export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswordSchema>) {
@@ -117,6 +104,7 @@ export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswor
         return { success: "Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña."};
     }
 
+    // En una aplicación real, aquí se generaría un token y se enviaría un correo electrónico.
     console.log(`Password reset link for ${email} would be sent here.`);
 
     return { success: "Si existe una cuenta con ese correo, se ha enviado un enlace para restablecer la contraseña."};
@@ -124,6 +112,6 @@ export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswor
 
 
 export async function logoutUser() {
-  cookies().delete('session_token');
+  await deleteSession();
   redirect('/login');
 }

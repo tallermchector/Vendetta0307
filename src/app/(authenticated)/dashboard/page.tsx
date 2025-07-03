@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { FileText, Mail, Move, Swords, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import prisma from "@/lib/prisma";
+import { protectPage } from "@/lib/auth";
 
 function StatBadge({
   count,
@@ -32,21 +32,12 @@ function StatBadge({
 }
 
 export default async function DashboardPage() {
-  // En un entorno real, obtendríamos el usuario de la sesión.
-  // Para este prototipo, obtenemos el primer usuario como ejemplo.
-  const user = await prisma.user.findFirst({
-    include: {
-        familia: true,
-        perfil: true,
-        propiedades: {
-            take: 1 // Tomamos solo la primera propiedad para la vista general
-        }
-    }
-  });
+  const user = await protectPage();
 
-  const playerProfile = user?.perfil;
-  const family = user?.familia;
-  const property = user?.propiedades[0];
+  const playerProfile = user.perfil;
+  const family = user.familia;
+  // Tomamos solo la primera propiedad para la vista general
+  const property = user.propiedades?.[0]; 
 
   return (
     <div className="flex flex-col gap-6">
@@ -63,7 +54,7 @@ export default async function DashboardPage() {
               </Avatar>
               <div className="ml-4">
                 <p className="text-sm text-muted-foreground">Jugador</p>
-                <h2 className="text-2xl font-bold font-headline">{user?.usuario || 'Jugador'}</h2>
+                <h2 className="text-2xl font-bold font-headline">{user.usuario}</h2>
               </div>
             </Card>
 

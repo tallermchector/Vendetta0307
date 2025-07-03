@@ -18,9 +18,8 @@ import { Building, ArrowUpCircle } from "lucide-react";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import type { Propiedad } from "@prisma/client";
+import { protectPage } from "@/lib/auth";
 
-// Este mapa conecta los nombres de los edificios de la tabla 'Building'
-// con los campos correspondientes en la tabla 'Propiedad'.
 const buildingFieldMap: Record<string, keyof Propiedad> = {
   'Oficina': 'oficina',
   'Escuela de Gángsters': 'escuela',
@@ -40,20 +39,17 @@ const buildingFieldMap: Record<string, keyof Propiedad> = {
 };
 
 export default async function RoomsPage() {
-  // Obtenemos el catálogo de todos los edificios disponibles
+  const user = await protectPage();
+
   const buildingCatalog = await prisma.building.findMany({
     orderBy: {
       id_edificio: 'asc'
     }
   });
-
-  // Para este prototipo, obtendremos las propiedades del primer usuario.
-  // En una aplicación real, obtendrías el ID del usuario que ha iniciado sesión.
-  const user = await prisma.user.findFirst();
-
-  const playerProperty = user ? await prisma.propiedad.findFirst({
-      where: { id_usuario: user.id_usuario },
-  }) : null;
+  
+  // Por ahora, gestionamos la primera propiedad del usuario.
+  // En el futuro, se podría seleccionar la propiedad activa desde la UI.
+  const playerProperty = user.propiedades?.[0];
 
   if (!playerProperty) {
     return (

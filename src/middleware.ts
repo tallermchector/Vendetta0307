@@ -1,42 +1,41 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
- 
-export function middleware(request: NextRequest) {
-  const sessionCookie = request.cookies.get('session_token');
-  const { pathname } = request.nextUrl;
- 
-  const isAuthenticated = !!sessionCookie;
- 
-  // Define las rutas que son parte del flujo de autenticación (públicas para no autenticados)
-  const authRoutes = [
-    '/login',
-    '/register',
-    '/forgot-password',
-    '/register/create-property'
-  ];
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { decrypt } from '@/lib/session';
+import { cookies } from 'next/headers';
+
+// 1. Specify protected and public routes
+const protectedRoutes = ['/dashboard'];
+const publicRoutes = ['/login', '/register', '/forgot-password', '/register/create-property', '/'];
+
+export async function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
+
+  // 2. Check if the current route is protected or public
+  const isProtectedRoute = protectedRoutes.some((prefix) => path.startsWith(prefix));
+  const isPublicRoute = publicRoutes.includes(path) || path.startsWith('/register/create-property');
   
-  // Define las rutas que deben ser protegidas
-  const protectedRoutes = [
-    '/dashboard'
-  ];
- 
-  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  // 3. Decrypt the session from the cookie
+  const cookie = cookies().get('session')?.value;
+  const session = cookie ? await decrypt(cookie) : null;
 
-  // Si el usuario está autenticado y intenta acceder a una ruta de autenticación, redirigir al dashboard
-  if (isAuthenticated && isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  // 4. Redirect logic
+  // 4.1. If the user is not authenticated and the route is protected, redirect to the login page
+  if (isProtectedRoute && !session?.userId) {
+    return NextResponse.redirect(new URL('/login', request.nextUrl));
   }
 
-  // Si el usuario NO está autenticado y trata de acceder a una ruta protegida, redirigir a login
-  if (!isAuthenticated && isProtectedRoute) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // 4.2. If the user is authenticated and trying to access a public route (like login), redirect to the dashboard
+  if (
+    session?.userId &&
+    (path === '/login' || path === '/register' || path === '/forgot-password')
+  ) {
+    return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
   }
- 
+
   return NextResponse.next();
 }
- 
-// Configuración del matcher para aplicar el middleware
+
+// Routes Middleware should not run on
 export const config = {
   matcher: [
     /*
@@ -45,8 +44,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - / (the homepage is public)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|/$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
-}
+};

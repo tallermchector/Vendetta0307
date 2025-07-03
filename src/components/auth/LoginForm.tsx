@@ -50,7 +50,9 @@ export default function LoginForm() {
     startTransition(() => {
       loginUser(values).then((data) => {
         if (data.success) {
-          router.push('/dashboard');
+          // Redirección manejada por el middleware después de un inicio de sesión exitoso.
+          // El router.refresh() asegura que el estado del servidor (y la cookie) se actualice.
+          router.refresh();
         } else if (data.error) {
           toast({
             title: "Error de inicio de sesión",
