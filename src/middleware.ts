@@ -18,5 +18,5 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   // El matcher asegura que este middleware se ejecute solo en las rutas del dashboard.
-  matcher: '/(authenticated)/dashboard/:path*',
+  matcher: '/dashboard/:path*',
 }
