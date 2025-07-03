@@ -23,7 +23,7 @@ const forgotPasswordSchema = z.object({
 });
 
 
-export async function registerUser(values: z.infer<typeof registerSchema>) {
+export async function registerUser(values: z.infer<typeof registerSchema>): Promise<{ success: true; userId: number; } | { error: string; }> {
   const validatedFields = registerSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -49,7 +49,7 @@ export async function registerUser(values: z.infer<typeof registerSchema>) {
     return { error: 'El nombre de usuario ya está en uso.' };
   }
 
-  await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       usuario: username,
       email: email,
@@ -58,7 +58,7 @@ export async function registerUser(values: z.infer<typeof registerSchema>) {
     },
   });
 
-  return { success: '¡Cuenta creada con éxito! Por favor, inicia sesión.' };
+  return { success: true, userId: newUser.id_usuario };
 }
 
 

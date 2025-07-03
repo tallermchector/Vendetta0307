@@ -66,10 +66,10 @@ export default function RegisterForm() {
           }
           if (data.success) {
             toast({
-              title: "¡Éxito!",
-              description: data.success,
+              title: "¡Cuenta Creada!",
+              description: "Paso 1/2: Ahora, establece tu propiedad inicial.",
             });
-            router.push('/login');
+            router.push(`/register/create-property?userId=${data.userId}`);
           }
         })
         .catch(() => {
@@ -85,7 +85,7 @@ export default function RegisterForm() {
   return (
     <Card className="w-full max-w-md border-border/60">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-headline">Crea una cuenta</CardTitle>
+        <CardTitle className="text-2xl font-headline">Crea una cuenta (Paso 1/2)</CardTitle>
         <CardDescription>Tu viaje en Vendetta Latino comienza aquí.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -158,7 +158,7 @@ export default function RegisterForm() {
             <Button type="submit" className="w-full" disabled={isPending}>
               {isPending ? "Creando cuenta..." : <>
                 <UserPlus className="mr-2 h-4 w-4" />
-                Registrarse
+                Siguiente Paso
               </>}
             </Button>
           </form>
