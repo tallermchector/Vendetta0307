@@ -47,8 +47,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { Propiedad } from "@prisma/client";
 
-export default function Sidebar() {
+export default function Sidebar({ properties }: { properties: Propiedad[] }) {
   const menuItems1 = [
     { href: "/dashboard", label: "Visión General", Icon: Home },
     { href: "/dashboard/rooms", label: "Habitaciones", Icon: BedDouble },
@@ -108,14 +109,20 @@ export default function Sidebar() {
           <Separator className="my-4 bg-primary" />
 
           <div className="px-4 mb-4">
-               <Select defaultValue="40:23:220">
+               <Select defaultValue={properties[0]?.id_propiedad.toString()}>
                   <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Seleccionar ubicación" />
+                      <SelectValue placeholder="Seleccionar propiedad" />
                   </SelectTrigger>
                   <SelectContent>
-                      <SelectItem value="40:23:220">40:23:220</SelectItem>
-                      <SelectItem value="40:23:221">40:23:221</SelectItem>
-                      <SelectItem value="40:23:222">40:23:222</SelectItem>
+                     {properties.length > 0 ? (
+                        properties.map((prop) => (
+                           <SelectItem key={prop.id_propiedad} value={prop.id_propiedad.toString()}>
+                             {`${prop.nombre} [${prop.coord_x}:${prop.coord_y}:${prop.coord_z}]`}
+                           </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled>No tienes propiedades</SelectItem>
+                      )}
                   </SelectContent>
               </Select>
           </div>
