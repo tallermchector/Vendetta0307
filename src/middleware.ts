@@ -1,24 +1,23 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getSession } from '@/lib/session';
+import { decrypt } from '@/lib/session';
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // @BestPractice: Define which routes are public and which are protected.
-  // Route groups like (authenticated) are ignored in middleware paths.
+  // This helps centralize the routing logic.
   const isProtectedRoute = path.startsWith('/dashboard');
-  const isPublicRoute = 
+  const isPublicAuthRoute = 
     path === '/login' ||
     path === '/register' ||
     path.startsWith('/register/create-property') ||
-    path === '/forgot-password' ||
-    path === '/';
+    path === '/forgot-password';
 
-  // @Security: Read the session from the incoming request's cookies.
-  // In middleware, we can't use the `cookies()` function from `next/headers`
-  // as it's a dynamic function not available in this edge runtime context.
-  const session = await getSession();
+  // @Security: In middleware, read the cookie directly from the request object.
+  // The `decrypt` function is safe to use here.
+  const sessionCookie = request.cookies.get('session')?.value;
+  const session = sessionCookie ? await decrypt(sessionCookie) : null;
 
   // Redirect logic
   if (isProtectedRoute && !session?.userId) {
@@ -27,9 +26,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.nextUrl));
   }
 
-  if (session?.userId && (path === '/login' || path === '/register')) {
-     // @Security: If an authenticated user tries to access login/register,
-     // redirect them to the dashboard.
+  if (session?.userId && isPublicAuthRoute) {
+     // @Security: If an authenticated user tries to access public auth pages like login/register,
+     // redirect them to the dashboard. They should log out first.
     return NextResponse.redirect(new URL('/dashboard', request.nextUrl));
   }
 
