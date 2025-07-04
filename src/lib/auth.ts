@@ -25,7 +25,12 @@ export const getCurrentUser = async () => {
     // in a single query to avoid waterfalls.
     include: {
       familia: true,
-      perfil: true,
+      perfil: {
+        include: {
+          // @New: Eager load the player's training levels with their profile.
+          trainings: true,
+        }
+      },
       propiedades: true,
       recursos: true,
     },

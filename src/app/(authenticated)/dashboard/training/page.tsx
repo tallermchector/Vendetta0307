@@ -18,16 +18,8 @@ import { Separator } from "@/components/ui/separator";
 import { Target, ArrowUpCircle, Swords, Shell, Martini, DollarSign, Clock } from "lucide-react";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
-import type { PlayerProfile } from "@prisma/client";
+import type { PlayerTraining } from "@prisma/client";
 import { protectPage } from "@/lib/auth";
-
-// @BestPractice: This map accurately links training names from the database
-// to their corresponding level fields in the `PlayerProfile` model.
-const trainingFieldMap: Record<string, keyof PlayerProfile> = {
-  'Entrenamiento con Pistola': 'ent_pistola',
-  'Entrenamiento con Ametralladora': 'ent_ametralladora',
-  'Combate Cuerpo a Cuerpo': 'ent_combate',
-};
 
 // Helper function to format seconds into a readable string (e.g., 1h 30m 15s)
 function formatDuration(totalSeconds: number): string {
@@ -83,6 +75,14 @@ export default async function TrainingPage() {
       </Card>
     )
   }
+  
+  // @Refactor: Create a Map for efficient lookup of training levels.
+  const playerTrainingsMap = new Map<number, PlayerTraining>();
+  if (playerProfile.trainings) {
+      for (const pt of playerProfile.trainings) {
+          playerTrainingsMap.set(pt.id_training, pt);
+      }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -111,8 +111,9 @@ export default async function TrainingPage() {
             </TableHeader>
             <TableBody>
               {trainingCatalog.map((training) => {
-                const trainingKey = trainingFieldMap[training.nombre];
-                const level = trainingKey ? (playerProfile[trainingKey] as number) : 0;
+                // @Refactor: Get level from the new relational data structure.
+                const playerTraining = playerTrainingsMap.get(training.id_training);
+                const level = playerTraining ? playerTraining.level : 0;
                 const nextLevel = level + 1;
 
                 // Calculate cost for the next level
@@ -131,7 +132,7 @@ export default async function TrainingPage() {
                   <TableRow key={training.id_training}>
                     <TableCell className="hidden sm:table-cell">
                       <Image
-                        src={training.imagen_url.startsWith('http') ? training.imagen_url : 'https://placehold.co/80x80.png'}
+                        src={training.imagen_url.startsWith('/') ? training.imagen_url : 'https://placehold.co/80x80.png'}
                         data-ai-hint="training skill icon"
                         alt={`Icono de ${training.nombre}`}
                         width={80}

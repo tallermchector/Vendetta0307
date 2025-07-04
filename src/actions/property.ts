@@ -64,18 +64,44 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
   if (existingPropertyAtCoords) {
     return { error: 'Las coordenadas seleccionadas ya están ocupadas.' };
   }
+  
+  const allTrainings = await prisma.training.findMany({
+    select: { id_training: true },
+  });
 
   try {
-    // @BestPractice: Use a transaction to ensure all related records are created or none at all.
-    await prisma.$transaction([
-      prisma.propiedad.create({
+    // @BestPractice: Use an interactive transaction to ensure all related records 
+    // (profile, trainings, property, resources) are created atomically.
+    await prisma.$transaction(async (tx) => {
+      const newProfile = await tx.playerProfile.create({
+        data: {
+          id_usuario: userId,
+          puntos_edificios: 0,
+          puntos_entrenamiento: 0,
+          puntos_tropas: 0,
+          ranking_global: 0,
+          lealtad: 100,
+        }
+      });
+      
+      // @New: Initialize all trainings for the new player at level 0.
+      if (allTrainings.length > 0) {
+        await tx.playerTraining.createMany({
+            data: allTrainings.map(training => ({
+                id_perfil: newProfile.id_perfil,
+                id_training: training.id_training,
+                level: 0,
+            }))
+        });
+      }
+
+      await tx.propiedad.create({
         data: {
           id_usuario: userId,
           nombre: name,
           coord_x: coordX,
           coord_y: coordY,
           coord_z: coordZ,
-          // Initialize all building levels to 1 as per requirements.
           oficina: 1,
           escuela: 1,
           armeria: 1,
@@ -92,18 +118,9 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
           torreta: 1,
           minas: 1,
         },
-      }),
-      prisma.playerProfile.create({
-        data: {
-          id_usuario: userId,
-          puntos_edificios: 0,
-          puntos_entrenamiento: 0,
-          puntos_tropas: 0,
-          ranking_global: 0,
-          lealtad: 100,
-        }
-      }),
-       prisma.playerResources.create({
+      });
+      
+      await tx.playerResources.create({
         data: {
           id_usuario: userId,
           armas: 500,
@@ -111,8 +128,8 @@ export async function createInitialProperty(values: z.infer<typeof createPropert
           alcohol: 0,
           dolares: 0,
         }
-      })
-    ]);
+      });
+    });
 
     return { success: '¡Propiedad creada con éxito! Ahora puedes iniciar sesión.' };
   } catch (error) {
