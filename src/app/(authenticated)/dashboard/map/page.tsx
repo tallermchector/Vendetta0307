@@ -7,14 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Map as MapIcon, ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function MapPage({
-  searchParams,
-}: {
-  searchParams?: { [key: string]: string | string[] | undefined };
-}) {
+// @BestPractice: Use the standard Next.js page props type for clarity and correctness.
+// This ensures compatibility with build environments.
+type MapPageProps = {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default async function MapPage({ searchParams }: MapPageProps) {
   const user = await protectPage();
 
-  const sectorParam = searchParams?.sector;
+  const sectorParam = searchParams.sector;
 
   // Safely get the sector from search params, handling potential arrays.
   const currentSectorParam = Array.isArray(sectorParam)
