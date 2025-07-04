@@ -10,18 +10,20 @@ import Link from 'next/link';
 export default async function MapPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const user = await protectPage();
 
+  const sectorParam = searchParams?.sector;
+
   // Safely get the sector from search params, handling potential arrays.
-  const sectorParam = Array.isArray(searchParams.sector)
-    ? searchParams.sector[0]
-    : searchParams.sector;
+  const currentSectorParam = Array.isArray(sectorParam)
+    ? sectorParam[0]
+    : sectorParam;
 
   let currentSector = 1;
-  if (sectorParam && !isNaN(Number(sectorParam))) {
-      const parsedSector = Number(sectorParam);
+  if (currentSectorParam && !isNaN(Number(currentSectorParam))) {
+      const parsedSector = Number(currentSectorParam);
       // Clamp between 1 and 255 based on schema
       currentSector = Math.max(1, Math.min(parsedSector, 255));
   }
