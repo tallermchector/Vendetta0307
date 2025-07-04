@@ -58,17 +58,14 @@ export default function LoginForm() {
             });
           }
           // If the action is successful, it calls `redirect()` which throws an
-          // error to stop execution and trigger the navigation. That error is
-          // handled internally by Next.js and this .then() block is not run.
-        })
-        .catch(() => {
-          // This catch block can handle unexpected server errors.
-          toast({
-            title: "Error inesperado",
-            description: "Algo salió mal. Por favor, inténtalo de nuevo.",
-            variant: "destructive",
-          });
+          // exception to stop execution and trigger the navigation. That exception
+          // is handled by Next.js and should not be caught here.
         });
+        // @Fix: Removed the .catch() block that was incorrectly interpreting
+        // the Next.js redirect signal as a runtime error, which caused the
+        // "Error inesperado" toast to appear on every successful login.
+        // Legitimate errors are now handled by returning an { error: "..." }
+        // object from the server action.
     });
   }
 
