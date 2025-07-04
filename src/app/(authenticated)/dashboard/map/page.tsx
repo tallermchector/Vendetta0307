@@ -17,7 +17,7 @@ export default async function MapPage({
 }) {
   const user = await protectPage();
 
-  const sectorParam = searchParams.sector;
+  const sectorParam = searchParams?.sector;
 
   // Safely get the sector from search params, handling potential arrays.
   const currentSectorParam = Array.isArray(sectorParam)
@@ -90,8 +90,12 @@ export default async function MapPage({
             </Button>
           </div>
           {/* Map Grid */}
-          <div className="mt-4 overflow-auto rounded-lg border">
-            <MapGrid properties={validProperties} currentUser={user} />
+          <div className="mt-4 w-full">
+            <MapGrid 
+                properties={validProperties} 
+                currentUser={user} 
+                currentSector={currentSector}
+            />
           </div>
         </CardContent>
       </Card>
