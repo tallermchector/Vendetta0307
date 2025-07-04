@@ -1,4 +1,4 @@
-
+ 
 # Vendetta 01: Un Juego de Estrategia Online
 
 Bienvenido al repositorio de **Vendetta 01**, una aplicación web moderna que revive la esencia de los juegos de estrategia online, construida con un stack tecnológico de última generación.
