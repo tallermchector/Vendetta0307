@@ -33,8 +33,9 @@ export async function createSession(payload: SessionPayload) {
   const session = await encrypt({ ...payload, expires });
 
   // @Security: Set cookies with HttpOnly, Secure (in prod), SameSite, and Path attributes.
-  // This is a dynamic function and must be used inside a Server Action or Route Handler.
-  cookies().set('session', session, {
+  // @BestPractice: First get the cookie store, then call methods on it.
+  const cookieStore = cookies();
+  cookieStore.set('session', session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     expires: expires,
@@ -44,8 +45,9 @@ export async function createSession(payload: SessionPayload) {
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  // @BestPractice: `cookies().get()` is a dynamic function.
-  const sessionCookie = cookies().get('session')?.value;
+  // @BestPractice: First get the cookie store, then call methods on it.
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get('session')?.value;
 
   if (!sessionCookie) return null;
 
@@ -56,5 +58,6 @@ export async function getSession(): Promise<SessionPayload | null> {
 
 export async function deleteSession() {
   // @Security: To log out, invalidate the cookie by setting an expiry date in the past.
-  cookies().set('session', '', { expires: new Date(0), path: '/' });
+  const cookieStore = cookies();
+  cookieStore.set('session', '', { expires: new Date(0), path: '/' });
 }
