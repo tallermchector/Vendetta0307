@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -50,17 +51,18 @@ export default function LoginForm() {
     startTransition(() => {
       loginUser(values)
         .then((data) => {
-          if (data?.error) {
+          // @Fix: Use a type guard (`'error' in data`) to correctly narrow the union type.
+          // This ensures we only access `.error` when the error object is returned.
+          if (data && 'error' in data) {
             toast({
               title: "Error de inicio de sesión",
               description: data.error,
               variant: "destructive",
             });
           }
-          // @Fix: If the action is successful, it now returns a `redirectTo` path.
-          // The client is responsible for performing the navigation.
-          // This avoids the `NEXT_REDIRECT` error in the console.
-          if (data?.success) {
+          
+          // @Fix: Use a type guard for the success case as well.
+          if (data && 'success' in data) {
             router.push(data.redirectTo);
           }
         });
