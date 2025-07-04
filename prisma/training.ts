@@ -1,3 +1,4 @@
+
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
@@ -43,17 +44,17 @@ async function main() {
           id_training: parseInt(row.id_training, 10),
           nombre: row.nombre || '',
           descripcion: row.descripcion || '',
-          costo_base: {}, // Assign empty object
-          c_armas: parseInteger(row.c_armas),
-          c_municion: parseInteger(row.c_municion),
-          c_alcohol: parseInteger(row.c_alcohol),
-          c_dolares: parseInteger(row.c_dolares),
-          fac_costo: parseFloat(row.fac_costo),
-          t_horas: row.t_horas || '0',
-          t_minutos: row.t_minutos || '0',
-          t_segundos: row.t_segundos || '0',
-          fac_dura: parseFloat(row.fac_dura),
-          imagen_url: row.imagen_url || '',
+          costo_base: {}, // Asignar un objeto vacío como se solicitó
+          c_armas: parseInteger(row.cArmas),
+          c_municion: parseInteger(row.cMunicion),
+          c_alcohol: parseInteger(row.cAlcohol),
+          c_dolares: parseInteger(row.cDolar),
+          fac_costo: parseFloat(row.facCosto),
+          t_horas: row.tHoras || '0',
+          t_minutos: row.tMinutos || '0',
+          t_segundos: row.tSegundos || '0',
+          fac_dura: parseFloat(row.facDura),
+          imagen_url: row.imagenurl || '',
         };
 
         await prisma.training.upsert({
