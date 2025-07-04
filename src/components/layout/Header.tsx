@@ -1,18 +1,30 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Coins, Martini, Clock } from 'lucide-react';
 import type { User, PlayerResources } from '@prisma/client';
 
-type UserWithResources = User & { recursos: PlayerResources | null };
+// The user object passed here comes from `getCurrentUser`, which omits the password.
+// We use Omit<User, 'pass'> to accurately type this object.
+type UserWithResources = Omit<User, 'pass'> & { recursos: PlayerResources | null };
 
 export default function Header({ user }: { user: UserWithResources }) {
   const resources = user.recursos;
-  
-  // En un juego real, la hora debería venir del servidor y estar sincronizada.
-  // Para el prototipo, usamos la hora del cliente.
-  const currentTime = new Date().toLocaleString('es-ES', {
-    dateStyle: 'short',
-    timeStyle: 'medium',
-  });
+  const [currentTime, setCurrentTime] = useState('');
+
+  useEffect(() => {
+    // This effect runs only on the client, after hydration, avoiding a mismatch.
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleString('es-ES', {
+        dateStyle: 'short',
+        timeStyle: 'medium',
+      }));
+    }, 1000); // Update every second
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(timer);
+  }, []); // Empty dependency array ensures this runs once on mount
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6">
@@ -41,7 +53,7 @@ export default function Header({ user }: { user: UserWithResources }) {
          </div>
          <div className="hidden lg:flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-md">
            <Clock className="h-5 w-5 text-primary" />
-           <span className="font-bold">{currentTime}</span>
+           <span className="font-bold">{currentTime || '...'}</span>
          </div>
        </div>
     </header>
