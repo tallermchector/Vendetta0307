@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -35,6 +36,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,9 +50,6 @@ export default function LoginForm() {
     startTransition(() => {
       loginUser(values)
         .then((data) => {
-          // The server action will only return a value if there's an error.
-          // On success, it redirects, and this `.then()` block isn't reached
-          // in a way that continues execution.
           if (data?.error) {
             toast({
               title: "Error de inicio de sesión",
@@ -58,13 +57,13 @@ export default function LoginForm() {
               variant: "destructive",
             });
           }
+          // @Fix: If the action is successful, it now returns a `redirectTo` path.
+          // The client is responsible for performing the navigation.
+          // This avoids the `NEXT_REDIRECT` error in the console.
+          if (data?.success) {
+            router.push(data.redirectTo);
+          }
         });
-        // A `.catch()` block is intentionally omitted here.
-        // This is because a successful login triggers a `redirect()` in the
-        // server action, which Next.js handles by throwing a special
-        // exception. Catching it here would incorrectly treat a successful
-        // redirect as a client-side error. Any true server errors are now
-        // caught within the server action itself and returned as an `error` object.
     });
   }
 

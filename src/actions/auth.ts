@@ -69,7 +69,7 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
 }
 
 
-export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ error: string } | void> {
+export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ error: string } | { success: true; redirectTo: string; }> {
     try {
         const validatedFields = loginSchema.safeParse(values);
 
@@ -103,20 +103,14 @@ export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ 
         });
 
         if (!profile) {
-            // If registration is incomplete, redirect them to the final step.
-            redirect('/register/create-property');
+            // If registration is incomplete, return the redirect path for the client to handle.
+            return { success: true, redirectTo: '/register/create-property' };
         }
         
-        // On full success, redirect to the dashboard.
-        redirect('/dashboard');
+        // On full success, return the redirect path for the client to handle.
+        return { success: true, redirectTo: '/dashboard' };
 
     } catch (error: any) {
-        // This is the crucial part for handling redirects vs. real errors.
-        // If the error is a redirect, Next.js throws an error with a specific digest. We must re-throw it.
-        if (error.digest?.startsWith('NEXT_REDIRECT')) {
-            throw error;
-        }
-
         // Log the unexpected error for debugging purposes on the server.
         console.error("Error inesperado durante el inicio de sesión:", error);
         
