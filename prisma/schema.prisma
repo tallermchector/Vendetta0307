@@ -4,13 +4,14 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-generator client {
-  provider = "prisma-client-js"
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
@@ -38,7 +39,7 @@ model Family {
 model PlayerProfile {
   id_perfil            Int              @id @default(autoincrement())
   id_usuario           Int              @unique
-  usuario              User             @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  usuario              User             @relation(fields: [id_usuario], references: [id_usuario])
   puntos_edificios     Int
   puntos_tropas        Int
   puntos_entrenamiento Int
@@ -47,21 +48,10 @@ model PlayerProfile {
   trainings            PlayerTraining[]
 }
 
-// @New: Model to store training levels for each player
-model PlayerTraining {
-  id_perfil   Int
-  id_training Int
-  level       Int           @default(0)
-  profile     PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
-  training    Training      @relation(fields: [id_training], references: [id_training], onDelete: Cascade)
-
-  @@id([id_perfil, id_training])
-}
-
 model PlayerResources {
   id_recursos          Int      @id @default(autoincrement())
   id_usuario           Int      @unique
-  usuario              User     @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  usuario              User     @relation(fields: [id_usuario], references: [id_usuario])
   armas                BigInt
   municion             BigInt
   alcohol              BigInt
@@ -72,7 +62,7 @@ model PlayerResources {
 model Propiedad {
   id_propiedad Int    @id @default(autoincrement())
   id_usuario   Int
-  usuario      User   @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  usuario      User   @relation(fields: [id_usuario], references: [id_usuario])
   nombre       String
   coord_x      Int
   coord_y      Int
@@ -97,7 +87,7 @@ model Propiedad {
 }
 
 model Building {
-  id_edificio Int    @id
+  id_edificio Int     @id
   nombre      String
   descripcion String
   costo_base  Json
@@ -114,19 +104,29 @@ model Building {
 }
 
 model Training {
-  id_training     Int              @id
-  nombre          String
-  descripcion     String
-  costo_base      Json
-  c_armas         Int
-  c_municion      Int
-  c_alcohol       Int
-  c_dolares       Int
-  fac_costo       Float
-  t_horas         String
-  t_minutos       String
-  t_segundos      String
-  fac_dura        Float
-  imagen_url      String
-  playerTrainings PlayerTraining[]
+  id_training Int     @id
+  nombre      String
+  descripcion String
+  costo_base  Json
+  c_armas     Int
+  c_municion  Int
+  c_alcohol   Int
+  c_dolares   Int
+  fac_costo   Float
+  t_horas     String
+  t_minutos   String
+  t_segundos  String
+  fac_dura    Float
+  imagen_url  String
+}
+
+model PlayerTraining {
+  id_player_training Int           @id @default(autoincrement())
+  id_perfil          Int
+  id_training        Int
+  level              Int
+  perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil])
+  training           Training      @relation(fields: [id_training], references: [id_training])
+
+  @@unique([id_perfil, id_training])
 }
