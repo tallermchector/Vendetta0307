@@ -33,8 +33,8 @@ export async function createSession(payload: SessionPayload) {
   const session = await encrypt({ ...payload, expires });
 
   // @Security: Set cookies with HttpOnly, Secure (in prod), SameSite, and Path attributes.
-  // @BestPractice: First get the cookie store, then call methods on it.
-  const cookieStore = cookies();
+  // @BestPractice: The `cookies()` function from `next/headers` is asynchronous.
+  const cookieStore = await cookies();
   cookieStore.set('session', session, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -45,8 +45,8 @@ export async function createSession(payload: SessionPayload) {
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  // @BestPractice: First get the cookie store, then call methods on it.
-  const cookieStore = cookies();
+  // @BestPractice: `cookies()` must be awaited to get the cookie store.
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('session')?.value;
 
   if (!sessionCookie) return null;
@@ -58,6 +58,6 @@ export async function getSession(): Promise<SessionPayload | null> {
 
 export async function deleteSession() {
   // @Security: To log out, invalidate the cookie by setting an expiry date in the past.
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   cookieStore.set('session', '', { expires: new Date(0), path: '/' });
 }
