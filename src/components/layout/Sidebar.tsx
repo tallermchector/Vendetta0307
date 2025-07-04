@@ -38,6 +38,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Select,
@@ -50,6 +51,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Propiedad } from "@prisma/client";
 
 export default function Sidebar({ properties }: { properties: Propiedad[] }) {
+  const { setOpenMobile } = useSidebar();
+  
+  const handleLinkClick = () => {
+    setOpenMobile(false);
+  };
+
   const menuItems1 = [
     { href: "/dashboard", label: "Visión General", Icon: Home },
     { href: "/dashboard/rooms", label: "Habitaciones", Icon: BedDouble },
@@ -96,7 +103,7 @@ export default function Sidebar({ properties }: { properties: Propiedad[] }) {
           <SidebarMenu className="px-2">
               {menuItems1.map((item) => (
                   <SidebarMenuItem key={item.label}>
-                      <SidebarMenuButton asChild className="w-full justify-start">
+                      <SidebarMenuButton asChild className="w-full justify-start" onClick={handleLinkClick}>
                           <Link href={item.href}>
                               <item.Icon className="h-4 w-4" />
                               <span>{item.label}</span>
@@ -130,7 +137,7 @@ export default function Sidebar({ properties }: { properties: Propiedad[] }) {
           <SidebarMenu className="px-2">
               {menuItems2.map((item) => (
                   <SidebarMenuItem key={item.label}>
-                       <SidebarMenuButton asChild className="w-full justify-start">
+                       <SidebarMenuButton asChild className="w-full justify-start" onClick={handleLinkClick}>
                           <Link href={item.href}>
                               <item.Icon className="h-4 w-4" />
                               <span>{item.label}</span>
@@ -145,7 +152,7 @@ export default function Sidebar({ properties }: { properties: Propiedad[] }) {
           <SidebarMenu className="px-2 pb-4">
               {menuItems3.map((item) => (
                   <SidebarMenuItem key={item.label}>
-                       <SidebarMenuButton asChild className="w-full justify-start">
+                       <SidebarMenuButton asChild className="w-full justify-start" onClick={handleLinkClick}>
                           <Link href={item.href}>
                               <item.Icon className="h-4 w-4" />
                               <span>{item.label}</span>
