@@ -5,13 +5,18 @@ import { decrypt } from '@/lib/session';
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // @BestPractice: Define which routes are public and which are protected.
-  // This helps centralize the routing logic.
-  const isProtectedRoute = path.startsWith('/dashboard');
+  // @BestPractice: Define which routes are protected.
+  // This helps centralize the routing logic. The create-property page is a
+  // protected part of the registration flow.
+  const isProtectedRoute = 
+    path.startsWith('/dashboard') ||
+    path.startsWith('/register/create-property');
+
+  // @BestPractice: Define public routes that authenticated users should be
+  // redirected away from (e.g., login, register).
   const isPublicAuthRoute = 
     path === '/login' ||
     path === '/register' ||
-    path.startsWith('/register/create-property') ||
     path === '/forgot-password';
 
   // @Security: In middleware, read the cookie directly from the request object.
