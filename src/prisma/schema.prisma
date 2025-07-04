@@ -14,6 +14,8 @@ datasource db {
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
+// @BestPractice: onDelete: Cascade is added to ensure that when a related entity
+// is deleted, its dependent records are also cleaned up, maintaining data integrity.
 model User {
   id_usuario     Int               @id @default(autoincrement())
   usuario        String            @unique
@@ -45,6 +47,8 @@ model PlayerProfile {
   puntos_entrenamiento Int
   ranking_global       Int
   lealtad              Int
+  // @Refactor: Instead of storing training levels as columns, this establishes a
+  // one-to-many relationship with the PlayerTraining model for scalability.
   trainings            PlayerTraining[]
 }
 
@@ -67,28 +71,27 @@ model Propiedad {
   coord_x      Int
   coord_y      Int
   coord_z      Int
-
-  oficina      Int @default(0)
-  escuela      Int @default(0)
-  armeria      Int @default(0)
-  municion     Int @default(0)
-  cerveceria   Int @default(0)
-  taberna      Int @default(0)
-  contrabando  Int @default(0)
-  almacenArm   Int @default(0)
-  deposito     Int @default(0)
-  almacenAlc   Int @default(0)
-  caja         Int @default(0)
-  campo        Int @default(0)
-  seguridad    Int @default(0)
-  torreta      Int @default(0)
-  minas        Int @default(0)
+  oficina      Int    @default(0)
+  escuela      Int    @default(0)
+  armeria      Int    @default(0)
+  municion     Int    @default(0)
+  cerveceria   Int    @default(0)
+  taberna      Int    @default(0)
+  contrabando  Int    @default(0)
+  almacenArm   Int    @default(0)
+  deposito     Int    @default(0)
+  almacenAlc   Int    @default(0)
+  caja         Int    @default(0)
+  campo        Int    @default(0)
+  seguridad    Int    @default(0)
+  torreta      Int    @default(0)
+  minas        Int    @default(0)
 
   @@unique([coord_x, coord_y, coord_z])
 }
 
 model Building {
-  id_edificio Int    @id
+  id_edificio Int     @id
   nombre      String
   descripcion String
   costo_base  Json
@@ -104,6 +107,19 @@ model Building {
   imagen_url  String
 }
 
+// @New: This model links a player's profile to their level in a specific training.
+model PlayerTraining {
+  id_player_training Int           @id @default(autoincrement())
+  id_perfil          Int
+  id_training        Int
+  level              Int
+  perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
+  training           Training      @relation(fields: [id_training], references: [id_training], onDelete: Cascade)
+
+  @@unique([id_perfil, id_training])
+}
+
+// @New: This model holds the static catalog of all available trainings in the game.
 model Training {
   id_training      Int              @id
   nombre           String
@@ -119,16 +135,5 @@ model Training {
   t_segundos       String
   fac_dura         Float
   imagen_url       String
-  player_trainings PlayerTraining[]
-}
-
-model PlayerTraining {
-  id_player_training Int           @id @default(autoincrement())
-  id_perfil          Int
-  id_training        Int
-  level              Int
-  perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
-  training           Training      @relation(fields: [id_training], references: [id_training], onDelete: Cascade)
-
-  @@unique([id_perfil, id_training])
+  players_training PlayerTraining[]
 }

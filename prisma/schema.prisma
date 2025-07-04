@@ -15,23 +15,23 @@ generator client {
 }
 
 model User {
-  id_usuario     Int               @id @default(autoincrement())
-  usuario        String            @unique
-  email          String            @unique
+  id_usuario     Int              @id @default(autoincrement())
+  usuario        String           @unique
+  email          String           @unique
   pass           String
   idioma         String
-  fecha_registro DateTime          @default(now())
+  fecha_registro DateTime         @default(now())
   id_familia     Int?
-  familia        Family?           @relation(fields: [id_familia], references: [id_familia])
+  familia        Family?          @relation(fields: [id_familia], references: [id_familia])
   perfil         PlayerProfile?
   recursos       PlayerResources?
   propiedades    Propiedad[]
 }
 
 model Family {
-  id_familia  Int      @id @default(autoincrement())
-  nombre      String   @unique
-  tag         String   @unique
+  id_familia  Int     @id @default(autoincrement())
+  nombre      String  @unique
+  tag         String  @unique
   emblema_url String?
   miembros    User[]
 }
@@ -87,7 +87,7 @@ model Propiedad {
 }
 
 model Building {
-  id_edificio Int     @id
+  id_edificio Int    @id
   nombre      String
   descripcion String
   costo_base  Json
@@ -104,20 +104,21 @@ model Building {
 }
 
 model Training {
-  id_training Int     @id
-  nombre      String
-  descripcion String
-  costo_base  Json
-  c_armas     Int
-  c_municion  Int
-  c_alcohol   Int
-  c_dolares   Int
-  fac_costo   Float
-  t_horas     String
-  t_minutos   String
-  t_segundos  String
-  fac_dura    Float
-  imagen_url  String
+  id_training    Int              @id
+  nombre         String
+  descripcion    String
+  costo_base     Json
+  c_armas        Int
+  c_municion     Int
+  c_alcohol      Int
+  c_dolares      Int
+  fac_costo      Float
+  t_horas        String
+  t_minutos      String
+  t_segundos     String
+  fac_dura       Float
+  imagen_url     String
+  PlayerTraining PlayerTraining[]
 }
 
 model PlayerTraining {
