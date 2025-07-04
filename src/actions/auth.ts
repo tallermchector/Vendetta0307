@@ -69,7 +69,7 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
 }
 
 
-export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ success: true; } | { error: string; }> {
+export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ success?: true; error?: string; redirect?: string; }> {
     const validatedFields = loginSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -86,19 +86,30 @@ export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ 
         return { error: "El correo electrónico no está registrado." };
     }
     
-    // @Security: Use bcrypt.compare to securely check the password against the stored hash.
     const passwordsMatch = await bcrypt.compare(password, user.pass);
 
     if (!passwordsMatch) {
         return { error: "La contraseña es incorrecta." };
     }
+
+    // @BestPractice: Check if the user has completed the registration flow by checking for a profile.
+    const profile = await prisma.playerProfile.findUnique({
+        where: { id_usuario: user.id_usuario },
+    });
     
-    // @Security: Create a secure, HttpOnly session cookie upon successful login.
+    // Create the session cookie regardless, so the user can proceed to the next step if registration is incomplete.
     await createSession({ userId: user.id_usuario });
+
+    if (!profile) {
+        // If there's no profile, the user didn't complete the second step of registration.
+        return { 
+            error: "Tu registro está incompleto. Te redirigimos para que finalices.",
+            redirect: '/register/create-property'
+        };
+    }
     
-    // @BestPractice: On successful login, simply return a success status.
-    // The client will handle the redirect, and the middleware will protect the target route.
-    return { success: true };
+    // If login is successful and registration is complete, provide success and redirect path.
+    return { success: true, redirect: '/dashboard' };
 }
 
 export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswordSchema>) {

@@ -49,20 +49,28 @@ export default function LoginForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
       loginUser(values).then((data) => {
-        if (data.success) {
-          // @BestPractice: Se redirige explícitamente al dashboard para una mejor experiencia de usuario.
-          // El middleware seguirá protegiendo la ruta de destino.
-          router.push('/dashboard');
-        } else if (data.error) {
+        if (data.success && data.redirect) {
+          // Case: Successful login
           toast({
-            title: "Error de inicio de sesión",
+            title: "¡Bienvenido de nuevo!",
+            description: "Redirigiendo a tu panel de control...",
+          });
+          router.push(data.redirect);
+        } else if (data.error) {
+          // Case: Incomplete registration or other login errors
+          toast({
+            title: data.redirect ? "Registro Incompleto" : "Error de inicio de sesión",
             description: data.error,
             variant: "destructive",
           });
+          if (data.redirect) {
+             // Redirect to property creation after showing the toast, giving the user time to read it.
+             setTimeout(() => router.push(data.redirect as string), 2000);
+          }
         }
       }).catch(() => {
         toast({
-            title: "Error",
+            title: "Error inesperado",
             description: "Algo salió mal. Por favor, inténtalo de nuevo.",
             variant: "destructive",
         });
