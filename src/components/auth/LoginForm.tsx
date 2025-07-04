@@ -38,21 +38,13 @@ export default function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
       loginUser(values).then((data) => {
         if (data.success) {
-          // Redirección manejada por el middleware después de un inicio de sesión exitoso.
-          // El router.refresh() asegura que el estado del servidor (y la cookie) se actualice.
-          router.refresh();
+          // @BestPractice: Se redirige explícitamente al dashboard para una mejor experiencia de usuario.
+          // El middleware seguirá protegiendo la ruta de destino.
+          router.push('/dashboard');
         } else if (data.error) {
           toast({
             title: "Error de inicio de sesión",
