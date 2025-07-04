@@ -29,6 +29,7 @@ export const getCurrentUser = async () => {
         include: {
           // @New: Eager load the player's training levels with their profile.
           trainings: true,
+          recruitments: true,
         }
       },
       propiedades: true,
