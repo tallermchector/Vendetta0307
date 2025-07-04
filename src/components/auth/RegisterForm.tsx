@@ -57,14 +57,15 @@ export default function RegisterForm() {
     startTransition(() => {
       registerUser(values)
         .then((data) => {
-          if (data.error) {
+          // @Fix: Use type guards to correctly handle the union return type.
+          if ('error' in data) {
             toast({
               title: "Error de registro",
               description: data.error,
               variant: "destructive",
             });
           }
-          if (data.success) {
+          if ('success' in data && data.success) {
             toast({
               title: "¡Cuenta Creada!",
               description: "Paso 1/2: Ahora, establece tu propiedad inicial.",

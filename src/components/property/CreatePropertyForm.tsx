@@ -26,29 +26,14 @@ import { MapPin, Globe, Satellite, Anchor, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createInitialProperty } from "@/actions/property";
 
-// Using .pipe() allows us to validate as a string first (for required fields)
-// and then coerce and validate as a number. This works well with controlled
-// form inputs that use empty strings for empty number fields.
+// @Fix: This schema validates form inputs as strings. The robust numeric validation
+// (min/max range) is handled by the server action's schema. This resolves
+// the type mismatch with defaultValues.
 const formSchema = z.object({
   name: z.string().trim().min(3, {message: "Debe tener al menos 3 caracteres."}).default("Propiedad Principal"),
-  coordX: z.string().min(1, { message: "La coordenada X es requerida."}).pipe(
-    z.coerce.number({invalid_type_error: "Debe ser un número"})
-    .int()
-    .min(1, { message: "Rango: 1-50" })
-    .max(50, { message: "Rango: 1-50" })
-  ),
-  coordY: z.string().min(1, { message: "La coordenada Y es requerida."}).pipe(
-    z.coerce.number({invalid_type_error: "Debe ser un número"})
-    .int()
-    .min(1, { message: "Rango: 1-50" })
-    .max(50, { message: "Rango: 1-50" })
-  ),
-  coordZ: z.string().min(1, { message: "El Sector Z es requerido."}).pipe(
-    z.coerce.number({invalid_type_error: "Debe ser un número"})
-    .int()
-    .min(1, { message: "Rango: 1-255" })
-    .max(255, { message: "Rango: 1-255" })
-  ),
+  coordX: z.string().min(1, { message: "La coordenada X es requerida."}),
+  coordY: z.string().min(1, { message: "La coordenada Y es requerida."}),
+  coordZ: z.string().min(1, { message: "El Sector Z es requerido."}),
 });
 
 
@@ -71,7 +56,7 @@ export default function CreatePropertyForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
         // @Security: The action now gets the user ID from the secure session,
-        // so we don't need to pass any arguments here.
+        // and handles its own validation and coercion from string to number.
         createInitialProperty(values)
             .then((data) => {
                 if (data.error) {

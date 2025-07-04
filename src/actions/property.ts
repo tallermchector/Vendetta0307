@@ -28,7 +28,9 @@ const createPropertySchema = z.object({
   ),
 });
 
-export async function createInitialProperty(values: z.infer<typeof createPropertySchema>) {
+// @Fix: The function argument should be typed with z.input<> to represent the raw
+// data before parsing, not z.infer<> which is the output type.
+export async function createInitialProperty(values: z.input<typeof createPropertySchema>) {
   // @Security: Protect this action by ensuring a user is authenticated.
   // This is crucial because this action performs database writes.
   const user = await protectAction();
