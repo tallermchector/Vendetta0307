@@ -133,18 +133,18 @@ CREATE TABLE "Recruitment" (
     "c_municion" INTEGER NOT NULL,
     "c_alcohol" INTEGER NOT NULL,
     "c_dolares" INTEGER NOT NULL,
-    "velocidad" INTEGER NOT NULL,
+    "velocidad" BIGINT NOT NULL,
     "t_horas" TEXT NOT NULL,
     "t_minutos" TEXT NOT NULL,
     "t_segundos" TEXT NOT NULL,
     "fac_dura" DOUBLE PRECISION NOT NULL,
     "puntos_por_nivel" INTEGER NOT NULL,
     "imagen_url" TEXT NOT NULL,
-    "ata" INTEGER NOT NULL,
-    "def" INTEGER NOT NULL,
-    "car" INTEGER NOT NULL,
-    "vel" INTEGER NOT NULL,
-    "punt" INTEGER NOT NULL,
+    "ata" BIGINT NOT NULL,
+    "def" BIGINT NOT NULL,
+    "car" BIGINT NOT NULL,
+    "vel" BIGINT NOT NULL,
+    "punt" BIGINT NOT NULL,
 
     CONSTRAINT "Recruitment_pkey" PRIMARY KEY ("id_recruitment")
 );
@@ -157,6 +157,40 @@ CREATE TABLE "PlayerRecruitment" (
     "quantity" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "PlayerRecruitment_pkey" PRIMARY KEY ("id_player_recruitment")
+);
+
+-- CreateTable
+CREATE TABLE "Security" (
+    "id_security" INTEGER NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "descripcion" TEXT NOT NULL,
+    "c_armas" INTEGER NOT NULL,
+    "c_municion" INTEGER NOT NULL,
+    "c_alcohol" INTEGER NOT NULL,
+    "c_dolares" INTEGER NOT NULL,
+    "t_horas" TEXT NOT NULL,
+    "t_minutos" TEXT NOT NULL,
+    "t_segundos" TEXT NOT NULL,
+    "fac_dura" DOUBLE PRECISION NOT NULL,
+    "puntos_por_nivel" INTEGER NOT NULL,
+    "imagen_url" TEXT NOT NULL,
+    "ata" BIGINT NOT NULL,
+    "def" BIGINT NOT NULL,
+    "car" BIGINT NOT NULL,
+    "vel" BIGINT NOT NULL,
+    "punt" BIGINT NOT NULL,
+
+    CONSTRAINT "Security_pkey" PRIMARY KEY ("id_security")
+);
+
+-- CreateTable
+CREATE TABLE "PlayerSecurity" (
+    "id_player_security" SERIAL NOT NULL,
+    "id_perfil" INTEGER NOT NULL,
+    "id_security" INTEGER NOT NULL,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "PlayerSecurity_pkey" PRIMARY KEY ("id_player_security")
 );
 
 -- CreateIndex
@@ -186,6 +220,9 @@ CREATE UNIQUE INDEX "PlayerTraining_id_perfil_id_training_key" ON "PlayerTrainin
 -- CreateIndex
 CREATE UNIQUE INDEX "PlayerRecruitment_id_perfil_id_recruitment_key" ON "PlayerRecruitment"("id_perfil", "id_recruitment");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "PlayerSecurity_id_perfil_id_security_key" ON "PlayerSecurity"("id_perfil", "id_security");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_id_familia_fkey" FOREIGN KEY ("id_familia") REFERENCES "Family"("id_familia") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -202,10 +239,16 @@ ALTER TABLE "Propiedad" ADD CONSTRAINT "Propiedad_id_usuario_fkey" FOREIGN KEY (
 ALTER TABLE "PlayerTraining" ADD CONSTRAINT "PlayerTraining_id_perfil_fkey" FOREIGN KEY ("id_perfil") REFERENCES "PlayerProfile"("id_perfil") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PlayerTraining" ADD CONSTRAINT "PlayerTraining_id_training_fkey" FOREIGN KEY ("id_training") REFERENCES "Training"("id_training") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PlayerTraining" ADD CONSTRAINT "PlayerTraining_id_training_fkey" FOREIGN KEY ("id_training") REFERENCES "Training"("id_training") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PlayerRecruitment" ADD CONSTRAINT "PlayerRecruitment_id_perfil_fkey" FOREIGN KEY ("id_perfil") REFERENCES "PlayerProfile"("id_perfil") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PlayerRecruitment" ADD CONSTRAINT "PlayerRecruitment_id_recruitment_fkey" FOREIGN KEY ("id_recruitment") REFERENCES "Recruitment"("id_recruitment") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PlayerRecruitment" ADD CONSTRAINT "PlayerRecruitment_id_recruitment_fkey" FOREIGN KEY ("id_recruitment") REFERENCES "Recruitment"("id_recruitment") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlayerSecurity" ADD CONSTRAINT "PlayerSecurity_id_perfil_fkey" FOREIGN KEY ("id_perfil") REFERENCES "PlayerProfile"("id_perfil") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlayerSecurity" ADD CONSTRAINT "PlayerSecurity_id_security_fkey" FOREIGN KEY ("id_security") REFERENCES "Security"("id_security") ON DELETE RESTRICT ON UPDATE CASCADE;
