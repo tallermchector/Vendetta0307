@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Target, ArrowUpCircle, Swords, Shell, Martini, DollarSign, Clock } from "lucide-react";
+import { Target, ArrowUpCircle, Clock } from "lucide-react";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import type { PlayerTraining } from "@prisma/client";
@@ -38,22 +39,38 @@ function formatDuration(totalSeconds: number): string {
 }
 
 // Helper component to display a single resource cost for Desktop
-function ResourceCost({ icon: Icon, value, label }: { icon: React.ElementType, value: number, label: string }) {
+function ResourceCost({ type, value, label }: { type: 'armas' | 'municion' | 'alcohol' | 'dolares', value: number, label: string }) {
   if (value === 0) return null;
+  
+  const iconMap = {
+      armas: '/img/recursos/armas.svg',
+      municion: '/img/recursos/municion.svg',
+      alcohol: '/img/recursos/alcohol.svg',
+      dolares: '/img/recursos/dolares.svg'
+  };
+
   return (
     <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={label}>
-      <Icon className="h-3.5 w-3.5 text-primary/80" />
+      <Image src={iconMap[type]} alt={label} width={14} height={14} className="h-3.5 w-3.5" />
       <span>{value.toLocaleString()}</span>
     </div>
   );
 }
 
 // Helper component for mobile resource costs
-function MobileResourceCost({ icon: Icon, value }: { icon: React.ElementType, value: number }) {
+function MobileResourceCost({ type, value, label }: { type: 'armas' | 'municion' | 'alcohol' | 'dolares', value: number, label: string }) {
   if (value === 0) return null;
+    
+  const iconMap = {
+      armas: '/img/recursos/armas.svg',
+      municion: '/img/recursos/municion.svg',
+      alcohol: '/img/recursos/alcohol.svg',
+      dolares: '/img/recursos/dolares.svg'
+  };
+
   return (
-    <div className="flex items-center gap-1">
-      <Icon className="h-3 w-3 text-destructive" />
+    <div className="flex items-center gap-1" title={label}>
+      <Image src={iconMap[type]} alt={label} width={12} height={12} className="h-3 w-3 text-destructive" />
       <span>{value.toLocaleString()}</span>
     </div>
   );
@@ -164,10 +181,10 @@ export default async function TrainingPage() {
                           <div className="flex flex-col gap-1.5">
                               <div className="font-semibold text-xs text-foreground">Al Nivel {nextLevel}:</div>
                               <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-                                  <ResourceCost icon={Swords} value={costArmas} label="Armas" />
-                                  <ResourceCost icon={Shell} value={costMunicion} label="Munición" />
-                                  <ResourceCost icon={Martini} value={costAlcohol} label="Alcohol" />
-                                  <ResourceCost icon={DollarSign} value={costDolares} label="Dólares" />
+                                  <ResourceCost type="armas" value={costArmas} label="Armas" />
+                                  <ResourceCost type="municion" value={costMunicion} label="Munición" />
+                                  <ResourceCost type="alcohol" value={costAlcohol} label="Alcohol" />
+                                  <ResourceCost type="dolares" value={costDolares} label="Dólares" />
                               </div>
                               <Separator className="my-1 bg-border/60" />
                               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
@@ -219,10 +236,10 @@ export default async function TrainingPage() {
                     <div className="text-right">
                       <p className="text-xs font-semibold text-muted-foreground">Al Nivel {nextLevel}:</p>
                       <div className="mt-1 flex flex-wrap justify-end gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                        <MobileResourceCost icon={Swords} value={costArmas} />
-                        <MobileResourceCost icon={Shell} value={costMunicion} />
-                        <MobileResourceCost icon={Martini} value={costAlcohol} />
-                        <MobileResourceCost icon={DollarSign} value={costDolares} />
+                        <MobileResourceCost type="armas" value={costArmas} label="Armas" />
+                        <MobileResourceCost type="municion" value={costMunicion} label="Munición" />
+                        <MobileResourceCost type="alcohol" value={costAlcohol} label="Alcohol" />
+                        <MobileResourceCost type="dolares" value={costDolares} label="Dólares" />
                       </div>
                       <div className="mt-2 flex items-center justify-end gap-1.5 text-xs font-semibold text-muted-foreground">
                         <Clock className="h-3.5 w-3.5" />

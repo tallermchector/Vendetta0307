@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -15,7 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { UserPlus, Swords, Shell, Martini, DollarSign, Shield, ShieldCheck } from "lucide-react";
+import { Swords, Shield, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import type { PlayerSecurity } from "@prisma/client";
@@ -23,23 +24,39 @@ import { protectPage } from "@/lib/auth";
 import { purchaseSecurity } from "@/actions/security";
 
 // Helper component to display a single resource cost for Desktop
-function ResourceCost({ icon: Icon, value, label }: { icon: React.ElementType, value: number, label: string }) {
-  if (value === 0) return null;
+function ResourceCost({ type, value, label }: { type: 'armas' | 'municion' | 'alcohol' | 'dolares', value: number | bigint, label: string }) {
+  if (value === 0 || value === 0n) return null;
+  
+  const iconMap = {
+      armas: '/img/recursos/armas.svg',
+      municion: '/img/recursos/municion.svg',
+      alcohol: '/img/recursos/alcohol.svg',
+      dolares: '/img/recursos/dolares.svg'
+  };
+
   return (
     <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={label}>
-      <Icon className="h-3.5 w-3.5 text-primary/80" />
-      <span>{value.toLocaleString()}</span>
+      <Image src={iconMap[type]} alt={label} width={14} height={14} className="h-3.5 w-3.5" />
+      <span>{Number(value).toLocaleString()}</span>
     </div>
   );
 }
 
 // Helper component for mobile resource costs
-function MobileResourceCost({ icon: Icon, value }: { icon: React.ElementType, value: number }) {
-  if (value === 0) return null;
+function MobileResourceCost({ type, value, label }: { type: 'armas' | 'municion' | 'alcohol' | 'dolares', value: number | bigint, label: string }) {
+  if (value === 0 || value === 0n) return null;
+    
+  const iconMap = {
+      armas: '/img/recursos/armas.svg',
+      municion: '/img/recursos/municion.svg',
+      alcohol: '/img/recursos/alcohol.svg',
+      dolares: '/img/recursos/dolares.svg'
+  };
+
   return (
-    <div className="flex items-center gap-1">
-      <Icon className="h-3 w-3 text-destructive" />
-      <span>{value.toLocaleString()}</span>
+    <div className="flex items-center gap-1" title={label}>
+      <Image src={iconMap[type]} alt={label} width={12} height={12} className="h-3 w-3" />
+      <span className="text-destructive">{Number(value).toLocaleString()}</span>
     </div>
   );
 }
@@ -167,10 +184,10 @@ export default async function SecurityPage() {
                       </TableCell>
                       <TableCell>
                           <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-                              <ResourceCost icon={Swords} value={unit.c_armas} label="Armas" />
-                              <ResourceCost icon={Shell} value={unit.c_municion} label="Munición" />
-                              <ResourceCost icon={Martini} value={unit.c_alcohol} label="Alcohol" />
-                              <ResourceCost icon={DollarSign} value={unit.c_dolares} label="Dólares" />
+                              <ResourceCost type="armas" value={unit.c_armas} label="Armas" />
+                              <ResourceCost type="municion" value={unit.c_municion} label="Munición" />
+                              <ResourceCost type="alcohol" value={unit.c_alcohol} label="Alcohol" />
+                              <ResourceCost type="dolares" value={unit.c_dolares} label="Dólares" />
                           </div>
                       </TableCell>
                       <TableCell>
@@ -226,11 +243,11 @@ export default async function SecurityPage() {
                   
                   <div className="mt-4">
                       <p className="text-xs font-semibold text-muted-foreground">Costo por unidad:</p>
-                      <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                        <MobileResourceCost icon={Swords} value={unit.c_armas} />
-                        <MobileResourceCost icon={Shell} value={unit.c_municion} />
-                        <MobileResourceCost icon={Martini} value={unit.c_alcohol} />
-                        <MobileResourceCost icon={DollarSign} value={unit.c_dolares} />
+                      <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                        <MobileResourceCost type="armas" value={unit.c_armas} label="Armas" />
+                        <MobileResourceCost type="municion" value={unit.c_municion} label="Munición" />
+                        <MobileResourceCost type="alcohol" value={unit.c_alcohol} label="Alcohol" />
+                        <MobileResourceCost type="dolares" value={unit.c_dolares} label="Dólares" />
                       </div>
                   </div>
 
