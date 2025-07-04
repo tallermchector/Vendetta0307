@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Coins, Martini, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import Image from 'next/image';
 import type { User, PlayerResources } from '@prisma/client';
 
 // The user object passed here comes from `getCurrentUser`, which omits the password.
@@ -32,25 +33,32 @@ export default function Header({ user }: { user: UserWithResources }) {
        
        <div className="flex-1"></div>
 
-       <div className="flex items-center justify-end gap-x-4 lg:gap-x-6 text-sm font-medium text-foreground">
-         <div className="hidden sm:flex items-center gap-2">
-           <span>ARMAS</span>
+       <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 lg:gap-x-6 text-sm font-medium text-foreground">
+         
+         <div className="flex items-center gap-2">
+           <Image src="/img/recursos/armas.svg" alt="Armas" width={20} height={20} />
+           <span className="hidden sm:inline">ARMAS</span>
            <span className="font-bold text-primary">{(Number(resources?.armas) || 0).toLocaleString()}</span>
          </div>
-         <div className="hidden sm:flex items-center gap-2">
-           <span>MUNICION</span>
+         
+         <div className="flex items-center gap-2">
+           <Image src="/img/recursos/municion.svg" alt="Munición" width={20} height={20} />
+           <span className="hidden sm:inline">MUNICION</span>
            <span className="font-bold text-primary">{(Number(resources?.municion) || 0).toLocaleString()}</span>
          </div>
+
          <div className="flex items-center gap-2">
-           <Martini className="h-5 w-5 text-primary" />
-           <span className="hidden md:inline">ALCOHOL</span>
+           <Image src="/img/recursos/alcohol.svg" alt="Alcohol" width={16} height={16} />
+           <span className="hidden sm:inline">ALCOHOL</span>
            <span className="font-bold text-primary">{(Number(resources?.alcohol) || 0).toLocaleString()}</span>
          </div>
+
          <div className="flex items-center gap-2">
-           <Coins className="h-5 w-5 text-primary" />
-           <span className="hidden md:inline">DOLARES</span>
+           <Image src="/img/recursos/dolares.svg" alt="Dólares" width={20} height={20} />
+           <span className="hidden sm:inline">DOLARES</span>
            <span className="font-bold text-primary">{(Number(resources?.dolares) || 0).toLocaleString()}</span>
          </div>
+
          <div className="hidden lg:flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-md">
            <Clock className="h-5 w-5 text-primary" />
            <span className="font-bold">{currentTime || '...'}</span>
