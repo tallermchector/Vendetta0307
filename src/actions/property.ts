@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import prisma from '@/lib/prisma';
 import { protectAction } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 // @BestPractice: Use .pipe() for complex validation, first ensuring the value is a
 // string, then coercing to a number for range checks.
@@ -44,11 +45,11 @@ export async function createInitialProperty(values: z.input<typeof createPropert
   
   const { name, coordX, coordY, coordZ } = validatedFields.data;
   
-  const existingPropertyForUser = await prisma.propiedad.findFirst({
+  const existingProfile = await prisma.playerProfile.findUnique({
       where: { id_usuario: userId }
   });
 
-  if (existingPropertyForUser) {
+  if (existingProfile) {
       return { error: 'Este usuario ya tiene una propiedad.' };
   }
 
@@ -132,10 +133,12 @@ export async function createInitialProperty(values: z.input<typeof createPropert
         }
       });
     });
-
-    return { success: '¡Propiedad creada con éxito! Ahora puedes iniciar sesión.' };
   } catch (error) {
     console.error("Error al crear la propiedad y el perfil:", error);
     return { error: 'No se pudo crear la propiedad. Inténtalo de nuevo.' };
   }
+  
+  // @BestPractice: Redirect must be called outside of a try/catch block.
+  // This ensures Next.js can properly handle the navigation.
+  redirect('/dashboard');
 }

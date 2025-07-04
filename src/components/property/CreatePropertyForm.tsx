@@ -3,7 +3,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import {
   Form,
@@ -40,7 +39,6 @@ const formSchema = z.object({
 export default function CreatePropertyForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,20 +57,15 @@ export default function CreatePropertyForm() {
         // and handles its own validation and coercion from string to number.
         createInitialProperty(values)
             .then((data) => {
-                if (data.error) {
+                // If the action returns a value, it's always an error object.
+                // A successful action results in a redirect, which doesn't resolve here.
+                if (data?.error) {
                     form.setError("root", { message: data.error });
                     toast({
                         title: "Error al crear la propiedad",
                         description: data.error,
                         variant: "destructive",
                     });
-                }
-                if (data.success) {
-                    toast({
-                        title: "¡Propiedad Establecida!",
-                        description: "Tu base de operaciones está lista.",
-                    });
-                    router.push('/dashboard');
                 }
             })
             .catch(() => {
