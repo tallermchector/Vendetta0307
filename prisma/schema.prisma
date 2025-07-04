@@ -4,34 +4,36 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
+// @BestPractice: onDelete: Cascade is added to ensure that when a related entity
+// is deleted, its dependent records are also cleaned up, maintaining data integrity.
 model User {
-  id_usuario     Int              @id @default(autoincrement())
-  usuario        String           @unique
-  email          String           @unique
+  id_usuario     Int               @id @default(autoincrement())
+  usuario        String            @unique
+  email          String            @unique
   pass           String
   idioma         String
-  fecha_registro DateTime         @default(now())
+  fecha_registro DateTime          @default(now())
   id_familia     Int?
-  familia        Family?          @relation(fields: [id_familia], references: [id_familia])
+  familia        Family?           @relation(fields: [id_familia], references: [id_familia])
   perfil         PlayerProfile?
   recursos       PlayerResources?
   propiedades    Propiedad[]
 }
 
 model Family {
-  id_familia  Int     @id @default(autoincrement())
-  nombre      String  @unique
-  tag         String  @unique
+  id_familia  Int      @id @default(autoincrement())
+  nombre      String   @unique
+  tag         String   @unique
   emblema_url String?
   miembros    User[]
 }
@@ -39,19 +41,21 @@ model Family {
 model PlayerProfile {
   id_perfil            Int              @id @default(autoincrement())
   id_usuario           Int              @unique
-  usuario              User             @relation(fields: [id_usuario], references: [id_usuario])
+  usuario              User             @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
   puntos_edificios     Int
   puntos_tropas        Int
   puntos_entrenamiento Int
   ranking_global       Int
   lealtad              Int
+  // @Refactor: Instead of storing training levels as columns, this establishes a
+  // one-to-many relationship with the PlayerTraining model for scalability.
   trainings            PlayerTraining[]
 }
 
 model PlayerResources {
   id_recursos          Int      @id @default(autoincrement())
   id_usuario           Int      @unique
-  usuario              User     @relation(fields: [id_usuario], references: [id_usuario])
+  usuario              User     @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
   armas                BigInt
   municion             BigInt
   alcohol              BigInt
@@ -62,7 +66,7 @@ model PlayerResources {
 model Propiedad {
   id_propiedad Int    @id @default(autoincrement())
   id_usuario   Int
-  usuario      User   @relation(fields: [id_usuario], references: [id_usuario])
+  usuario      User   @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
   nombre       String
   coord_x      Int
   coord_y      Int
@@ -87,7 +91,7 @@ model Propiedad {
 }
 
 model Building {
-  id_edificio Int    @id
+  id_edificio Int     @id
   nombre      String
   descripcion String
   costo_base  Json
@@ -103,31 +107,33 @@ model Building {
   imagen_url  String
 }
 
-model Training {
-  id_training    Int              @id
-  nombre         String
-  descripcion    String
-  costo_base     Json
-  c_armas        Int
-  c_municion     Int
-  c_alcohol      Int
-  c_dolares      Int
-  fac_costo      Float
-  t_horas        String
-  t_minutos      String
-  t_segundos     String
-  fac_dura       Float
-  imagen_url     String
-  PlayerTraining PlayerTraining[]
-}
-
+// @New: This model links a player's profile to their level in a specific training.
 model PlayerTraining {
   id_player_training Int           @id @default(autoincrement())
   id_perfil          Int
   id_training        Int
   level              Int
-  perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil])
-  training           Training      @relation(fields: [id_training], references: [id_training])
+  perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
+  training           Training      @relation(fields: [id_training], references: [id_training], onDelete: Cascade)
 
   @@unique([id_perfil, id_training])
+}
+
+// @New: This model holds the static catalog of all available trainings in the game.
+model Training {
+  id_training      Int              @id
+  nombre           String
+  descripcion      String
+  costo_base       Json
+  c_armas          Int
+  c_municion       Int
+  c_alcohol        Int
+  c_dolares        Int
+  fac_costo        Float
+  t_horas          String
+  t_minutos        String
+  t_segundos       String
+  fac_dura         Float
+  imagen_url       String
+  players_training PlayerTraining[]
 }
