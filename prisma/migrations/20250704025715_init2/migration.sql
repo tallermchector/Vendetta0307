@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Recruitment" ALTER COLUMN "vel" SET DATA TYPE DOUBLE PRECISION;

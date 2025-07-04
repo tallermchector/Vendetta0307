@@ -95,16 +95,6 @@ CREATE TABLE "Building" (
 );
 
 -- CreateTable
-CREATE TABLE "PlayerTraining" (
-    "id_player_training" SERIAL NOT NULL,
-    "id_perfil" INTEGER NOT NULL,
-    "id_training" INTEGER NOT NULL,
-    "level" INTEGER NOT NULL,
-
-    CONSTRAINT "PlayerTraining_pkey" PRIMARY KEY ("id_player_training")
-);
-
--- CreateTable
 CREATE TABLE "Training" (
     "id_training" INTEGER NOT NULL,
     "nombre" TEXT NOT NULL,
@@ -122,6 +112,51 @@ CREATE TABLE "Training" (
     "imagen_url" TEXT NOT NULL,
 
     CONSTRAINT "Training_pkey" PRIMARY KEY ("id_training")
+);
+
+-- CreateTable
+CREATE TABLE "PlayerTraining" (
+    "id_player_training" SERIAL NOT NULL,
+    "id_perfil" INTEGER NOT NULL,
+    "id_training" INTEGER NOT NULL,
+    "level" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "PlayerTraining_pkey" PRIMARY KEY ("id_player_training")
+);
+
+-- CreateTable
+CREATE TABLE "Recruitment" (
+    "id_recruitment" INTEGER NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "descripcion" TEXT NOT NULL,
+    "c_armas" INTEGER NOT NULL,
+    "c_municion" INTEGER NOT NULL,
+    "c_alcohol" INTEGER NOT NULL,
+    "c_dolares" INTEGER NOT NULL,
+    "velocidad" INTEGER NOT NULL,
+    "t_horas" TEXT NOT NULL,
+    "t_minutos" TEXT NOT NULL,
+    "t_segundos" TEXT NOT NULL,
+    "fac_dura" DOUBLE PRECISION NOT NULL,
+    "puntos_por_nivel" INTEGER NOT NULL,
+    "imagen_url" TEXT NOT NULL,
+    "ata" INTEGER NOT NULL,
+    "def" INTEGER NOT NULL,
+    "car" INTEGER NOT NULL,
+    "vel" INTEGER NOT NULL,
+    "punt" INTEGER NOT NULL,
+
+    CONSTRAINT "Recruitment_pkey" PRIMARY KEY ("id_recruitment")
+);
+
+-- CreateTable
+CREATE TABLE "PlayerRecruitment" (
+    "id_player_recruitment" SERIAL NOT NULL,
+    "id_perfil" INTEGER NOT NULL,
+    "id_recruitment" INTEGER NOT NULL,
+    "quantity" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "PlayerRecruitment_pkey" PRIMARY KEY ("id_player_recruitment")
 );
 
 -- CreateIndex
@@ -148,6 +183,9 @@ CREATE UNIQUE INDEX "Propiedad_coord_x_coord_y_coord_z_key" ON "Propiedad"("coor
 -- CreateIndex
 CREATE UNIQUE INDEX "PlayerTraining_id_perfil_id_training_key" ON "PlayerTraining"("id_perfil", "id_training");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "PlayerRecruitment_id_perfil_id_recruitment_key" ON "PlayerRecruitment"("id_perfil", "id_recruitment");
+
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_id_familia_fkey" FOREIGN KEY ("id_familia") REFERENCES "Family"("id_familia") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -165,3 +203,9 @@ ALTER TABLE "PlayerTraining" ADD CONSTRAINT "PlayerTraining_id_perfil_fkey" FORE
 
 -- AddForeignKey
 ALTER TABLE "PlayerTraining" ADD CONSTRAINT "PlayerTraining_id_training_fkey" FOREIGN KEY ("id_training") REFERENCES "Training"("id_training") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlayerRecruitment" ADD CONSTRAINT "PlayerRecruitment_id_perfil_fkey" FOREIGN KEY ("id_perfil") REFERENCES "PlayerProfile"("id_perfil") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PlayerRecruitment" ADD CONSTRAINT "PlayerRecruitment_id_recruitment_fkey" FOREIGN KEY ("id_recruitment") REFERENCES "Recruitment"("id_recruitment") ON DELETE CASCADE ON UPDATE CASCADE;

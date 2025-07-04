@@ -23,6 +23,18 @@ function parseFloatValue(value: string | undefined): number {
     return isNaN(number) ? 0 : number;
 }
 
+// Helper to parse potentially large integers into BigInt.
+function parseBigInt(value: string | undefined): bigint {
+    if (!value) return 0n;
+    const cleanValue = value.replace(/[.,]/g, '');
+    try {
+        return BigInt(cleanValue);
+    } catch (e) {
+        console.warn(`Could not parse value as BigInt: "${value}", returning 0n.`);
+        return 0n;
+    }
+}
+
 
 async function main() {
   console.log(`Iniciando el sembrado de datos de reclutamiento desde CSV...`);
@@ -58,18 +70,18 @@ async function main() {
           c_municion: parseInteger(row.cMunicion),
           c_alcohol: parseInteger(row.cAlcohol),
           c_dolares: parseInteger(row.cDolar),
-          velocidad: parseInteger(row.velocidad),
+          velocidad: parseBigInt(row.velocidad),
           t_horas: row.tHoras || '0',
           t_minutos: row.tMinutos || '0',
           t_segundos: row.tSegundos || '0',
           fac_dura: parseFloatValue(row.facDura),
           puntos_por_nivel: parseInteger(row.puntosxnivel),
           imagen_url: row.imagenurl || '',
-          ata: parseInteger(row.ATA),
-          def: parseInteger(row.DEF),
-          car: parseInteger(row.CAR),
-          vel: parseInteger(row.VEL),
-          punt: parseInteger(row.PUNT),
+          ata: parseBigInt(row.ATA),
+          def: parseBigInt(row.DEF),
+          car: parseBigInt(row.CAR),
+          vel: parseBigInt(row.VEL),
+          punt: parseBigInt(row.PUNT),
         };
 
         await prisma.recruitment.upsert({
