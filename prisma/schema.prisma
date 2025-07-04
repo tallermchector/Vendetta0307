@@ -1,33 +1,27 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
-datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
-}
-
-// @BestPractice: onDelete: Cascade is added to ensure that when a related entity
-// is deleted, its dependent records are also cleaned up, maintaining data integrity.
 model User {
-  id_usuario     Int               @id @default(autoincrement())
-  usuario        String            @unique
-  email          String            @unique
+  id_usuario     Int      @id @default(autoincrement())
+  usuario        String   @unique
+  email          String   @unique
   pass           String
   idioma         String
-  fecha_registro DateTime          @default(now())
+  fecha_registro DateTime @default(now())
   id_familia     Int?
-  familia        Family?           @relation(fields: [id_familia], references: [id_familia])
-  perfil         PlayerProfile?
-  recursos       PlayerResources?
-  propiedades    Propiedad[]
+  familia        Family?  @relation(fields: [id_familia], references: [id_familia])
+
+  perfil      PlayerProfile?
+  recursos    PlayerResources?
+  propiedades Propiedad[]
 }
 
 model Family {
@@ -39,17 +33,16 @@ model Family {
 }
 
 model PlayerProfile {
-  id_perfil            Int              @id @default(autoincrement())
-  id_usuario           Int              @unique
-  usuario              User             @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
+  id_perfil            Int      @id @default(autoincrement())
+  id_usuario           Int      @unique
+  usuario              User     @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade)
   puntos_edificios     Int
   puntos_tropas        Int
   puntos_entrenamiento Int
   ranking_global       Int
   lealtad              Int
-  // @Refactor: Instead of storing training levels as columns, this establishes a
-  // one-to-many relationship with the PlayerTraining model for scalability.
   trainings            PlayerTraining[]
+  recruitments         PlayerRecruitment[]
 }
 
 model PlayerResources {
@@ -91,9 +84,9 @@ model Propiedad {
 }
 
 model Building {
-  id_edificio Int     @id
+  id_edificio Int    @id
   nombre      String
-  descripcion String
+  descripcion String @db.Text
   costo_base  Json
   c_armas     Int
   c_municion  Int
@@ -107,33 +100,70 @@ model Building {
   imagen_url  String
 }
 
-// @New: This model links a player's profile to their level in a specific training.
+model Training {
+  id_training Int    @id
+  nombre      String
+  descripcion String @db.Text
+  costo_base  Json
+  c_armas     Int
+  c_municion  Int
+  c_alcohol   Int
+  c_dolares   Int
+  fac_costo   Float
+  t_horas     String
+  t_minutos   String
+  t_segundos  String
+  fac_dura    Float
+  imagen_url  String
+
+  players PlayerTraining[]
+}
+
 model PlayerTraining {
-  id_player_training Int           @id @default(autoincrement())
+  id_player_training Int     @id @default(autoincrement())
   id_perfil          Int
   id_training        Int
-  level              Int
+  level              Int     @default(0)
   perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
   training           Training      @relation(fields: [id_training], references: [id_training], onDelete: Cascade)
 
   @@unique([id_perfil, id_training])
 }
 
-// @New: This model holds the static catalog of all available trainings in the game.
-model Training {
-  id_training      Int              @id
+// @New: Catalog of all possible units that can be recruited in the game.
+model Recruitment {
+  id_recruitment   Int    @id
   nombre           String
-  descripcion      String
-  costo_base       Json
+  descripcion      String @db.Text
   c_armas          Int
   c_municion       Int
   c_alcohol        Int
   c_dolares        Int
-  fac_costo        Float
+  velocidad        Int
   t_horas          String
   t_minutos        String
   t_segundos       String
   fac_dura         Float
+  puntos_por_nivel Int
   imagen_url       String
-  players_training PlayerTraining[]
+  ata              Int
+  def              Int
+  car              Int
+  vel              Int
+  punt             Int
+
+  players PlayerRecruitment[]
+}
+
+// @New: Join table to track how many units of each type a player has recruited.
+model PlayerRecruitment {
+  id_player_recruitment Int @id @default(autoincrement())
+  id_perfil             Int
+  id_recruitment        Int
+  quantity              Int @default(0)
+
+  perfil      PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
+  recruitment Recruitment   @relation(fields: [id_recruitment], references: [id_recruitment], onDelete: Cascade)
+
+  @@unique([id_perfil, id_recruitment])
 }
