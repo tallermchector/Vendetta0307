@@ -1,18 +1,20 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
 }
 
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
+
+
+// ---------------------
+// Modelos de Autenticación y Usuario
+// ---------------------
 
 model User {
   id_usuario     Int      @id @default(autoincrement())
@@ -22,12 +24,12 @@ model User {
   idioma         String
   fecha_registro DateTime @default(now())
 
-  id_familia Int?
-  familia    Family? @relation(fields: [id_familia], references: [id_familia])
-
-  perfil      PlayerProfile?
-  recursos    PlayerResources?
-  propiedades Propiedad[]
+  // Relaciones del Jugador
+  id_familia    Int?
+  familia       Family?          @relation(fields: [id_familia], references: [id_familia])
+  perfil        PlayerProfile?
+  recursos      PlayerResources?
+  propiedades   Propiedad[]
 }
 
 model Family {
@@ -38,6 +40,10 @@ model Family {
   miembros    User[]
 }
 
+// ---------------------
+// Modelos de Datos del Jugador
+// ---------------------
+
 model PlayerProfile {
   id_perfil            Int      @id @default(autoincrement())
   id_usuario           Int      @unique
@@ -47,8 +53,11 @@ model PlayerProfile {
   puntos_entrenamiento Int
   ranking_global       Int
   lealtad              Int
-  trainings            PlayerTraining[]
-  recruitments         PlayerRecruitment[]
+
+  // Relaciones de Progreso
+  trainings    PlayerTraining[]
+  recruitments PlayerRecruitment[]
+  securities   PlayerSecurity[]
 }
 
 model PlayerResources {
@@ -71,10 +80,11 @@ model Propiedad {
   coord_y      Int
   coord_z      Int
 
+  // Niveles de Edificios
   oficina     Int @default(0)
   escuela     Int @default(0)
   armeria     Int @default(0)
-  municion    Int @default(0)
+  municion    Int @default(0) // Fábrica de municiones, no el recurso
   cerveceria  Int @default(0)
   taberna     Int @default(0)
   contrabando Int @default(0)
@@ -87,11 +97,16 @@ model Propiedad {
   torreta     Int @default(0)
   minas       Int @default(0)
 
+
   @@unique([coord_x, coord_y, coord_z])
 }
 
+// ---------------------
+// Modelos de Catálogo del Juego
+// ---------------------
+
 model Building {
-  id_edificio Int    @id
+  id_edificio Int     @id // No autoincremental para IDs fijos
   nombre      String
   descripcion String
   costo_base  Json
@@ -108,7 +123,7 @@ model Building {
 }
 
 model Training {
-  id_training    Int     @id
+  id_training    Int     @id // No autoincremental
   nombre         String
   descripcion    String
   costo_base     Json
@@ -122,22 +137,23 @@ model Training {
   t_segundos     String
   fac_dura       Float
   imagen_url     String
-  PlayerTraining PlayerTraining[]
+  playerTrainings PlayerTraining[]
 }
 
+// Tabla pivote para el progreso de entrenamiento de cada jugador
 model PlayerTraining {
-  id_player_training Int           @id @default(autoincrement())
+  id_player_training Int      @id @default(autoincrement())
   id_perfil          Int
   id_training        Int
-  level              Int
+  level              Int      @default(0)
   perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
-  training           Training      @relation(fields: [id_training], references: [id_training])
+  training           Training    @relation(fields: [id_training], references: [id_training])
 
   @@unique([id_perfil, id_training])
 }
 
 model Recruitment {
-  id_recruitment    Int     @id
+  id_recruitment    Int      @id
   nombre            String
   descripcion       String
   c_armas           Int
@@ -156,16 +172,49 @@ model Recruitment {
   car               BigInt
   vel               BigInt
   punt              BigInt
-  PlayerRecruitment PlayerRecruitment[]
+  playerRecruitments PlayerRecruitment[]
 }
 
 model PlayerRecruitment {
-  id_player_recruitment Int           @id @default(autoincrement())
+  id_player_recruitment Int         @id @default(autoincrement())
   id_perfil             Int
   id_recruitment        Int
-  quantity              Int
+  quantity              Int         @default(0)
   perfil                PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
-  recruitment           Recruitment   @relation(fields: [id_recruitment], references: [id_recruitment])
+  recruitment           Recruitment @relation(fields: [id_recruitment], references: [id_recruitment])
 
   @@unique([id_perfil, id_recruitment])
+}
+
+model Security {
+  id_security    Int      @id
+  nombre         String
+  descripcion    String
+  c_armas        Int
+  c_municion     Int
+  c_alcohol      Int
+  c_dolares      Int
+  t_horas        String
+  t_minutos      String
+  t_segundos     String
+  fac_dura       Float
+  puntos_por_nivel Int
+  imagen_url     String
+  ata            BigInt
+  def            BigInt
+  car            BigInt
+  vel            BigInt
+  punt           BigInt
+  playerSecurities PlayerSecurity[]
+}
+
+model PlayerSecurity {
+  id_player_security Int         @id @default(autoincrement())
+  id_perfil          Int
+  id_security        Int
+  quantity           Int         @default(0)
+  perfil             PlayerProfile @relation(fields: [id_perfil], references: [id_perfil], onDelete: Cascade)
+  security           Security    @relation(fields: [id_security], references: [id_security])
+
+  @@unique([id_perfil, id_security])
 }

@@ -19,6 +19,8 @@ async function main() {
         playerTrainings: await prisma.playerTraining.findMany(),
         recruitments: await prisma.recruitment.findMany(),
         playerRecruitments: await prisma.playerRecruitment.findMany(),
+        securities: await prisma.security.findMany(),
+        playerSecurities: await prisma.playerSecurity.findMany(),
     };
     
     // JSON.stringify no soporta BigInt, así que lo convertimos a string.

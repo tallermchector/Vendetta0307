@@ -1,0 +1,5 @@
+id_security,nombre,descripcion,cArmas,cMunicion,cAlcohol,cDolar,tHoras,tMinutos,tSegundos,facDura,puntosxnivel,imagenurl,ATA,DEF,CAR,VEL,PUNT
+1,"Guardia de Seguridad","Un guardia entrenado para patrullar y defender la propiedad. Bueno para la defensa básica.","100","200","0","500","0","30","0",1,10,"/img/S1K.gif",5,25,0,0,10
+2,"Perro Guardián","Un perro leal y feroz. Rápido para alertar de intrusos y muy efectivo en combate cercano.","50","0","100","200","0","15","0",1,5,"/img/S2K.gif",10,15,0,0,5
+3,"Torreta de Defensa","Una torreta automática que dispara a los enemigos a la vista. Proporciona una defensa perimetral sólida.","2500","5000","0","1000","1","0","0",1,50,"/img/S3K.gif",50,50,0,0,50
+4,"Campo de Minas Sónico","Minas avanzadas que incapacitan a los enemigos con un pulso sónico en lugar de una explosión.","1000","1000","0","3000","0","45","0",1,30,"/img/S4K.gif",20,80,0,0,30

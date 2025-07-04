@@ -27,9 +27,10 @@ export const getCurrentUser = async () => {
       familia: true,
       perfil: {
         include: {
-          // @New: Eager load the player's training levels with their profile.
+          // @New: Eager load the player's progress with their profile.
           trainings: true,
           recruitments: true,
+          securities: true,
         }
       },
       propiedades: true,
