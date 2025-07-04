@@ -1,26 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
+// Modelo para los usuarios del juego
 model User {
-  id_usuario     Int               @id @default(autoincrement())
-  usuario        String            @unique
-  email          String            @unique
+  id_usuario     Int      @id @default(autoincrement())
+  usuario        String   @unique
+  email          String   @unique
   pass           String
   idioma         String
-  fecha_registro DateTime          @default(now())
-  id_familia     Int?
-  familia        Family?           @relation(fields: [id_familia], references: [id_familia])
-  perfil         PlayerProfile?
-  recursos       PlayerResources?
-  propiedades    Propiedad[]
+  fecha_registro DateTime @default(now())
+
+  // Relación con la familia (clan)
+  id_familia Int?
+  familia    Family? @relation(fields: [id_familia], references: [id_familia])
+
+  // Relaciones uno a uno/muchos
+  perfil      PlayerProfile?
+  recursos    PlayerResources?
+  propiedades Propiedad[]
 }
 
+// Modelo para las familias o clanes
 model Family {
   id_familia  Int      @id @default(autoincrement())
   nombre      String   @unique
@@ -29,17 +42,24 @@ model Family {
   miembros    User[]
 }
 
+// Modelo para el perfil y estadísticas del jugador
 model PlayerProfile {
-  id_perfil            Int    @id @default(autoincrement())
-  id_usuario           Int    @unique
-  usuario              User   @relation(fields: [id_usuario], references: [id_usuario])
+  id_perfil            Int  @id @default(autoincrement())
+  id_usuario           Int  @unique
+  usuario              User @relation(fields: [id_usuario], references: [id_usuario])
   puntos_edificios     Int
   puntos_tropas        Int
   puntos_entrenamiento Int
   ranking_global       Int
   lealtad              Int
+
+  // Niveles de entrenamiento
+  ent_pistola       Int @default(0)
+  ent_ametralladora Int @default(0)
+  ent_combate       Int @default(0)
 }
 
+// Modelo para los recursos del jugador
 model PlayerResources {
   id_recursos          Int      @id @default(autoincrement())
   id_usuario           Int      @unique
@@ -51,36 +71,57 @@ model PlayerResources {
   ultima_actualizacion DateTime @updatedAt
 }
 
+// Modelo para las propiedades del jugador
 model Propiedad {
-  id_propiedad Int @id @default(autoincrement())
+  id_propiedad Int    @id @default(autoincrement())
   id_usuario   Int
-  usuario      User @relation(fields: [id_usuario], references: [id_usuario])
+  usuario      User   @relation(fields: [id_usuario], references: [id_usuario])
   nombre       String
   coord_x      Int
   coord_y      Int
   coord_z      Int
 
-  oficina      Int @default(0)
-  escuela      Int @default(0)
-  armeria      Int @default(0)
-  municion     Int @default(0)
-  cerveceria   Int @default(0)
-  taberna      Int @default(0)
-  contrabando  Int @default(0)
-  almacenArm   Int @default(0)
-  deposito     Int @default(0)
-  almacenAlc   Int @default(0)
-  caja         Int @default(0)
-  campo        Int @default(0)
-  seguridad    Int @default(0)
-  torreta      Int @default(0)
-  minas        Int @default(0)
+  // Niveles de los edificios
+  oficina     Int @default(0)
+  escuela     Int @default(0)
+  armeria     Int @default(0)
+  municion    Int @default(0)
+  cerveceria  Int @default(0)
+  taberna     Int @default(0)
+  contrabando Int @default(0)
+  almacenArm  Int @default(0)
+  deposito    Int @default(0)
+  almacenAlc  Int @default(0)
+  caja        Int @default(0)
+  campo       Int @default(0)
+  seguridad   Int @default(0)
+  torreta     Int @default(0)
+  minas       Int @default(0)
 
   @@unique([coord_x, coord_y, coord_z])
 }
 
+// Modelo que define los tipos de edificios disponibles para construir
 model Building {
-  id_edificio Int    @id
+  id_edificio Int     @id
+  nombre      String
+  descripcion String
+  costo_base  Json // Para referencia, no se usa directamente en cálculos por ahora
+  c_armas     Int
+  c_municion  Int
+  c_alcohol   Int
+  c_dolares   Int
+  fac_costo   Float
+  t_horas     String
+  t_minutos   String
+  t_segundos  String
+  fac_dura    Float
+  imagen_url  String
+}
+
+// Modelo que define los tipos de entrenamientos disponibles
+model Training {
+  id_training Int    @id
   nombre      String
   descripcion String
   costo_base  Json

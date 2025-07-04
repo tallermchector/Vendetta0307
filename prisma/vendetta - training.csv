@@ -1,0 +1,4 @@
+id_training,nombre,descripcion,c_armas,c_municion,c_alcohol,c_dolares,fac_costo,t_horas,t_minutos,t_segundos,fac_dura,imagen_url
+1,"Entrenamiento con Pistola","Mejora la puntería y velocidad de recarga con armas cortas. Esencial para cualquier matón que se precie.",50,200,10,0,1.8,0,10,0,1.8,"/img/T1.gif"
+2,"Entrenamiento con Ametralladora","Aprende a controlar el retroceso y a disparar ráfagas precisas. Perfecto para el fuego de supresión.",250,1000,50,100,2.1,0,30,0,2.1,"/img/T2.gif"
+3,"Combate Cuerpo a Cuerpo","Domina el arte de la pelea sin armas. Aumenta la fuerza y la resistencia en enfrentamientos cercanos.",10,10,200,50,1.5,0,5,0,1.5,"/img/T3.gif"
