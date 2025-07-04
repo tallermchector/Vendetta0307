@@ -48,8 +48,9 @@ export default function LoginForm() {
     startTransition(() => {
       loginUser(values)
         .then((data) => {
-          // This block only executes if the server action returns a value,
-          // which in this case is always an error object.
+          // The server action will only return a value if there's an error.
+          // On success, it redirects, and this `.then()` block isn't reached
+          // in a way that continues execution.
           if (data?.error) {
             toast({
               title: "Error de inicio de sesión",
@@ -57,15 +58,13 @@ export default function LoginForm() {
               variant: "destructive",
             });
           }
-          // If the action is successful, it calls `redirect()` which throws an
-          // exception to stop execution and trigger the navigation. That exception
-          // is handled by Next.js and should not be caught here.
         });
-        // @Fix: Removed the .catch() block that was incorrectly interpreting
-        // the Next.js redirect signal as a runtime error, which caused the
-        // "Error inesperado" toast to appear on every successful login.
-        // Legitimate errors are now handled by returning an { error: "..." }
-        // object from the server action.
+        // A `.catch()` block is intentionally omitted here.
+        // This is because a successful login triggers a `redirect()` in the
+        // server action, which Next.js handles by throwing a special
+        // exception. Catching it here would incorrectly treat a successful
+        // redirect as a client-side error. Any true server errors are now
+        // caught within the server action itself and returned as an `error` object.
     });
   }
 

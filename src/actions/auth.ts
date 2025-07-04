@@ -70,43 +70,59 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
 
 
 export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ error: string } | void> {
-    const validatedFields = loginSchema.safeParse(values);
+    try {
+        const validatedFields = loginSchema.safeParse(values);
 
-    if (!validatedFields.success) {
-        return { error: "Campos inválidos." };
+        if (!validatedFields.success) {
+            return { error: "Datos de inicio de sesión inválidos." };
+        }
+
+        const { email, password } = validatedFields.data;
+
+        const user = await prisma.user.findUnique({
+            where: { email },
+        });
+
+        if (!user) {
+            // @Security: Use a generic error message to prevent email enumeration.
+            return { error: "El correo electrónico o la contraseña son incorrectos." };
+        }
+        
+        const passwordsMatch = await bcrypt.compare(password, user.pass);
+
+        if (!passwordsMatch) {
+             // @Security: Use a generic error message.
+            return { error: "El correo electrónico o la contraseña son incorrectos." };
+        }
+        
+        await createSession({ userId: user.id_usuario });
+
+        // @BestPractice: Check if the user has completed the registration flow by checking for a profile.
+        const profile = await prisma.playerProfile.findUnique({
+            where: { id_usuario: user.id_usuario },
+        });
+
+        if (!profile) {
+            // If registration is incomplete, redirect them to the final step.
+            redirect('/register/create-property');
+        }
+        
+        // On full success, redirect to the dashboard.
+        redirect('/dashboard');
+
+    } catch (error: any) {
+        // This is the crucial part for handling redirects vs. real errors.
+        // If the error is a redirect, Next.js throws an error with a specific digest. We must re-throw it.
+        if (error.digest?.startsWith('NEXT_REDIRECT')) {
+            throw error;
+        }
+
+        // Log the unexpected error for debugging purposes on the server.
+        console.error("Error inesperado durante el inicio de sesión:", error);
+        
+        // Return a generic, user-friendly error message.
+        return { error: "Ocurrió un error inesperado. Por favor, inténtalo de nuevo más tarde." };
     }
-
-    const { email, password } = validatedFields.data;
-
-    const user = await prisma.user.findUnique({
-        where: { email },
-    });
-
-    if (!user) {
-        return { error: "El correo electrónico no está registrado." };
-    }
-    
-    const passwordsMatch = await bcrypt.compare(password, user.pass);
-
-    if (!passwordsMatch) {
-        return { error: "La contraseña es incorrecta." };
-    }
-    
-    await createSession({ userId: user.id_usuario });
-
-    // @BestPractice: Check if the user has completed the registration flow by checking for a profile.
-    const profile = await prisma.playerProfile.findUnique({
-        where: { id_usuario: user.id_usuario },
-    });
-
-    if (!profile) {
-        // If registration is incomplete, redirect them to the final step.
-        redirect('/register/create-property');
-    }
-    
-    // On full success, redirect to the dashboard. This is caught by Next.js
-    // and the client is navigated automatically.
-    redirect('/dashboard');
 }
 
 export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswordSchema>) {
