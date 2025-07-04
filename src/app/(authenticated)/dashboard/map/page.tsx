@@ -8,12 +8,12 @@ import { Map as MapIcon, ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 // @BestPractice: Use the standard Next.js page props type for clarity and correctness.
-// This ensures compatibility with build environments.
-type MapPageProps = {
+// This ensures compatibility with build environments by defining the props inline.
+export default async function MapPage({
+  searchParams,
+}: {
   searchParams: { [key: string]: string | string[] | undefined };
-};
-
-export default async function MapPage({ searchParams }: MapPageProps) {
+}) {
   const user = await protectPage();
 
   const sectorParam = searchParams.sector;
