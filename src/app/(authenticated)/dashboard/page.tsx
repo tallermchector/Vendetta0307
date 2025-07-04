@@ -42,7 +42,7 @@ export default async function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Player Info & Actions Section */}
-      <section className="relative">
+      <section className="relative animate-fade-in-up" style={{ animationDelay: '100ms' }}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {/* Col 1: Player */}
             <Card className="flex items-center p-4">
@@ -104,7 +104,7 @@ export default async function DashboardPage() {
       </section>
 
       {/* Content Sections */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
         <Card className="lg:col-span-2">
             <CardHeader>
                 <CardTitle>Estado Actual</CardTitle>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
       </section>
       
       {/* Bottom Stats Bar */}
-      <section>
+      <section className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
         <Card className="p-4">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                 <div className="md:border-r md:border-border md:pr-4">

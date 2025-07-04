@@ -20,7 +20,7 @@ export default async function AuthenticatedLayout({
         <Sidebar properties={user.propiedades || []} />
         <div className="flex flex-1 flex-col">
           <Header user={user} />
-            <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+            <main className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">{children}</main>
         </div>
       </div>
     </SidebarProvider>
