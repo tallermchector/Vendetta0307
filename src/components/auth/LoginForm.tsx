@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Link from "next/link";
 import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import {
   Form,
   FormControl,
@@ -36,7 +35,6 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,33 +46,29 @@ export default function LoginForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
-      loginUser(values).then((data) => {
-        if (data.success && data.redirect) {
-          // Case: Successful login
-          toast({
-            title: "¡Bienvenido de nuevo!",
-            description: "Redirigiendo a tu panel de control...",
-          });
-          router.push(data.redirect);
-        } else if (data.error) {
-          // Case: Incomplete registration or other login errors
-          toast({
-            title: data.redirect ? "Registro Incompleto" : "Error de inicio de sesión",
-            description: data.error,
-            variant: "destructive",
-          });
-          if (data.redirect) {
-             // Redirect to property creation after showing the toast, giving the user time to read it.
-             setTimeout(() => router.push(data.redirect as string), 2000);
+      loginUser(values)
+        .then((data) => {
+          // This block only executes if the server action returns a value,
+          // which in this case is always an error object.
+          if (data?.error) {
+            toast({
+              title: "Error de inicio de sesión",
+              description: data.error,
+              variant: "destructive",
+            });
           }
-        }
-      }).catch(() => {
-        toast({
+          // If the action is successful, it calls `redirect()` which throws an
+          // error to stop execution and trigger the navigation. That error is
+          // handled internally by Next.js and this .then() block is not run.
+        })
+        .catch(() => {
+          // This catch block can handle unexpected server errors.
+          toast({
             title: "Error inesperado",
             description: "Algo salió mal. Por favor, inténtalo de nuevo.",
             variant: "destructive",
+          });
         });
-      });
     });
   }
 

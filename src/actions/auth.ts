@@ -69,7 +69,7 @@ export async function registerUser(values: z.infer<typeof registerSchema>): Prom
 }
 
 
-export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ success?: true; error?: string; redirect?: string; }> {
+export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ error: string } | void> {
     const validatedFields = loginSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -91,25 +91,22 @@ export async function loginUser(values: z.infer<typeof loginSchema>): Promise<{ 
     if (!passwordsMatch) {
         return { error: "La contraseña es incorrecta." };
     }
+    
+    await createSession({ userId: user.id_usuario });
 
     // @BestPractice: Check if the user has completed the registration flow by checking for a profile.
     const profile = await prisma.playerProfile.findUnique({
         where: { id_usuario: user.id_usuario },
     });
-    
-    // Create the session cookie regardless, so the user can proceed to the next step if registration is incomplete.
-    await createSession({ userId: user.id_usuario });
 
     if (!profile) {
-        // If there's no profile, the user didn't complete the second step of registration.
-        return { 
-            error: "Tu registro está incompleto. Te redirigimos para que finalices.",
-            redirect: '/register/create-property'
-        };
+        // If registration is incomplete, redirect them to the final step.
+        redirect('/register/create-property');
     }
     
-    // If login is successful and registration is complete, provide success and redirect path.
-    return { success: true, redirect: '/dashboard' };
+    // On full success, redirect to the dashboard. This is caught by Next.js
+    // and the client is navigated automatically.
+    redirect('/dashboard');
 }
 
 export async function sendPasswordResetLink(values: z.infer<typeof forgotPasswordSchema>) {
