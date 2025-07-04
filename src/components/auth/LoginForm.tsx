@@ -38,6 +38,14 @@ export default function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(() => {
       loginUser(values).then((data) => {
