@@ -22,12 +22,23 @@ import type { PlayerRecruitment } from "@prisma/client";
 import { protectPage } from "@/lib/auth";
 import { recruitUnit } from "@/actions/recruitment";
 
-// Helper component to display a single resource cost
+// Helper component to display a single resource cost for Desktop
 function ResourceCost({ icon: Icon, value, label }: { icon: React.ElementType, value: number, label: string }) {
   if (value === 0) return null;
   return (
     <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={label}>
       <Icon className="h-3.5 w-3.5 text-primary/80" />
+      <span>{value.toLocaleString()}</span>
+    </div>
+  );
+}
+
+// Helper component for mobile resource costs
+function MobileResourceCost({ icon: Icon, value }: { icon: React.ElementType, value: number }) {
+  if (value === 0) return null;
+  return (
+    <div className="flex items-center gap-1">
+      <Icon className="h-3 w-3 text-destructive" />
       <span>{value.toLocaleString()}</span>
     </div>
   );
@@ -58,7 +69,6 @@ export default async function RecruitmentPage() {
     )
   }
   
-  // Create a Map for efficient lookup of the player's current units.
   const playerRecruitmentsMap = new Map<number, PlayerRecruitment>();
   if (playerProfile.recruitments) {
       for (const pr of playerProfile.recruitments) {
@@ -66,22 +76,17 @@ export default async function RecruitmentPage() {
       }
   }
 
-  // Server Action to be bound to the form. It wraps the main recruitUnit action.
   async function handleRecruit(formData: FormData) {
     "use server";
 
     const id_recruitment = Number(formData.get('id_recruitment'));
     const quantity = Number(formData.get('quantity'));
 
-    // Basic validation, more robust validation is in the action itself.
     if (isNaN(id_recruitment) || isNaN(quantity) || quantity <= 0) {
       console.error("Invalid form data for recruitment");
       return;
     }
     
-    // The `recruitUnit` action already handles revalidation and returns success/error.
-    // For an RSC form action, we might not be able to show a toast directly,
-    // but the revalidation will update the UI. We can log the result for now.
     const result = await recruitUnit({ id_recruitment, quantity });
     
     if (result?.error) {
@@ -107,8 +112,9 @@ export default async function RecruitmentPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="relative w-full overflow-auto">
+        <CardContent className="p-0 md:p-6 md:pt-0">
+          {/* Desktop View */}
+          <div className="relative hidden w-full overflow-auto md:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -192,6 +198,60 @@ export default async function RecruitmentPage() {
                 })}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="divide-y divide-border md:hidden">
+            {recruitmentCatalog.map((unit, index) => {
+              const playerUnit = playerRecruitmentsMap.get(unit.id_recruitment);
+              const currentQuantity = playerUnit ? playerUnit.quantity : 0;
+              return (
+                <div key={unit.id_recruitment} className="p-4 animate-fade-in-up" style={{ animationDelay: `${index * 50}ms`}}>
+                  <div className="flex justify-between items-start gap-4">
+                    <div>
+                      <p className="font-bold text-base">{unit.nombre}</p>
+                      <p className="text-sm text-muted-foreground">Tienes: {currentQuantity}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5 text-xs">
+                        <div className="flex items-center gap-2" title="Ataque">
+                            <Swords className="h-3.5 w-3.5 text-destructive" />
+                            <span>{unit.ata.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-2" title="Defensa">
+                            <Shield className="h-3.5 w-3.5 text-blue-400" />
+                            <span>{unit.def.toLocaleString()}</span>
+                        </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-4">
+                      <p className="text-xs font-semibold text-muted-foreground">Costo por unidad:</p>
+                      <div className="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        <MobileResourceCost icon={Swords} value={unit.c_armas} />
+                        <MobileResourceCost icon={Shell} value={unit.c_municion} />
+                        <MobileResourceCost icon={Martini} value={unit.c_alcohol} />
+                        <MobileResourceCost icon={DollarSign} value={unit.c_dolares} />
+                      </div>
+                  </div>
+
+                  <form action={handleRecruit} className="mt-4 flex items-center gap-2">
+                    <input type="hidden" name="id_recruitment" value={unit.id_recruitment} />
+                    <Input
+                      type="number"
+                      name="quantity"
+                      min="1"
+                      placeholder="Cant."
+                      className="w-24 h-9"
+                      required
+                    />
+                    <Button type="submit" size="sm" className="flex-grow">
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Reclutar
+                    </Button>
+                  </form>
+                </div>
+              )
+            })}
           </div>
         </CardContent>
       </Card>

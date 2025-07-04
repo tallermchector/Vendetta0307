@@ -57,12 +57,23 @@ function formatDuration(totalSeconds: number): string {
   return parts.join(' ');
 }
 
-// Helper component to display a single resource cost
+// Helper component to display a single resource cost for Desktop
 function ResourceCost({ icon: Icon, value, label }: { icon: React.ElementType, value: number, label: string }) {
   if (value === 0) return null;
   return (
     <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={label}>
       <Icon className="h-3.5 w-3.5 text-primary/80" />
+      <span>{value.toLocaleString()}</span>
+    </div>
+  );
+}
+
+// Helper component for mobile resource costs
+function MobileResourceCost({ icon: Icon, value }: { icon: React.ElementType, value: number }) {
+  if (value === 0) return null;
+  return (
+    <div className="flex items-center gap-1">
+      <Icon className="h-3 w-3 text-destructive" />
       <span>{value.toLocaleString()}</span>
     </div>
   );
@@ -110,8 +121,9 @@ export default async function RoomsPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="relative w-full overflow-auto">
+        <CardContent className="p-0 md:p-6 md:pt-0">
+           {/* Desktop View */}
+          <div className="relative hidden w-full overflow-auto md:block">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -189,6 +201,56 @@ export default async function RoomsPage() {
                 })}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Mobile View */}
+          <div className="divide-y divide-border md:hidden">
+             {buildingCatalog.map((building, index) => {
+                  const buildingKey = buildingFieldMap[building.nombre];
+                  const level = buildingKey ? (playerProperty[buildingKey] as number) : 0;
+                  const nextLevel = level + 1;
+
+                  const costFactor = Math.pow(building.fac_costo, level);
+                  const costArmas = Math.floor(building.c_armas * costFactor);
+                  const costMunicion = Math.floor(building.c_municion * costFactor);
+                  const costAlcohol = Math.floor(building.c_alcohol * costFactor);
+                  const costDolares = Math.floor(building.c_dolares * costFactor);
+
+                  const baseDurationSeconds = (parseInt(building.t_horas) * 3600) + (parseInt(building.t_minutos) * 60) + parseInt(building.t_segundos);
+                  const durationFactor = Math.pow(building.fac_dura, level);
+                  const nextDurationSeconds = Math.floor(baseDurationSeconds * durationFactor);
+              
+              return (
+                <div key={building.id_edificio} className="grid grid-cols-[1fr_auto] items-start gap-4 p-4 animate-fade-in-up" style={{ animationDelay: `${index * 50}ms`}}>
+                  {/* Left Column */}
+                  <div>
+                    <p className="font-bold text-base">{building.nombre}</p>
+                    <p className="text-sm font-bold text-primary">Nivel {level}</p>
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="flex flex-col items-end gap-3">
+                    <div className="text-right">
+                      <p className="text-xs font-semibold text-muted-foreground">Al Nivel {nextLevel}:</p>
+                      <div className="mt-1 flex flex-wrap justify-end gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <MobileResourceCost icon={Swords} value={costArmas} />
+                        <MobileResourceCost icon={Shell} value={costMunicion} />
+                        <MobileResourceCost icon={Martini} value={costAlcohol} />
+                        <MobileResourceCost icon={DollarSign} value={costDolares} />
+                      </div>
+                      <div className="mt-2 flex items-center justify-end gap-1.5 text-xs font-semibold text-muted-foreground">
+                        <Clock className="h-3.5 w-3.5" />
+                        <span>{formatDuration(nextDurationSeconds)}</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full">
+                      <ArrowUpCircle className="mr-2 h-4 w-4" />
+                      Ampliar
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
