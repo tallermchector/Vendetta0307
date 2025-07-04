@@ -10,12 +10,15 @@ import Link from 'next/link';
 export default async function MapPage({
   searchParams,
 }: {
-  searchParams?: { sector?: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const user = await protectPage();
 
-  // Validate and get the current sector from search params, default to 1
-  const sectorParam = searchParams?.sector;
+  // Safely get the sector from search params, handling potential arrays.
+  const sectorParam = Array.isArray(searchParams?.sector)
+    ? searchParams.sector[0]
+    : searchParams?.sector;
+
   let currentSector = 1;
   if (sectorParam && !isNaN(Number(sectorParam))) {
       const parsedSector = Number(sectorParam);
