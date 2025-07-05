@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 
 // @BestPractice: Define a reusable payload for getting the user with all their relations.
 // This ensures consistency across different parts of the application.
-const userWithRelationsPayload = {
+const userWithRelationsPayload: Prisma.UserArgs = {
   include: {
     familia: {
       include: {
