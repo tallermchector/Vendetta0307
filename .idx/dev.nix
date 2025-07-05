@@ -8,6 +8,7 @@
     pkgs.nodejs
     pkgs.bun
     pkgs.openssl
+    pkgs.python313
   ];
   # Sets environment variables in the workspace
   env = {
