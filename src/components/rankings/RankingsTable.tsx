@@ -1,6 +1,7 @@
 
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { RankingsTableRow, type RankedPlayer } from "./RankingsTableRow";
+import { RankingsTableRow } from "./RankingsTableRow";
+import type { RankedPlayer } from "@/lib/types";
 import type { AuthenticatedUser } from "@/lib/auth";
 
 interface RankingsTableProps {
@@ -24,11 +25,10 @@ export function RankingsTable({ rankedPlayers, currentUser }: RankingsTableProps
               </TableRow>
           </TableHeader>
           <TableBody>
-              {rankedPlayers.map((player, index) => (
+              {rankedPlayers.map((player) => (
                   <RankingsTableRow 
                       key={player.id_usuario}
                       player={player}
-                      rank={index + 1}
                       isCurrentUser={player.id_usuario === currentUser.id_usuario}
                   />
               ))}
