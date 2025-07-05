@@ -22,22 +22,22 @@
     {
       "id_perfil": 1,
       "id_usuario": 1,
-      "puntos_edificios": 0,
-      "puntos_tropas": 0,
-      "puntos_entrenamiento": 0,
-      "ranking_global": 0,
-      "lealtad": 100
+      "puntos_edificios": 58,
+      "puntos_tropas": 64,
+      "puntos_entrenamiento": 123,
+      "ranking_global": 1,
+      "lealtad": 99
     }
   ],
   "playerResources": [
     {
       "id_recursos": 1,
       "id_usuario": 1,
-      "armas": "500",
-      "municion": "500",
-      "alcohol": "0",
-      "dolares": "0",
-      "ultima_actualizacion": "2025-07-05T02:02:43.116Z"
+      "armas": "280614",
+      "municion": "2965750",
+      "alcohol": "3000000",
+      "dolares": "80000000",
+      "ultima_actualizacion": "2025-07-05T03:32:37.447Z"
     }
   ],
   "properties": [
@@ -48,10 +48,10 @@
       "coord_x": 1,
       "coord_y": 1,
       "coord_z": 1,
-      "oficina": 1,
+      "oficina": 2,
       "escuela": 1,
-      "armeria": 1,
-      "municion": 1,
+      "armeria": 3,
+      "municion": 11,
       "cerveceria": 1,
       "taberna": 1,
       "contrabando": 1,
@@ -567,100 +567,100 @@
   ],
   "playerTrainings": [
     {
-      "id_player_training": 1,
-      "id_perfil": 1,
-      "id_training": 1,
-      "level": 0
-    },
-    {
       "id_player_training": 2,
       "id_perfil": 1,
       "id_training": 2,
-      "level": 0
-    },
-    {
-      "id_player_training": 3,
-      "id_perfil": 1,
-      "id_training": 3,
-      "level": 0
-    },
-    {
-      "id_player_training": 4,
-      "id_perfil": 1,
-      "id_training": 4,
-      "level": 0
+      "level": 1
     },
     {
       "id_player_training": 5,
       "id_perfil": 1,
       "id_training": 5,
-      "level": 0
+      "level": 1
     },
     {
-      "id_player_training": 6,
+      "id_player_training": 4,
       "id_perfil": 1,
-      "id_training": 6,
-      "level": 0
+      "id_training": 4,
+      "level": 1
     },
     {
-      "id_player_training": 7,
+      "id_player_training": 3,
       "id_perfil": 1,
-      "id_training": 7,
-      "level": 0
-    },
-    {
-      "id_player_training": 8,
-      "id_perfil": 1,
-      "id_training": 8,
-      "level": 0
+      "id_training": 3,
+      "level": 1
     },
     {
       "id_player_training": 9,
       "id_perfil": 1,
       "id_training": 9,
-      "level": 0
+      "level": 1
     },
     {
-      "id_player_training": 10,
+      "id_player_training": 7,
       "id_perfil": 1,
-      "id_training": 10,
-      "level": 0
+      "id_training": 7,
+      "level": 1
     },
     {
-      "id_player_training": 11,
+      "id_player_training": 8,
       "id_perfil": 1,
-      "id_training": 11,
-      "level": 0
+      "id_training": 8,
+      "level": 1
     },
     {
-      "id_player_training": 12,
+      "id_player_training": 6,
       "id_perfil": 1,
-      "id_training": 12,
-      "level": 0
-    },
-    {
-      "id_player_training": 13,
-      "id_perfil": 1,
-      "id_training": 13,
-      "level": 0
+      "id_training": 6,
+      "level": 1
     },
     {
       "id_player_training": 14,
       "id_perfil": 1,
       "id_training": 14,
-      "level": 0
+      "level": 1
+    },
+    {
+      "id_player_training": 13,
+      "id_perfil": 1,
+      "id_training": 13,
+      "level": 1
+    },
+    {
+      "id_player_training": 11,
+      "id_perfil": 1,
+      "id_training": 11,
+      "level": 1
+    },
+    {
+      "id_player_training": 12,
+      "id_perfil": 1,
+      "id_training": 12,
+      "level": 1
+    },
+    {
+      "id_player_training": 10,
+      "id_perfil": 1,
+      "id_training": 10,
+      "level": 1
     },
     {
       "id_player_training": 15,
       "id_perfil": 1,
       "id_training": 15,
-      "level": 0
+      "level": 1
     },
     {
       "id_player_training": 16,
       "id_perfil": 1,
       "id_training": 16,
-      "level": 0
+      "level": 1
+    },
+    {
+      "id_player_training": 1,
+      "id_perfil": 1,
+      "id_training": 1,
+      "level": 2
     }
   ],
   "recruitments": [
@@ -1006,7 +1006,7 @@
       "id_player_recruitment": 1,
       "id_perfil": 1,
       "id_recruitment": 1,
-      "quantity": 1
+      "quantity": 3
     }
   ],
   "securities": [
