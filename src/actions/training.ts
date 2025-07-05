@@ -105,7 +105,7 @@ export async function upgradeTraining(
       if (pointsToAdd > 0) {
         await tx.playerProfile.update({
           where: { id_perfil: user.perfil!.id_perfil },
-          data: { puntos_entrenamiento: { increment: pointsToAdd } },
+          data: { puntos_entrenamiento: { increment: Number(pointsToAdd) } },
         });
       }
     });

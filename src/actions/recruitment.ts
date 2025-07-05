@@ -106,7 +106,7 @@ export async function recruitUnit(
       if (pointsToAdd > 0) {
         await tx.playerProfile.update({
             where: { id_perfil: user.perfil!.id_perfil },
-            data: { puntos_tropas: { increment: pointsToAdd } },
+            data: { puntos_tropas: { increment: Number(pointsToAdd) } },
         });
       }
     });

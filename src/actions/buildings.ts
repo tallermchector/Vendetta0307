@@ -93,7 +93,7 @@ export async function upgradeBuilding(
       if (pointsToAdd > 0) {
         await tx.playerProfile.update({
           where: { id_perfil: user.perfil!.id_perfil },
-          data: { puntos_edificios: { increment: pointsToAdd } },
+          data: { puntos_edificios: { increment: Number(pointsToAdd) } },
         });
       }
     });
