@@ -22,7 +22,7 @@ import {
   UserPlus,
   Crown,
   ShieldCheck,
-  User,
+  User as UserIcon,
   LogIn,
   LogOut,
   PlusCircle,
@@ -33,9 +33,21 @@ import {
   inviteMember,
   handleInvitation,
 } from '@/actions/family';
-import { RoleInFamily } from '@prisma/client';
+import { RoleInFamily, type Family, type User, type FamilyInvitation } from '@prisma/client';
 import Image from 'next/image';
 import { LeaveFamilyForm } from '@/components/family/LeaveFamilyForm';
+
+// Define more specific types for props
+type InvitationWithFamily = FamilyInvitation & {
+  familia: {
+    nombre: string;
+    tag: string;
+  };
+};
+
+type FamilyWithMembers = Family & {
+  miembros: User[];
+};
 
 // Main Page Component
 export default async function FamilyPage() {
@@ -85,16 +97,16 @@ export default async function FamilyPage() {
 }
 
 // View for users WITH a family
-function FamilyView({ family, currentUserRole }: { family: any, currentUserRole: RoleInFamily | null }) {
+function FamilyView({ family, currentUserRole }: { family: FamilyWithMembers, currentUserRole: RoleInFamily | null }) {
   const canManage = currentUserRole === RoleInFamily.Leader || currentUserRole === RoleInFamily.CoLeader;
 
-  const roleIconMap = {
+  const roleIconMap: Record<RoleInFamily, React.ReactNode> = {
     [RoleInFamily.Leader]: <Crown className="h-4 w-4 text-yellow-400" />,
     [RoleInFamily.CoLeader]: <ShieldCheck className="h-4 w-4 text-blue-400" />,
-    [RoleInFamily.Member]: <User className="h-4 w-4 text-muted-foreground" />,
+    [RoleInFamily.Member]: <UserIcon className="h-4 w-4 text-muted-foreground" />,
   };
   
-  const roleLabelMap = {
+  const roleLabelMap: Record<RoleInFamily, string> = {
     [RoleInFamily.Leader]: "Líder",
     [RoleInFamily.CoLeader]: "Co-Líder",
     [RoleInFamily.Member]: "Miembro",
@@ -140,14 +152,16 @@ function FamilyView({ family, currentUserRole }: { family: any, currentUserRole:
                               </TableRow>
                           </TableHeader>
                           <TableBody>
-                              {family.miembros.map((member: any) => (
+                              {family.miembros.map((member: User) => (
                                   <TableRow key={member.id_usuario}>
                                       <TableCell className="font-medium">{member.usuario}</TableCell>
                                       <TableCell>
-                                          <div className="flex items-center gap-2">
-                                              {roleIconMap[member.roleInFamily!]}
-                                              <span>{roleLabelMap[member.roleInFamily!]}</span>
-                                          </div>
+                                          {member.roleInFamily && (
+                                            <div className="flex items-center gap-2">
+                                                {roleIconMap[member.roleInFamily]}
+                                                <span>{roleLabelMap[member.roleInFamily]}</span>
+                                            </div>
+                                          )}
                                       </TableCell>
                                       <TableCell className="text-right">
                                         <Button variant="ghost" size="sm" disabled>Gestionar</Button>
@@ -188,7 +202,7 @@ function FamilyView({ family, currentUserRole }: { family: any, currentUserRole:
 }
 
 // View for users WITHOUT a family
-function NoFamilyView({ invitations }: { invitations: any[] }) {
+function NoFamilyView({ invitations }: { invitations: InvitationWithFamily[] }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card>
