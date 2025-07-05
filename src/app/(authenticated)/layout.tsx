@@ -16,10 +16,7 @@ export default async function AuthenticatedLayout({
 
   // @Security: Serialize the resources before passing them to the client component Header.
   // This prevents the "cannot serialize BigInt" error.
-  const serializedUser = {
-    ...user,
-    recursos: user.recursos ? safeSerialize(user.recursos) : null,
-  };
+  const serializedResources = user.recursos ? safeSerialize(user.recursos) : null;
 
 
   return (
@@ -27,7 +24,7 @@ export default async function AuthenticatedLayout({
       <div className="flex min-h-screen w-full bg-background">
         <Sidebar properties={user.propiedades || []} />
         <div className="flex flex-1 flex-col">
-          <Header user={serializedUser} />
+          <Header resources={serializedResources} />
             <main className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in-up">{children}</main>
         </div>
       </div>

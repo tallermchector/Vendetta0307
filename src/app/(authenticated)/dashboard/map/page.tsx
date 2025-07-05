@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Map as MapIcon, ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { safeSerialize } from '@/lib/serialize';
 
 // Helper function to safely parse and clamp numeric search parameters.
 function getClampedCoordinate(
@@ -33,6 +34,7 @@ export default async function MapPage({
   searchParams: any;
 }) {
   const user = await protectPage();
+  const serializedUser = safeSerialize(user);
 
   const userProperty = user.propiedades?.[0];
 
@@ -167,7 +169,7 @@ export default async function MapPage({
           <div className="mt-4 w-full">
             <MapGrid 
                 properties={validProperties} 
-                currentUser={user} 
+                currentUser={serializedUser} 
                 currentSector={currentSector}
             />
           </div>

@@ -4,16 +4,13 @@ import { useState, useEffect } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from 'lucide-react';
 import Image from 'next/image';
-import type { User, PlayerResources } from '@prisma/client';
+import type { PlayerResources } from '@prisma/client';
 import type { Serialized } from '@/lib/serialize';
 
-// The user object passed here now has its resources serialized.
-type SerializedPlayerResources = Serialized<PlayerResources>;
-type UserWithSerializedResources = Omit<User, 'pass'> & { recursos: SerializedPlayerResources | null };
+// The resources object is now serialized before being passed as a prop.
+type SerializedPlayerResources = Serialized<PlayerResources> | null;
 
-
-export default function Header({ user }: { user: UserWithSerializedResources }) {
-  const resources = user.recursos;
+export default function Header({ resources }: { resources: SerializedPlayerResources }) {
   const [currentTime, setCurrentTime] = useState('');
 
   useEffect(() => {

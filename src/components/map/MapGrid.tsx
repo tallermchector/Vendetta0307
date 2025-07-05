@@ -5,6 +5,7 @@ import type { Propiedad, User } from '@prisma/client';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Home, User as UserIcon } from 'lucide-react';
+import type { Serialized } from '@/lib/serialize';
 
 // Define the type for properties with the included user data
 type PropertyWithUser = Propiedad & {
@@ -20,7 +21,7 @@ type CurrentUser = Omit<User, 'pass'>;
 
 interface MapGridProps {
   properties: PropertyWithUser[];
-  currentUser: CurrentUser;
+  currentUser: Serialized<CurrentUser>;
   currentSector: number;
 }
 
