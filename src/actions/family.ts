@@ -12,7 +12,7 @@ const createFamilySchema = z.object({
   tag: z.string().trim().min(2, "El tag debe tener 2-5 caracteres.").max(5, "El tag no puede exceder los 5 caracteres."),
 });
 
-export async function createFamily(formData: FormData): Promise<{ success?: string; error?: string }> {
+export async function createFamily(prevState: { error?: string; success?: string }, formData: FormData): Promise<{ success?: string; error?: string }> {
   const user = await protectAction();
 
   if (user.id_familia) {
@@ -67,7 +67,7 @@ const inviteMemberSchema = z.object({
   username: z.string().trim().min(1, "El nombre de usuario es requerido."),
 });
 
-export async function inviteMember(formData: FormData): Promise<{ success?: string; error?: string }> {
+export async function inviteMember(prevState: { error?: string; success?: string }, formData: FormData): Promise<{ success?: string; error?: string }> {
     const inviter = await protectAction();
 
     if (!inviter.id_familia || !inviter.roleInFamily) {
@@ -132,7 +132,7 @@ const handleInvitationSchema = z.object({
   action: z.enum(['accept', 'decline']),
 });
 
-export async function handleInvitation(formData: FormData): Promise<{ success?: string; error?: string }> {
+export async function handleInvitation(prevState: { error?: string; success?: string }, formData: FormData): Promise<{ success?: string; error?: string }> {
     const user = await protectAction();
     
     const validatedFields = handleInvitationSchema.safeParse({

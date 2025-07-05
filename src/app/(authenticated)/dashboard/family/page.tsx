@@ -16,28 +16,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  UserPlus,
   Crown,
   ShieldCheck,
   User as UserIcon,
-  LogIn,
-  LogOut,
-  PlusCircle,
-  XCircle,
 } from "lucide-react";
 import {
-  createFamily,
-  inviteMember,
-  handleInvitation,
-} from '@/actions/family';
-import { RoleInFamily, type Family, type User, type FamilyInvitation } from '@prisma/client';
+  RoleInFamily, 
+  type Family as FamilyType, 
+  type User, 
+  type FamilyInvitation
+} from '@prisma/client';
 import Image from 'next/image';
 import { LeaveFamilyForm } from '@/components/family/LeaveFamilyForm';
 import { ManageRoleForm } from '@/components/family/ManageRoleForm';
-
+import { CreateFamilyForm } from '@/components/family/CreateFamilyForm';
+import { InviteMemberForm } from '@/components/family/InviteMemberForm';
+import { HandleInvitationForm } from '@/components/family/HandleInvitationForm';
 
 type InvitationWithFamily = FamilyInvitation & {
   familia: {
@@ -46,9 +41,19 @@ type InvitationWithFamily = FamilyInvitation & {
   };
 };
 
-type FamilyWithMembers = Family & {
+type FamilyWithMembers = FamilyType & {
   miembros: User[];
 };
+
+type NoFamilyViewProps = {
+  invitations: InvitationWithFamily[];
+};
+
+type FamilyViewProps = {
+  family: FamilyWithMembers;
+  currentUserRole: RoleInFamily;
+  currentUserId: number;
+}
 
 export default async function FamilyPage() {
   const user = await protectPage();
@@ -70,13 +75,17 @@ export default async function FamilyPage() {
   }
   
   const currentUserRole = user.roleInFamily;
-  const currentUserId = user.id_usuario;
+  if (!currentUserRole) {
+      // This should ideally not happen if a user is in a family
+      // but it's a good safeguard.
+      return <p>Error: Rol de usuario no definido en la familia.</p>;
+  }
 
-  return <FamilyView family={family} currentUserRole={currentUserRole} currentUserId={currentUserId} />;
+  return <FamilyView family={family} currentUserRole={currentUserRole} currentUserId={user.id_usuario} />;
 }
 
 // View for users WITH a family
-function FamilyView({ family, currentUserRole, currentUserId }: { family: FamilyWithMembers; currentUserRole: RoleInFamily | null; currentUserId: number }) {
+function FamilyView({ family, currentUserRole, currentUserId }: FamilyViewProps) {
   const canManageMembers = currentUserRole === RoleInFamily.Leader;
   const canInvite = currentUserRole === RoleInFamily.Leader || currentUserRole === RoleInFamily.CoLeader;
 
@@ -166,16 +175,7 @@ function FamilyView({ family, currentUserRole, currentUserId }: { family: Family
                         <CardDescription>Invita a un nuevo jugador a unirse a la familia.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form action={inviteMember} className="space-y-4">
-                            <div>
-                                <Label htmlFor="username">Nombre de usuario</Label>
-                                <Input id="username" name="username" placeholder="Alias del jugador" required />
-                            </div>
-                            <Button type="submit" className="w-full">
-                                <UserPlus className="mr-2 h-4 w-4" />
-                                Enviar Invitación
-                            </Button>
-                        </form>
+                        <InviteMemberForm />
                     </CardContent>
                 </Card>
             </div>
@@ -186,7 +186,7 @@ function FamilyView({ family, currentUserRole, currentUserId }: { family: Family
 }
 
 // View for users WITHOUT a family
-function NoFamilyView({ invitations }: { invitations: InvitationWithFamily[] }) {
+function NoFamilyView({ invitations }: NoFamilyViewProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <Card>
@@ -195,20 +195,7 @@ function NoFamilyView({ invitations }: { invitations: InvitationWithFamily[] }) 
           <CardDescription>Forja tu propio destino y funda un nuevo clan.</CardDescription>
         </CardHeader>
         <CardContent>
-            <form action={createFamily} className="space-y-4">
-                <div>
-                    <Label htmlFor="name">Nombre de la Familia</Label>
-                    <Input id="name" name="name" placeholder="Ej: Los Corleone" required />
-                </div>
-                <div>
-                    <Label htmlFor="tag">Tag de la Familia (2-5 caracteres)</Label>
-                    <Input id="tag" name="tag" placeholder="Ej: FLC" required minLength={2} maxLength={5} />
-                </div>
-                <Button type="submit" className="w-full">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Fundar Familia
-                </Button>
-            </form>
+            <CreateFamilyForm />
         </CardContent>
       </Card>
 
@@ -228,20 +215,8 @@ function NoFamilyView({ invitations }: { invitations: InvitationWithFamily[] }) 
                     <p className="font-semibold">{inv.familia.nombre} <span className="text-muted-foreground">[{inv.familia.tag}]</span></p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <form action={handleInvitation}>
-                        <input type="hidden" name="invitationId" value={inv.id_invitation} />
-                        <input type="hidden" name="action" value="accept" />
-                        <Button type="submit" size="sm" variant="outline" className="text-green-500 border-green-500 hover:bg-green-500/10 hover:text-green-500">
-                          <LogIn className="mr-2 h-4 w-4" /> Aceptar
-                        </Button>
-                    </form>
-                     <form action={handleInvitation}>
-                        <input type="hidden" name="invitationId" value={inv.id_invitation} />
-                        <input type="hidden" name="action" value="decline" />
-                        <Button type="submit" size="sm" variant="outline" className="text-red-500 border-red-500 hover:bg-red-500/10 hover:text-red-500">
-                           <XCircle className="mr-2 h-4 w-4" /> Rechazar
-                        </Button>
-                    </form>
+                    <HandleInvitationForm invitationId={inv.id_invitation} actionType="accept" />
+                    <HandleInvitationForm invitationId={inv.id_invitation} actionType="decline" />
                   </div>
                 </div>
               ))}
