@@ -39,13 +39,11 @@ export async function POST(request: Request) {
         continue;
       }
 
-      // Calculate time difference in hours since last update.
+      // Calculate time difference in SECONDS since last update.
       const lastUpdate = new Date(user.recursos.ultima_actualizacion);
-      const diffMs = now.getTime() - lastUpdate.getTime();
-      const diffHours = diffMs / (1000 * 60 * 60);
+      const diffSeconds = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
       
-      // Skip if not enough time has passed to avoid unnecessary writes.
-      if (diffHours <= 0) {
+      if (diffSeconds <= 0) {
         continue;
       }
 
@@ -59,22 +57,25 @@ export async function POST(request: Request) {
           totalProduction.dolares += rates.dolares;
       }
 
-      // Calculate resources generated in the elapsed time.
+      // --- CORRECCIÓN CRÍTICA AQUÍ ---
+      // Realiza todos los cálculos con BigInt para que coincida con el tipo de la base de datos.
+      // La fórmula es: (producción_por_hora * segundos_transcurridos) / 3600
       const resourcesToAdd = {
-        armas: Math.floor(totalProduction.armas * diffHours),
-        municion: Math.floor(totalProduction.municion * diffHours),
-        alcohol: Math.floor(totalProduction.alcohol * diffHours),
-        dolares: Math.floor(totalProduction.dolares * diffHours),
+        armas:    (BigInt(totalProduction.armas)    * BigInt(diffSeconds)) / 3600n,
+        municion: (BigInt(totalProduction.municion) * BigInt(diffSeconds)) / 3600n,
+        alcohol:  (BigInt(totalProduction.alcohol)  * BigInt(diffSeconds)) / 3600n,
+        dolares:  (BigInt(totalProduction.dolares)  * BigInt(diffSeconds)) / 3600n,
       };
+      // ---------------------------------
 
       // Create an update promise for the user's resources.
       const updatePromise = prisma.playerResources.update({
         where: { id_usuario: user.id_usuario },
         data: {
-          armas: { increment: resourcesToAdd.armas },
+          armas:    { increment: resourcesToAdd.armas },
           municion: { increment: resourcesToAdd.municion },
-          alcohol: { increment: resourcesToAdd.alcohol },
-          dolares: { increment: resourcesToAdd.dolares },
+          alcohol:  { increment: resourcesToAdd.alcohol },
+          dolares:  { increment: resourcesToAdd.dolares },
           ultima_actualizacion: now,
         },
       });
