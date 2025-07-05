@@ -3,9 +3,8 @@
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
-import { protectAction } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-import { deleteSession } from '@/lib/session';
+import { deleteSession, getSession } from '@/lib/session';
 import { redirect } from 'next/navigation';
 
 const updatePasswordSchema = z
@@ -22,7 +21,17 @@ const updatePasswordSchema = z
 export async function updatePassword(
   values: z.infer<typeof updatePasswordSchema>
 ): Promise<{ success?: string; error?: string }> {
-  const user = await protectAction();
+  const session = await getSession();
+  if (!session?.userId) {
+    return { error: 'No autorizado. Por favor, inicia sesión.' };
+  }
+  const user = await prisma.user.findUnique({
+    where: { id_usuario: session.userId },
+  });
+
+  if (!user) {
+    return { error: 'Usuario no encontrado.' };
+  }
 
   const validatedFields = updatePasswordSchema.safeParse(values);
   if (!validatedFields.success) {
@@ -55,7 +64,17 @@ const updateEmailSchema = z.object({
 export async function updateEmail(
   values: z.infer<typeof updateEmailSchema>
 ): Promise<{ success?: string; error?: string }> {
-  const user = await protectAction();
+  const session = await getSession();
+  if (!session?.userId) {
+    return { error: 'No autorizado. Por favor, inicia sesión.' };
+  }
+  const user = await prisma.user.findUnique({
+    where: { id_usuario: session.userId },
+  });
+
+  if (!user) {
+    return { error: 'Usuario no encontrado.' };
+  }
 
   const validatedFields = updateEmailSchema.safeParse(values);
   if (!validatedFields.success) {
@@ -93,7 +112,17 @@ const deleteAccountSchema = z.object({
 export async function deleteAccount(
   values: z.infer<typeof deleteAccountSchema>
 ): Promise<{ error?: string }> {
-  const user = await protectAction();
+  const session = await getSession();
+  if (!session?.userId) {
+    return { error: 'No autorizado. Por favor, inicia sesión.' };
+  }
+  const user = await prisma.user.findUnique({
+    where: { id_usuario: session.userId },
+  });
+
+  if (!user) {
+    return { error: 'Usuario no encontrado.' };
+  }
 
   const validatedFields = deleteAccountSchema.safeParse(values);
   if (!validatedFields.success) {
