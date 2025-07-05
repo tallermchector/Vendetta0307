@@ -1,9 +1,70 @@
 {
-  "users": [],
-  "families": [],
-  "playerProfiles": [],
-  "playerResources": [],
-  "properties": [],
+  "users": [
+    {
+      "id_usuario": 1,
+      "usuario": "Bomberox",
+      "email": "bomberox@ejemplo.com",
+      "pass": "$2a$10$eV0um3XKXdQUGE04thVp2eHc/OZ6Sxo4jMNqD3X3uU9.8XpSvGRR.",
+      "idioma": "es",
+      "fecha_registro": "2025-07-04T20:18:29.648Z",
+      "id_familia": 1
+    }
+  ],
+  "families": [
+    {
+      "id_familia": 1,
+      "nombre": "BADBOYS",
+      "tag": "BAD",
+      "emblema_url": null
+    }
+  ],
+  "playerProfiles": [
+    {
+      "id_perfil": 1,
+      "id_usuario": 1,
+      "puntos_edificios": 0,
+      "puntos_tropas": 0,
+      "puntos_entrenamiento": 0,
+      "ranking_global": 0,
+      "lealtad": 100
+    }
+  ],
+  "playerResources": [
+    {
+      "id_recursos": 1,
+      "id_usuario": 1,
+      "armas": "20000",
+      "municion": "500",
+      "alcohol": "0",
+      "dolares": "0",
+      "ultima_actualizacion": "2025-07-04T20:19:23.774Z"
+    }
+  ],
+  "properties": [
+    {
+      "id_propiedad": 1,
+      "id_usuario": 1,
+      "nombre": "Propiedad Principal",
+      "coord_x": 1,
+      "coord_y": 1,
+      "coord_z": 1,
+      "oficina": 1,
+      "escuela": 1,
+      "armeria": 1,
+      "municion": 1,
+      "cerveceria": 1,
+      "taberna": 1,
+      "contrabando": 1,
+      "almacenArm": 1,
+      "deposito": 1,
+      "almacenAlc": 1,
+      "caja": 1,
+      "campo": 1,
+      "seguridad": 1,
+      "torreta": 1,
+      "minas": 1
+    }
+  ],
   "buildings": [
     {
       "id_edificio": 1,
@@ -504,7 +565,104 @@
       "imagen_url": "/img/F16K.gif"
     }
   ],
-  "playerTrainings": [],
+  "playerTrainings": [
+    {
+      "id_player_training": 1,
+      "id_perfil": 1,
+      "id_training": 1,
+      "level": 0
+    },
+    {
+      "id_player_training": 2,
+      "id_perfil": 1,
+      "id_training": 2,
+      "level": 0
+    },
+    {
+      "id_player_training": 3,
+      "id_perfil": 1,
+      "id_training": 3,
+      "level": 0
+    },
+    {
+      "id_player_training": 4,
+      "id_perfil": 1,
+      "id_training": 4,
+      "level": 0
+    },
+    {
+      "id_player_training": 5,
+      "id_perfil": 1,
+      "id_training": 5,
+      "level": 0
+    },
+    {
+      "id_player_training": 6,
+      "id_perfil": 1,
+      "id_training": 6,
+      "level": 0
+    },
+    {
+      "id_player_training": 7,
+      "id_perfil": 1,
+      "id_training": 7,
+      "level": 0
+    },
+    {
+      "id_player_training": 8,
+      "id_perfil": 1,
+      "id_training": 8,
+      "level": 0
+    },
+    {
+      "id_player_training": 9,
+      "id_perfil": 1,
+      "id_training": 9,
+      "level": 0
+    },
+    {
+      "id_player_training": 10,
+      "id_perfil": 1,
+      "id_training": 10,
+      "level": 0
+    },
+    {
+      "id_player_training": 11,
+      "id_perfil": 1,
+      "id_training": 11,
+      "level": 0
+    },
+    {
+      "id_player_training": 12,
+      "id_perfil": 1,
+      "id_training": 12,
+      "level": 0
+    },
+    {
+      "id_player_training": 13,
+      "id_perfil": 1,
+      "id_training": 13,
+      "level": 0
+    },
+    {
+      "id_player_training": 14,
+      "id_perfil": 1,
+      "id_training": 14,
+      "level": 0
+    },
+    {
+      "id_player_training": 15,
+      "id_perfil": 1,
+      "id_training": 15,
+      "level": 0
+    },
+    {
+      "id_player_training": 16,
+      "id_perfil": 1,
+      "id_training": 16,
+      "level": 0
+    }
+  ],
   "recruitments": [
     {
       "id_recruitment": 1,
@@ -926,5 +1084,12 @@
       "punt": "30"
     }
   ],
-  "playerSecurities": []
+  "playerSecurities": [
+    {
+      "id_player_security": 1,
+      "id_perfil": 1,
+      "id_security": 1,
+      "quantity": 0
+    }
+  ]
 }
