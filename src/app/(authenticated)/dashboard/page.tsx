@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { protectPage } from "@/lib/auth";
 import { StatsBar } from "@/components/dashboard/StatsBar";
+import { safeSerialize } from "@/lib/serialize";
 
 function StatBadge({
   count,
@@ -39,6 +40,10 @@ export default async function DashboardPage() {
   const family = user.familia;
   // Tomamos solo la primera propiedad para la vista general
   const property = user.propiedades?.[0]; 
+
+  // @Security: Serialize the profile object before passing it to a client component
+  // to prevent errors with non-serializable types like BigInt.
+  const serializedProfile = playerProfile ? safeSerialize(playerProfile) : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -162,7 +167,7 @@ export default async function DashboardPage() {
       
       {/* Bottom Stats Bar */}
       <section className="animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-        <StatsBar playerProfile={playerProfile} properties={user.propiedades} />
+        <StatsBar playerProfile={serializedProfile} properties={user.propiedades} />
       </section>
     </div>
   );

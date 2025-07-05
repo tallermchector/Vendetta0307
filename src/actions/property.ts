@@ -72,6 +72,14 @@ export async function createInitialProperty(values: z.input<typeof createPropert
     select: { id_training: true },
   });
 
+  // Calculate initial building points based on the base cost of all buildings.
+  const allBuildings = await prisma.building.findMany();
+  const initialResourceCost = allBuildings.reduce((total, building) => {
+    return total + building.c_armas + building.c_municion + building.c_alcohol + building.c_dolares;
+  }, 0);
+  // A common formula in such games: points = total resources spent / 1000
+  const initialBuildingPoints = Math.floor(initialResourceCost / 1000);
+
   try {
     // @BestPractice: Use an interactive transaction to ensure all related records 
     // (profile, trainings, property, resources) are created atomically.
@@ -79,7 +87,7 @@ export async function createInitialProperty(values: z.input<typeof createPropert
       const newProfile = await tx.playerProfile.create({
         data: {
           id_usuario: userId,
-          puntos_edificios: 0,
+          puntos_edificios: initialBuildingPoints,
           puntos_entrenamiento: 0,
           puntos_tropas: 0,
           ranking_global: 0,
