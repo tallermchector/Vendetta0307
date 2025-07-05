@@ -4,8 +4,9 @@ import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { Prisma } from '@prisma/client';
 
-// Reusable payload for getting the user with all their relations.
-const userWithRelationsPayload: Prisma.UserArgs = {
+// Define the payload for the user query, ensuring all relations are included.
+// We use 'satisfies' to check the type without widening it, which is crucial for Prisma.UserGetPayload.
+const userWithRelationsPayload = {
   include: {
     familia: {
       include: {
@@ -26,13 +27,13 @@ const userWithRelationsPayload: Prisma.UserArgs = {
     propiedades: true,
     recursos: true,
   },
-};
+} satisfies Prisma.UserArgs;
 
-// Type for the full user object including relations and password.
-export type UserWithRelations = Prisma.UserGetPayload<typeof userWithRelationsPayload>;
+// Derive the full user type from the payload. This includes the password hash.
+type FullUserPayload = Prisma.UserGetPayload<typeof userWithRelationsPayload>;
 
 // The secure, final user type that is exposed by helpers, explicitly omitting the password hash.
-export type AuthenticatedUser = Omit<UserWithRelations, 'pass'>;
+export type AuthenticatedUser = Omit<FullUserPayload, 'pass'>;
 
 export interface SessionPayload {
   userId: number;
@@ -45,7 +46,7 @@ export interface SessionPayload {
  * It is intended for internal use within the auth library.
  * @returns The full user object or null if not found/authenticated.
  */
-const getCurrentUserWithPassword = async (): Promise<UserWithRelations | null> => {
+const getCurrentUserWithPassword = async (): Promise<FullUserPayload | null> => {
   const session = await getSession();
   if (!session?.userId) {
     return null;

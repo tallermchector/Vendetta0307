@@ -1,16 +1,25 @@
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import type { User, Family, PlayerProfile } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
-export type RankedPlayer = User & {
-    familia: Family | null;
-    perfil: PlayerProfile | null;
+// Define the query payload for rankings to derive the type from it.
+const rankingQueryPayload = {
+  include: {
+    perfil: true,
+    familia: true,
     _count: {
-        propiedades: number;
-    };
-    totalPoints: number;
-};
+      select: { propiedades: true },
+    },
+  },
+} satisfies Prisma.UserArgs;
+
+// Derive the player type from the query payload.
+type PlayerForRanking = Prisma.UserGetPayload<typeof rankingQueryPayload>;
+
+// The final, enriched type for a player in the rankings table.
+export type RankedPlayer = PlayerForRanking & { totalPoints: number };
+
 
 interface RankingsTableRowProps {
   player: RankedPlayer;

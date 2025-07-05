@@ -1,13 +1,11 @@
 
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RankingsTableRow, type RankedPlayer } from "./RankingsTableRow";
-import type { User } from "@prisma/client";
-
-type CurrentUser = Omit<User, 'pass'>;
+import type { AuthenticatedUser } from "@/lib/auth";
 
 interface RankingsTableProps {
   rankedPlayers: RankedPlayer[];
-  currentUser: CurrentUser;
+  currentUser: AuthenticatedUser;
 }
 
 export function RankingsTable({ rankedPlayers, currentUser }: RankingsTableProps) {
