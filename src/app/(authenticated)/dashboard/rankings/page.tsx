@@ -29,10 +29,12 @@ export default async function RankingsPage() {
       const perfil = player.perfil;
       if (!perfil) return null;
 
+      // @Fix: Convert BigInt fields to Number before summing them up
+      // to match the 'totalPoints: number' type in RankedPlayer.
       const totalPoints =
-        (perfil.puntos_edificios ?? 0) +
-        (perfil.puntos_entrenamiento ?? 0) +
-        (perfil.puntos_tropas ?? 0);
+        Number(perfil.puntos_edificios ?? 0) +
+        Number(perfil.puntos_entrenamiento ?? 0) +
+        Number(perfil.puntos_tropas ?? 0);
 
       return {
         ...player,
