@@ -5,6 +5,7 @@ import 'server-only';
 import { getSession } from '@/lib/session';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { RoleInFamily } from '@prisma/client';
 
 export interface SessionPayload {
   userId: number;
@@ -24,7 +25,16 @@ export const getCurrentUser = async () => {
     // @BestPractice: Include related data needed for the authenticated layout
     // in a single query to avoid waterfalls.
     include: {
-      familia: true,
+      familia: {
+        include: {
+          miembros: {
+             orderBy: {
+               // @New: Sort family members by role for consistent display.
+               roleInFamily: 'asc', // Leader, CoLeader, Member
+             }
+          }
+        }
+      },
       perfil: {
         include: {
           // @New: Eager load the player's progress with their profile.

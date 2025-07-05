@@ -45,6 +45,7 @@ type InvitationWithFamily = FamilyInvitation & {
   };
 };
 
+// @Fix: Ensure the type for Family includes its members, which are of type User.
 type FamilyWithMembers = Family & {
   miembros: User[];
 };
@@ -52,8 +53,12 @@ type FamilyWithMembers = Family & {
 // Main Page Component
 export default async function FamilyPage() {
   const user = await protectPage();
+  
+  // @Fix: Use the `familia` object directly from the authenticated user.
+  // This is more efficient as the data is already fetched by `protectPage`.
+  const family = user.familia;
 
-  if (!user.id_familia) {
+  if (!family) {
     // If user has no family, fetch their pending invitations
     const invitations = await prisma.familyInvitation.findMany({
       where: { id_usuario_invitado: user.id_usuario },
@@ -68,28 +73,6 @@ export default async function FamilyPage() {
     });
     return <NoFamilyView invitations={invitations} />;
   }
-
-  // If user has a family, fetch full family details
-  const family = await prisma.family.findUnique({
-    where: { id_familia: user.id_familia },
-    include: {
-      miembros: {
-        orderBy: {
-          roleInFamily: 'asc' // Leader, CoLeader, Member
-        }
-      }
-    }
-  });
-
-  if (!family) {
-    // This case should ideally not happen if data is consistent
-    // We can update the user to reflect they have no family
-    await prisma.user.update({
-        where: { id_usuario: user.id_usuario },
-        data: { id_familia: null, roleInFamily: null },
-    });
-    return <p>Error: Los datos de tu familia son inconsistentes. Hemos corregido tu estado. Refresca la página.</p>;
-  }
   
   const currentUserRole = user.roleInFamily;
 
@@ -97,7 +80,7 @@ export default async function FamilyPage() {
 }
 
 // View for users WITH a family
-function FamilyView({ family, currentUserRole }: { family: FamilyWithMembers, currentUserRole: RoleInFamily | null }) {
+function FamilyView({ family, currentUserRole }: { family: FamilyWithMembers; currentUserRole: RoleInFamily | null }) {
   const canManage = currentUserRole === RoleInFamily.Leader || currentUserRole === RoleInFamily.CoLeader;
 
   const roleIconMap: Record<RoleInFamily, React.ReactNode> = {
