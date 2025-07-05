@@ -237,3 +237,76 @@ export async function leaveFamily(
     revalidatePath('/dashboard');
     return { success: 'Has abandonado la familia.' };
 }
+
+// Schema for updating a member's role
+const updateRoleSchema = z.object({
+  memberId: z.coerce.number().int(),
+  newRole: z.nativeEnum(RoleInFamily),
+});
+
+export async function updateMemberRole(
+    prevState: { error?: string; success?: string },
+    formData: FormData
+): Promise<{ success?: string; error?: string }> {
+    const adminUser = await protectAction();
+
+    // Only Leaders can manage roles
+    if (!adminUser.id_familia || adminUser.roleInFamily !== RoleInFamily.Leader) {
+        return { error: 'No tienes permisos para cambiar roles.' };
+    }
+    
+    const validatedFields = updateRoleSchema.safeParse({
+        memberId: formData.get('memberId'),
+        newRole: formData.get('newRole'),
+    });
+
+    if (!validatedFields.success) {
+        return { error: 'Datos de formulario inválidos.' };
+    }
+
+    const { memberId, newRole } = validatedFields.data;
+
+    // A Leader cannot change their own role using this form.
+    if (memberId === adminUser.id_usuario) {
+        return { error: 'No puedes cambiar tu propio rol con esta función.' };
+    }
+  
+    const memberToUpdate = await prisma.user.findFirst({
+        where: {
+            id_usuario: memberId,
+            id_familia: adminUser.id_familia,
+        },
+    });
+
+    if (!memberToUpdate) {
+        return { error: 'El miembro no se encuentra en tu familia.' };
+    }
+  
+    // Logic to prevent removing the last leader
+    if (memberToUpdate.roleInFamily === RoleInFamily.Leader && newRole !== RoleInFamily.Leader) {
+        const leaderCount = await prisma.user.count({
+            where: {
+                id_familia: adminUser.id_familia,
+                roleInFamily: RoleInFamily.Leader,
+            },
+        });
+
+        if (leaderCount <= 1) {
+            return { error: 'No puedes degradar al último líder de la familia. Nombra a otro líder primero.' };
+        }
+    }
+
+    try {
+        await prisma.user.update({
+            where: { id_usuario: memberId },
+            data: { roleInFamily: newRole },
+        });
+
+        revalidatePath('/dashboard/family');
+        return { success: `Rol de ${memberToUpdate.usuario} actualizado a ${newRole}.` };
+
+    } catch (error) {
+        console.error("Error al actualizar rol:", error);
+        return { error: 'Ocurrió un error al actualizar el rol.' };
+    }
+}

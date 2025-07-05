@@ -36,8 +36,9 @@ import {
 import { RoleInFamily, type Family, type User, type FamilyInvitation } from '@prisma/client';
 import Image from 'next/image';
 import { LeaveFamilyForm } from '@/components/family/LeaveFamilyForm';
+import { ManageRoleForm } from '@/components/family/ManageRoleForm';
 
-// Define more specific types for props
+
 type InvitationWithFamily = FamilyInvitation & {
   familia: {
     nombre: string;
@@ -45,21 +46,15 @@ type InvitationWithFamily = FamilyInvitation & {
   };
 };
 
-// @Fix: Ensure the type for Family includes its members, which are of type User.
 type FamilyWithMembers = Family & {
   miembros: User[];
 };
 
-// Main Page Component
 export default async function FamilyPage() {
   const user = await protectPage();
-  
-  // @Fix: Use the `familia` object directly from the authenticated user.
-  // This is more efficient as the data is already fetched by `protectPage`.
   const family = user.familia;
 
   if (!family) {
-    // If user has no family, fetch their pending invitations
     const invitations = await prisma.familyInvitation.findMany({
       where: { id_usuario_invitado: user.id_usuario },
       include: {
@@ -75,13 +70,15 @@ export default async function FamilyPage() {
   }
   
   const currentUserRole = user.roleInFamily;
+  const currentUserId = user.id_usuario;
 
-  return <FamilyView family={family} currentUserRole={currentUserRole} />;
+  return <FamilyView family={family} currentUserRole={currentUserRole} currentUserId={currentUserId} />;
 }
 
 // View for users WITH a family
-function FamilyView({ family, currentUserRole }: { family: FamilyWithMembers; currentUserRole: RoleInFamily | null }) {
-  const canManage = currentUserRole === RoleInFamily.Leader || currentUserRole === RoleInFamily.CoLeader;
+function FamilyView({ family, currentUserRole, currentUserId }: { family: FamilyWithMembers; currentUserRole: RoleInFamily | null; currentUserId: number }) {
+  const canManageMembers = currentUserRole === RoleInFamily.Leader;
+  const canInvite = currentUserRole === RoleInFamily.Leader || currentUserRole === RoleInFamily.CoLeader;
 
   const roleIconMap: Record<RoleInFamily, React.ReactNode> = {
     [RoleInFamily.Leader]: <Crown className="h-4 w-4 text-yellow-400" />,
@@ -147,7 +144,11 @@ function FamilyView({ family, currentUserRole }: { family: FamilyWithMembers; cu
                                           )}
                                       </TableCell>
                                       <TableCell className="text-right">
-                                        <Button variant="ghost" size="sm" disabled>Gestionar</Button>
+                                        {canManageMembers && member.id_usuario !== currentUserId ? (
+                                            <ManageRoleForm member={member} />
+                                        ) : (
+                                            <Button variant="ghost" size="sm" disabled>Gestionar</Button>
+                                        )}
                                       </TableCell>
                                   </TableRow>
                               ))}
@@ -157,7 +158,7 @@ function FamilyView({ family, currentUserRole }: { family: FamilyWithMembers; cu
               </Card>
           </div>
           
-          {canManage && (
+          {canInvite && (
             <div>
                 <Card>
                     <CardHeader>
