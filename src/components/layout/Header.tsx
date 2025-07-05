@@ -5,12 +5,14 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Clock } from 'lucide-react';
 import Image from 'next/image';
 import type { User, PlayerResources } from '@prisma/client';
+import type { Serialized } from '@/lib/serialize';
 
-// The user object passed here comes from `getCurrentUser`, which omits the password.
-// We use Omit<User, 'pass'> to accurately type this object.
-type UserWithResources = Omit<User, 'pass'> & { recursos: PlayerResources | null };
+// The user object passed here now has its resources serialized.
+type SerializedPlayerResources = Serialized<PlayerResources>;
+type UserWithSerializedResources = Omit<User, 'pass'> & { recursos: SerializedPlayerResources | null };
 
-export default function Header({ user }: { user: UserWithResources }) {
+
+export default function Header({ user }: { user: UserWithSerializedResources }) {
   const resources = user.recursos;
   const [currentTime, setCurrentTime] = useState('');
 
