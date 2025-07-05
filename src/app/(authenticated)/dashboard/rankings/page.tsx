@@ -30,16 +30,16 @@ export default async function RankingsPage() {
             if (!perfil) return null;
 
             const totalPoints =
-                (perfil.puntos_edificios ?? 0) +
-                (perfil.puntos_entrenamiento ?? 0) +
-                (perfil.puntos_tropas ?? 0);
+                (Number(perfil.puntos_edificios) ?? 0) +
+                (Number(perfil.puntos_entrenamiento) ?? 0) +
+                (Number(perfil.puntos_tropas) ?? 0);
 
             return {
                 ...player,
                 totalPoints,
             };
         })
-        .filter((player): player is RankedPlayer => player !== null)
+        .filter(Boolean as any as (player: RankedPlayer | null) => player is RankedPlayer)
         .sort((a, b) => b.totalPoints - a.totalPoints);
 
     return (
