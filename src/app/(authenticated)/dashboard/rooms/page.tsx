@@ -19,28 +19,9 @@ import { Separator } from "@/components/ui/separator";
 import { Building, ArrowUpCircle, Clock } from "lucide-react";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
-import type { Propiedad } from "@prisma/client";
 import { protectPage } from "@/lib/auth";
-
-// @BestPractice: This map accurately links building names from the database
-// to their corresponding level fields in the `Propiedad` model.
-const buildingFieldMap: Record<string, keyof Propiedad> = {
-  'Oficina del Jefe': 'oficina',
-  'Escuela de especialización': 'escuela',
-  'Armería': 'armeria',
-  'Almacén de munición': 'municion',
-  'Cervecería': 'cerveceria',
-  'Taberna': 'taberna',
-  'Contrabando': 'contrabando',
-  'Almacén de armas': 'almacenArm',
-  'Depósito de munición': 'deposito',
-  'Almacén de alcohol': 'almacenAlc',
-  'Caja fuerte': 'caja',
-  'Campo de entrenamiento': 'campo',
-  'Seguridad': 'seguridad',
-  'Torreta de fuego automático': 'torreta',
-  'Minas ocultas': 'minas',
-};
+import { upgradeBuilding } from "@/actions/buildings";
+import { buildingFieldMap } from "@/lib/constants";
 
 // Helper function to format seconds into a readable string (e.g., 1h 30m 15s)
 function formatDuration(totalSeconds: number): string {
@@ -122,6 +103,20 @@ export default async function RoomsPage() {
         </CardContent>
       </Card>
     )
+  }
+
+  async function handleUpgrade(formData: FormData) {
+    "use server";
+
+    const id_edificio = Number(formData.get('id_edificio'));
+    if (isNaN(id_edificio)) {
+      console.error("ID de edificio inválido.");
+      return;
+    }
+    
+    // Server action does not need toast logic here, it will revalidate the path
+    // For more advanced feedback, a client component with useFormState would be needed.
+    await upgradeBuilding({ id_edificio });
   }
 
   return (
@@ -208,10 +203,13 @@ export default async function RoomsPage() {
                           </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="outline" size="sm">
-                          <ArrowUpCircle className="mr-2 h-4 w-4" />
-                          Ampliar
-                        </Button>
+                        <form action={handleUpgrade}>
+                          <input type="hidden" name="id_edificio" value={building.id_edificio} />
+                          <Button type="submit" variant="outline" size="sm">
+                            <ArrowUpCircle className="mr-2 h-4 w-4" />
+                            Ampliar
+                          </Button>
+                        </form>
                       </TableCell>
                     </TableRow>
                   );
@@ -260,10 +258,13 @@ export default async function RoomsPage() {
                         <span>{formatDuration(nextDurationSeconds)}</span>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <ArrowUpCircle className="mr-2 h-4 w-4" />
-                      Ampliar
-                    </Button>
+                    <form action={handleUpgrade} className="w-full">
+                      <input type="hidden" name="id_edificio" value={building.id_edificio} />
+                      <Button type="submit" variant="outline" size="sm" className="w-full">
+                        <ArrowUpCircle className="mr-2 h-4 w-4" />
+                        Ampliar
+                      </Button>
+                    </form>
                   </div>
                 </div>
               );

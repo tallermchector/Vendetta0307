@@ -21,6 +21,7 @@ import Image from "next/image";
 import prisma from "@/lib/prisma";
 import type { PlayerTraining } from "@prisma/client";
 import { protectPage } from "@/lib/auth";
+import { upgradeTraining } from "@/actions/training";
 
 // Helper function to format seconds into a readable string (e.g., 1h 30m 15s)
 function formatDuration(totalSeconds: number): string {
@@ -103,12 +104,23 @@ export default async function TrainingPage() {
     )
   }
   
-  // @Refactor: Create a Map for efficient lookup of training levels.
   const playerTrainingsMap = new Map<number, PlayerTraining>();
   if (playerProfile.trainings) {
       for (const pt of playerProfile.trainings) {
           playerTrainingsMap.set(pt.id_training, pt);
       }
+  }
+
+  async function handleImprove(formData: FormData) {
+    "use server";
+    
+    const id_training = Number(formData.get('id_training'));
+    if (isNaN(id_training)) {
+      console.error("ID de entrenamiento inválido.");
+      return;
+    }
+    
+    await upgradeTraining({ id_training });
   }
 
   return (
@@ -194,10 +206,13 @@ export default async function TrainingPage() {
                           </div>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="outline" size="sm">
-                          <ArrowUpCircle className="mr-2 h-4 w-4" />
-                          Mejorar
-                        </Button>
+                        <form action={handleImprove}>
+                          <input type="hidden" name="id_training" value={training.id_training} />
+                          <Button type="submit" variant="outline" size="sm">
+                            <ArrowUpCircle className="mr-2 h-4 w-4" />
+                            Mejorar
+                          </Button>
+                        </form>
                       </TableCell>
                     </TableRow>
                   );
@@ -246,10 +261,13 @@ export default async function TrainingPage() {
                         <span>{formatDuration(nextDurationSeconds)}</span>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full">
-                      <ArrowUpCircle className="mr-2 h-4 w-4" />
-                      Mejorar
-                    </Button>
+                    <form action={handleImprove} className="w-full">
+                      <input type="hidden" name="id_training" value={training.id_training} />
+                      <Button type="submit" variant="outline" size="sm" className="w-full">
+                        <ArrowUpCircle className="mr-2 h-4 w-4" />
+                        Mejorar
+                      </Button>
+                    </form>
                   </div>
                 </div>
               );

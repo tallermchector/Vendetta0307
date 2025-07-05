@@ -67,6 +67,9 @@ export async function recruitUnit(
     return { error: 'No tienes suficientes dólares.' };
   }
 
+  // @New: Calculate the points to be awarded for recruiting these units.
+  const pointsToAdd = BigInt(unitToRecruit.puntos_por_nivel) * BigInt(quantity);
+
   // 6. Ejecutar la actualización de la base de datos en una transacción atómica.
   try {
     await prisma.$transaction(async (tx) => {
@@ -98,6 +101,14 @@ export async function recruitUnit(
           quantity: quantity,
         },
       });
+
+      // @New: Update player's troop points.
+      if (pointsToAdd > 0) {
+        await tx.playerProfile.update({
+            where: { id_perfil: user.perfil!.id_perfil },
+            data: { puntos_tropas: { increment: pointsToAdd } },
+        });
+      }
     });
   } catch (error) {
     console.error('Error durante la transacción de reclutamiento:', error);
@@ -106,5 +117,6 @@ export async function recruitUnit(
 
   // 7. Revalidar la ruta para que la UI se actualice y devolver éxito.
   revalidatePath('/dashboard/recruitment');
+  revalidatePath('/dashboard');
   return { success: `${quantity} ${unitToRecruit.nombre}(s) reclutado(s) exitosamente.` };
 }

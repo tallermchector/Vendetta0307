@@ -67,6 +67,9 @@ export async function purchaseSecurity(
     return { error: 'No tienes suficientes dólares.' };
   }
 
+  // @New: Calculate points to add. Security units contribute to 'puntos_tropas'.
+  const pointsToAdd = BigInt(unitToPurchase.puntos_por_nivel) * BigInt(quantity);
+
   // 6. Execute the database update in an atomic transaction.
   try {
     await prisma.$transaction(async (tx) => {
@@ -98,6 +101,14 @@ export async function purchaseSecurity(
           quantity: quantity,
         },
       });
+
+      // @New: Update player's troop points.
+      if (pointsToAdd > 0) {
+        await tx.playerProfile.update({
+            where: { id_perfil: user.perfil!.id_perfil },
+            data: { puntos_tropas: { increment: pointsToAdd } },
+        });
+      }
     });
   } catch (error) {
     console.error('Error durante la transacción de compra de seguridad:', error);
@@ -106,5 +117,6 @@ export async function purchaseSecurity(
 
   // 7. Revalidate the path so the UI updates and return success.
   revalidatePath('/dashboard/security');
+  revalidatePath('/dashboard');
   return { success: `${quantity} ${unitToPurchase.nombre}(s) adquirido(s) exitosamente.` };
 }
