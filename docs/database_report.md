@@ -61,7 +61,7 @@ Este documento es un análisis autogenerado del esquema de Prisma (`prisma/schem
 ---
 
 ### **Modelo: `PlayerProfile`**
-*   **Propósito Inferido:** Almacena estadísticas de rendimiento y clasificación del jugador, como puntos y ranking, para ser mostradas en el dashboard.
+*   **Propósito Inferido:** Almacena estadísticas de rendimiento, progreso y clasificación del jugador. Es la tabla central para el estado del jugador.
 
 **Estructura de Campos:**
 
@@ -70,17 +70,29 @@ Este documento es un análisis autogenerado del esquema de Prisma (`prisma/schem
 | `id_perfil`            | `Int`  | `@id`, `@default(autoincrement())` | Identificador único del perfil.                        |
 | `id_usuario`           | `Int`  | `@unique`                       | Clave foránea que enlaza con un `User` de forma única. |
 | `usuario`              | `User` | `@relation(...)`                | Relación con el modelo `User`.                         |
-| `puntos_edificios`     | `Int`  |                                 | Puntos acumulados por la construcción de edificios.    |
-| `puntos_tropas`        | `Int`  |                                 | Puntos acumulados por el número de tropas.             |
-| `puntos_entrenamiento` | `Int`  |                                 | Puntos acumulados por los entrenamientos completados.  |
+| `puntos_edificios`     | `BigInt` |                                 | Puntos acumulados por la construcción de edificios.    |
+| `puntos_tropas`        | `BigInt` |                                 | Puntos acumulados por el número de tropas.             |
+| `puntos_entrenamiento` | `BigInt` |                                 | Puntos acumulados por los entrenamientos completados.  |
 | `ranking_global`       | `Int`  |                                 | Posición del jugador en la clasificación global.       |
 | `lealtad`              | `Int`  |                                 | Nivel de lealtad del jugador (en porcentaje).          |
+| `trainings`            | `PlayerTraining[]` |                    | Progreso de los entrenamientos del jugador.            |
+| `recruitments`         | `PlayerRecruitment[]` |                 | Unidades reclutadas por el jugador.                    |
+| `securities`           | `PlayerSecurity[]` |                      | Defensas de seguridad del jugador.                     |
 
 **Relaciones:**
 *   **Relación con `User`:**
     *   **Tipo:** Uno a Uno.
     *   **Modelo Relacionado:** `User`.
-    *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`.
+    *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`, `onDelete: Cascade`.
+*   **Relación con `PlayerTraining`:**
+    *   **Tipo:** Uno a Muchos.
+    *   **Modelo Relacionado:** `PlayerTraining`.
+*   **Relación con `PlayerRecruitment`:**
+    *   **Tipo:** Uno a Muchos.
+    *   **Modelo Relacionado:** `PlayerRecruitment`.
+*   **Relación con `PlayerSecurity`:**
+    *   **Tipo:** Uno a Muchos.
+    *   **Modelo Relacionado:** `PlayerSecurity`.
 
 ---
 
@@ -104,7 +116,7 @@ Este documento es un análisis autogenerado del esquema de Prisma (`prisma/schem
 *   **Relación con `User`:**
     *   **Tipo:** Uno a Uno.
     *   **Modelo Relacionado:** `User`.
-    *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`.
+    *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`, `onDelete: Cascade`.
 
 ---
 
@@ -123,52 +135,47 @@ Este documento es un análisis autogenerado del esquema de Prisma (`prisma/schem
 | `coord_y`    | `Int`    |                                 | Coordenada Y de la propiedad en el mapa.              |
 | `coord_z`    | `Int`    |                                 | Coordenada Z de la propiedad en el mapa (ej: sector). |
 | `oficina`    | `Int`    | `@default(0)`                   | Nivel del edificio "Oficina".                         |
-| `escuela`    | `Int`    | `@default(0)`                   | Nivel del edificio "Escuela de Gángsters".            |
-| `armeria`    | `Int`    | `@default(0)`                   | Nivel del edificio "Armería".                         |
-| `municion`   | `Int`    | `@default(0)`                   | Nivel del edificio "Fábrica de Municiones".           |
-| `cerveceria` | `Int`    | `@default(0)`                   | Nivel del edificio "Cervecería".                      |
-| `taberna`    | `Int`    | `@default(0)`                   | Nivel del edificio "Taberna".                         |
-| `contrabando`| `Int`    | `@default(0)`                   | Nivel del edificio "Centro de Contrabando".           |
-| `almacenArm` | `Int`    | `@default(0)`                   | Nivel del edificio "Almacén de Armas".                |
-| `deposito`   | `Int`    | `@default(0)`                   | Nivel del edificio "Depósito de Munición".            |
-| `almacenAlc` | `Int`    | `@default(0)`                   | Nivel del edificio "Almacén de Alcohol".              |
-| `caja`       | `Int`    | `@default(0)`                   | Nivel del edificio "Caja Fuerte".                     |
-| `campo`      | `Int`    | `@default(0)`                   | Nivel del edificio "Campo de Tiro".                   |
-| `seguridad`  | `Int`    | `@default(0)`                   | Nivel del edificio "Puesto de Seguridad".             |
-| `torreta`    | `Int`    | `@default(0)`                   | Nivel del edificio "Torreta de Defensa".              |
-| `minas`      | `Int`    | `@default(0)`                   | Nivel del edificio "Operación Minera".                |
+| ...          | `Int`    | `@default(0)`                   | (Todos los demás campos de edificios)                 |
 
 **Relaciones:**
 *   **Relación con `User`:**
     *   **Tipo:** Muchos a Uno.
     *   **Modelo Relacionado:** `User`.
-    *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`.
+    *   **Campos de Clave:** `fields: [id_usuario]`, `references: [id_usuario]`, `onDelete: Cascade`.
+*   **Atributo Único:** `@@unique([coord_x, coord_y, coord_z])` para evitar múltiples propiedades en las mismas coordenadas.
 
 ---
 
-### **Modelo: `Building`**
-*   **Propósito Inferido:** Actúa como un catálogo de todos los tipos de edificios disponibles para construir, definiendo sus propiedades base como costos, tiempos de construcción y factores de incremento.
+### **Catálogos (Building, Training, Recruitment, Security)**
+*   **Propósito Inferido:** Estos modelos (`Building`, `Training`, etc.) actúan como catálogos de todos los tipos de elementos disponibles en el juego. Definen sus propiedades base como costos, tiempos y factores de incremento. Son datos estáticos.
 
-**Estructura de Campos:**
+**Estructura de Campos (Ejemplo con `Building`):**
 
 | Campo         | Tipo   | Atributos | Descripción                                                    |
 | ------------- | ------ | --------- | -------------------------------------------------------------- |
-| `id_edificio` | `Int`  | `@id`     | Identificador único para el tipo de edificio (no autoincremental). |
-| `nombre`      | `String`|           | Nombre del edificio (ej: "Cuartel").                           |
-| `descripcion` | `String`|           | Descripción del propósito del edificio.                        |
-| `costo_base`  | `Json` |           | Objeto JSON con el costo base (posiblemente de referencia).    |
-| `c_armas`     | `Int`  |           | Costo inicial en Armas.                                        |
-| `c_municion`  | `Int`  |           | Costo inicial en Munición.                                     |
-| `c_alcohol`   | `Int`  |           | Costo inicial en Alcohol.                                      |
-| `c_dolares`   | `Int`  |           | Costo inicial en Dólares.                                      |
-| `fac_costo`   | `Float`|           | Factor de multiplicación de costo por nivel.                   |
-| `t_horas`     | `String`|           | Tiempo de construcción base (horas).                           |
-| `t_minutos`   | `String`|           | Tiempo de construcción base (minutos).                         |
-| `t_segundos`  | `String`|           | Tiempo de construcción base (segundos).                        |
-| `fac_dura`    | `Float`|           | Factor de multiplicación de duración por nivel.                |
-| `imagen_url`  | `String`|           | URL a la imagen del edificio.                                  |
+| `id_edificio` | `Int`  | `@id`     | Identificador único para el tipo de edificio.                  |
+| `nombre`      | `String`|           | Nombre del edificio.                                           |
+| ...           | ...    |           | (costos, factores, tiempos, descripción, imagen)             |
 
 **Relaciones:**
-*   Este modelo no tiene relaciones directas con otros modelos.
+*   Estos modelos de catálogo no tienen relaciones directas salientes. Son referenciados por las tablas de progreso del jugador.
 
 ---
+
+### **Tablas de Progreso (PlayerTraining, PlayerRecruitment, PlayerSecurity)**
+*   **Propósito Inferido:** Estas tablas actúan como tablas "pivote" o de unión, conectando a un jugador con los catálogos para registrar su progreso específico (nivel de entrenamiento, cantidad de unidades, etc.).
+
+**Estructura de Campos (Ejemplo con `PlayerTraining`):**
+
+| Campo               | Tipo     | Atributos                       | Descripción                                                  |
+| ------------------- | -------- | ------------------------------- | ------------------------------------------------------------ |
+| `id_player_training`| `Int`    | `@id @default(autoincrement())` | ID único del registro de progreso.                           |
+| `id_perfil`         | `Int`    |                                 | Clave foránea que enlaza con `PlayerProfile`.                 |
+| `id_training`       | `Int`    |                                 | Clave foránea que enlaza con `Training`.                      |
+| `perfil`            | `PlayerProfile`| `@relation(...)`         | Relación con el perfil del jugador.                          |
+| `training`          | `Training`| `@relation(...)`               | Relación con el catálogo de entrenamientos.                  |
+| `level`             | `Int`    | `@default(0)`                   | Nivel actual del jugador para este entrenamiento.            |
+
+**Relaciones y Atributos:**
+*   Cada tabla de progreso tiene una relación "Muchos a Uno" con `PlayerProfile` y una con su catálogo correspondiente.
+*   Se define una restricción única (`@@unique`) sobre los campos `id_perfil` y `id_training` para asegurar que un jugador solo pueda tener un registro por cada tipo de entrenamiento, unidad o defensa.

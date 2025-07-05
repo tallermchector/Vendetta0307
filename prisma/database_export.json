@@ -4,9 +4,9 @@
       "id_usuario": 1,
       "usuario": "Bomberox",
       "email": "bomberox@ejemplo.com",
-      "pass": "$2a$10$eV0um3XKXdQUGE04thVp2eHc/OZ6Sxo4jMNqD3X3uU9.8XpSvGRR.",
+      "pass": "$2a$10$avVd0Od/bEpk6fX90Bcgee2BGfZ2EQu8RKGSCo0SWHv7CznpP39v6",
       "idioma": "es",
-      "fecha_registro": "2025-07-04T20:18:29.648Z",
+      "fecha_registro": "2025-07-05T02:02:38.022Z",
       "id_familia": 1
     }
   ],
@@ -33,11 +33,11 @@
     {
       "id_recursos": 1,
       "id_usuario": 1,
-      "armas": "20000",
+      "armas": "500",
       "municion": "500",
       "alcohol": "0",
       "dolares": "0",
-      "ultima_actualizacion": "2025-07-04T20:19:23.774Z"
+      "ultima_actualizacion": "2025-07-05T02:02:43.116Z"
     }
   ],
   "properties": [
@@ -1001,7 +1001,14 @@
       "punt": "1176"
     }
   ],
-  "playerRecruitments": [],
+  "playerRecruitments": [
+    {
+      "id_player_recruitment": 1,
+      "id_perfil": 1,
+      "id_recruitment": 1,
+      "quantity": 1
+    }
+  ],
   "securities": [
     {
       "id_security": 1,
@@ -1089,7 +1096,7 @@
       "id_player_security": 1,
       "id_perfil": 1,
       "id_security": 1,
-      "quantity": 0
+      "quantity": 1
     }
   ]
 }
