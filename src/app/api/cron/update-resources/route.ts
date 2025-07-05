@@ -4,13 +4,13 @@ import { calculateProductionRates, type ProductionRates } from '@/lib/production
 
 /**
  * @fileOverview API route for a cron job to update player resources.
- * This endpoint should be called periodically by a trusted scheduler.
+ * This endpoint should be called periodically by a trusted scheduler via a POST request.
  *
  * It iterates through all active players, calculates their resource
  * production since the last update, and applies it to their account.
  */
 
-export async function GET(request: Request) {
+export async function POST(request: Request) {
   // 1. Security: Protect the endpoint with a secret key.
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -87,12 +87,11 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      success: true,
-      message: `Resource update completed for ${updatePromises.length} users.`,
+      message: `Recursos actualizados para ${updatePromises.length} jugadores.`,
     });
 
   } catch (error) {
-    console.error('Cron job for updating resources failed:', error);
+    console.error('Cron job para actualizar recursos falló:', error);
     return new NextResponse('Internal Server Error', { status: 500 });
   }
 }
