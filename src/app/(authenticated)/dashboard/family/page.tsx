@@ -32,10 +32,10 @@ import {
   createFamily,
   inviteMember,
   handleInvitation,
-  leaveFamily,
 } from '@/actions/family';
 import { RoleInFamily } from '@prisma/client';
 import Image from 'next/image';
+import { LeaveFamilyForm } from '@/components/family/LeaveFamilyForm';
 
 // Main Page Component
 export default async function FamilyPage() {
@@ -120,12 +120,7 @@ function FamilyView({ family, currentUserRole }: { family: any, currentUserRole:
               <CardDescription>{family.miembros.length} miembro(s)</CardDescription>
             </div>
           </div>
-          <form action={leaveFamily}>
-              <Button variant="destructive" size="sm">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Abandonar Familia
-              </Button>
-          </form>
+          <LeaveFamilyForm />
         </CardHeader>
       </Card>
       

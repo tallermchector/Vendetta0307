@@ -188,7 +188,10 @@ export async function handleInvitation(formData: FormData): Promise<{ success?: 
     }
 }
 
-export async function leaveFamily(): Promise<{ success?: string; error?: string }> {
+export async function leaveFamily(
+  prevState: { error?: string; success?: string },
+  formData: FormData
+): Promise<{ success?: string; error?: string }> {
     const user = await protectAction();
 
     if (!user.id_familia || !user.roleInFamily) {
