@@ -1,51 +1,58 @@
 import 'server-only';
-// @BestPractice: No se utiliza 'cache' aquí porque interfiere con la naturaleza
-// dinámica de `cookies()` durante el flujo de autenticación, causando que se
-// lea un estado de sesión obsoleto.
 import { getSession } from '@/lib/session';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
-import { RoleInFamily } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+// @BestPractice: Define a reusable payload for getting the user with all their relations.
+// This ensures consistency across different parts of the application.
+const userWithRelationsPayload = {
+  include: {
+    familia: {
+      include: {
+        miembros: {
+          orderBy: {
+            roleInFamily: 'asc',
+          },
+        },
+      },
+    },
+    perfil: {
+      include: {
+        trainings: true,
+        recruitments: true,
+        securities: true,
+      },
+    },
+    propiedades: true,
+    recursos: true,
+  },
+};
+
+// @BestPractice: Create an explicit TypeScript type from the Prisma payload.
+// This helps with type safety and autocompletion in other parts of the app.
+export type UserWithRelations = Prisma.UserGetPayload<typeof userWithRelationsPayload>;
+
+// @BestPractice: The final, secure user type that is exposed by authentication helpers.
+// It explicitly omits the password hash.
+export type AuthenticatedUser = Omit<UserWithRelations, 'pass'>;
+
 
 export interface SessionPayload {
   userId: number;
   expires?: Date;
 }
 
-// @BestPractice: Se elimina el `cache` para asegurar que siempre se obtenga la sesión más reciente.
-// Esto es crucial para flujos como login/register donde la sesión cambia en la misma petición.
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<AuthenticatedUser | null> => {
   const session = await getSession();
   if (!session?.userId) {
     return null;
   }
-
+  
+  // Use the defined payload for the query.
   const user = await prisma.user.findUnique({
     where: { id_usuario: session.userId },
-    // @BestPractice: Include related data needed for the authenticated layout
-    // in a single query to avoid waterfalls.
-    include: {
-      familia: {
-        include: {
-          miembros: {
-             orderBy: {
-               // @New: Sort family members by role for consistent display.
-               roleInFamily: 'asc', // Leader, CoLeader, Member
-             }
-          }
-        }
-      },
-      perfil: {
-        include: {
-          // @New: Eager load the player's progress with their profile.
-          trainings: true,
-          recruitments: true,
-          securities: true,
-        }
-      },
-      propiedades: true,
-      recursos: true,
-    },
+    ...userWithRelationsPayload,
   });
 
   if (!user) {
@@ -62,7 +69,7 @@ export const getCurrentUser = async () => {
  * It checks for a valid session and redirects to '/login' if not found.
  * @returns The user object if the session is valid.
  */
-export async function protectPage() {
+export async function protectPage(): Promise<AuthenticatedUser> {
     const user = await getCurrentUser();
     if (!user) {
         redirect('/login');
@@ -76,7 +83,7 @@ export async function protectPage() {
  * This is essential for preventing unauthorized mutations.
  * @returns The user object if the session is valid.
  */
-export async function protectAction() {
+export async function protectAction(): Promise<AuthenticatedUser> {
     const user = await getCurrentUser();
     if (!user) {
         throw new Error('No autorizado: El usuario debe iniciar sesión.');
