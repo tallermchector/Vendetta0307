@@ -1,21 +1,29 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma, User } from '@prisma/client';
 
-/**
- * Define un objeto de configuración para la consulta de Prisma.
- * Esto asegura que siempre pidamos las mismas relaciones en todas partes.
- */
+// 1. Argumentos de consulta para obtener un usuario con TODAS sus relaciones.
 export const userQueryArgs = {
   include: {
-    perfil: true,
+    perfil: {
+      include: {
+        recruitments: true, // Incluir estas relaciones anidadas
+        securities: true,
+        trainings: true,
+      },
+    },
     recursos: true,
     propiedades: true,
     familia: true,
   },
 };
 
-/**
- * Este es el tipo principal para el usuario autenticado en toda la aplicación.
- * Prisma.UserGetPayload genera un tipo preciso basado en la consulta.
- * Incluye el usuario y todas sus relaciones principales.
- */
+// 2. El tipo AUTORITATIVO para un usuario autenticado y completo.
 export type FullAuthenticatedUser = Prisma.UserGetPayload<typeof userQueryArgs>;
+
+// 3. El tipo para un jugador en el ranking. DEBE incluir las relaciones.
+export type RankedPlayer = User & {
+  perfil: Prisma.PlayerProfileGetPayload<{}> | null;
+  familia: Prisma.FamilyGetPayload<{}> | null;
+  _count: Prisma.UserCountOutputType;
+  totalPoints: number; // Usar number para cálculos en JS
+  rank: number;
+};
