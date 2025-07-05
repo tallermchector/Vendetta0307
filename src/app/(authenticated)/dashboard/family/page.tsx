@@ -1,5 +1,3 @@
-import { protectPage } from '@/lib/auth';
-import prisma from '@/lib/prisma';
 import {
   Card,
   CardContent,
@@ -7,221 +5,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  Crown,
-  ShieldCheck,
-  User as UserIcon,
-} from "lucide-react";
-import {
-  RoleInFamily, 
-  type Family as FamilyType, 
-  type User, 
-  type FamilyInvitation
-} from '@prisma/client';
-import Image from 'next/image';
-import { LeaveFamilyForm } from '@/components/family/LeaveFamilyForm';
-import { ManageRoleForm } from '@/components/family/ManageRoleForm';
-import { CreateFamilyForm } from '@/components/family/CreateFamilyForm';
-import { InviteMemberForm } from '@/components/family/InviteMemberForm';
-import { HandleInvitationForm } from '@/components/family/HandleInvitationForm';
+import { Construction } from "lucide-react";
 
-type InvitationWithFamily = FamilyInvitation & {
-  familia: {
-    nombre: string;
-    tag: string;
-  };
-};
-
-type FamilyWithMembers = FamilyType & {
-  miembros: User[];
-};
-
-type NoFamilyViewProps = {
-  invitations: InvitationWithFamily[];
-};
-
-type FamilyViewProps = {
-  family: FamilyWithMembers;
-  currentUserRole: RoleInFamily;
-  currentUserId: number;
-}
-
-export default async function FamilyPage() {
-  const user = await protectPage();
-  const family = user.familia;
-
-  if (!family) {
-    const invitations = await prisma.familyInvitation.findMany({
-      where: { id_usuario_invitado: user.id_usuario },
-      include: {
-        familia: {
-          select: {
-            nombre: true,
-            tag: true,
-          }
-        }
-      }
-    });
-    return <NoFamilyView invitations={invitations} />;
-  }
-  
-  const currentUserRole = user.roleInFamily;
-  if (!currentUserRole) {
-      // This should ideally not happen if a user is in a family
-      // but it's a good safeguard.
-      return <p>Error: Rol de usuario no definido en la familia.</p>;
-  }
-
-  return <FamilyView family={family} currentUserRole={currentUserRole} currentUserId={user.id_usuario} />;
-}
-
-// View for users WITH a family
-function FamilyView({ family, currentUserRole, currentUserId }: FamilyViewProps) {
-  const canManageMembers = currentUserRole === RoleInFamily.Leader;
-  const canInvite = currentUserRole === RoleInFamily.Leader || currentUserRole === RoleInFamily.CoLeader;
-
-  const roleIconMap: Record<RoleInFamily, React.ReactNode> = {
-    [RoleInFamily.Leader]: <Crown className="h-4 w-4 text-yellow-400" />,
-    [RoleInFamily.CoLeader]: <ShieldCheck className="h-4 w-4 text-blue-400" />,
-    [RoleInFamily.Member]: <UserIcon className="h-4 w-4 text-muted-foreground" />,
-  };
-  
-  const roleLabelMap: Record<RoleInFamily, string> = {
-    [RoleInFamily.Leader]: "Líder",
-    [RoleInFamily.CoLeader]: "Co-Líder",
-    [RoleInFamily.Member]: "Miembro",
-  };
-
+export default function FamilyPage() {
   return (
     <div className="flex flex-col gap-6">
       <Card>
-        <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Image
-              src={family.emblema_url || 'https://placehold.co/128x128.png'}
-              data-ai-hint="family crest shield"
-              alt={`Emblema de ${family.nombre}`}
-              width={80}
-              height={80}
-              className="rounded-lg border-2 border-primary"
-            />
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Construction className="h-6 w-6 text-primary" />
             <div>
-              <CardTitle className="text-3xl font-headline">
-                {family.nombre} <span className="text-primary">[{family.tag}]</span>
-              </CardTitle>
-              <CardDescription>{family.miembros.length} miembro(s)</CardDescription>
+              <CardTitle>Familia</CardTitle>
+              <CardDescription>
+                Este módulo está actualmente en construcción.
+              </CardDescription>
             </div>
           </div>
-          <LeaveFamilyForm />
-        </CardHeader>
-      </Card>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-              <Card>
-                  <CardHeader>
-                      <CardTitle>Miembros</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                      <Table>
-                          <TableHeader>
-                              <TableRow>
-                                  <TableHead>Nombre</TableHead>
-                                  <TableHead>Rol</TableHead>
-                                  <TableHead className="text-right">Acciones</TableHead>
-                              </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                              {family.miembros.map((member: User) => (
-                                  <TableRow key={member.id_usuario}>
-                                      <TableCell className="font-medium">{member.usuario}</TableCell>
-                                      <TableCell>
-                                          {member.roleInFamily && (
-                                            <div className="flex items-center gap-2">
-                                                {roleIconMap[member.roleInFamily]}
-                                                <span>{roleLabelMap[member.roleInFamily]}</span>
-                                            </div>
-                                          )}
-                                      </TableCell>
-                                      <TableCell className="text-right">
-                                        {canManageMembers && member.id_usuario !== currentUserId ? (
-                                            <ManageRoleForm member={member} />
-                                        ) : (
-                                            <Button variant="ghost" size="sm" disabled>Gestionar</Button>
-                                        )}
-                                      </TableCell>
-                                  </TableRow>
-                              ))}
-                          </TableBody>
-                      </Table>
-                  </CardContent>
-              </Card>
-          </div>
-          
-          {canInvite && (
-            <div>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Invitar Miembro</CardTitle>
-                        <CardDescription>Invita a un nuevo jugador a unirse a la familia.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <InviteMemberForm />
-                    </CardContent>
-                </Card>
-            </div>
-          )}
-      </div>
-    </div>
-  );
-}
-
-// View for users WITHOUT a family
-function NoFamilyView({ invitations }: NoFamilyViewProps) {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Crea tu Propia Familia</CardTitle>
-          <CardDescription>Forja tu propio destino y funda un nuevo clan.</CardDescription>
         </CardHeader>
         <CardContent>
-            <CreateFamilyForm />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Invitaciones Pendientes</CardTitle>
-          <CardDescription>
-            {invitations.length > 0 ? 'Has sido invitado a unirte a estas familias.' : 'No tienes invitaciones pendientes.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {invitations.length > 0 && (
-            <div className="space-y-3">
-              {invitations.map(inv => (
-                <div key={inv.id_invitation} className="flex items-center justify-between p-3 rounded-md border bg-muted/50">
-                  <div>
-                    <p className="font-semibold">{inv.familia.nombre} <span className="text-muted-foreground">[{inv.familia.tag}]</span></p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <HandleInvitationForm invitationId={inv.id_invitation} actionType="accept" />
-                    <HandleInvitationForm invitationId={inv.id_invitation} actionType="decline" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <p className="text-muted-foreground">Vuelve pronto para ver las nuevas funcionalidades.</p>
         </CardContent>
       </Card>
     </div>
