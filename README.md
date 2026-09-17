@@ -1,78 +1,157 @@
- 
-# Vendetta 01: Un Juego de Estrategia Online
+# Vendetta - MMORTS Mafia Strategy Game
 
-Bienvenido al repositorio de **Vendetta 01**, una aplicación web moderna que revive la esencia de los juegos de estrategia online, construida con un stack tecnológico de última generación.
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+[![TypeScript 5](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
 
-## Cometido del Proyecto
+**Vendetta** es un videojuego de estrategia masiva multijugador online en tiempo real (MMORTS) ambientado en el submundo de las organizaciones criminales de la mafia. Los jugadores asumen el rol de Don o Capo, gestionando operaciones clandestinas, producción y contrabando de recursos, reclutamiento de matones y especialistas, guerras territoriales entre Familias y espionaje estratégico.
 
-El objetivo principal de **Vendetta 01** es desarrollar una aplicación web robusta y escalable que sirva como plataforma para un juego de estrategia multijugador online. El núcleo de la aplicación se centra en un sistema de autenticación seguro y un panel de control (dashboard) interactivo, desde donde los jugadores gestionan sus recursos, propiedades y progreso en el juego.
+Construido con una arquitectura moderna de alto rendimiento basada en **Next.js 16 (App Router)**, **React Server Components**, **Server Actions con transacciones ACID** y una interfaz con estética **Dark Mafia Modern**.
 
-## Tecnologías Utilizadas
+---
 
-Este proyecto aprovecha un conjunto de tecnologías modernas para garantizar un rendimiento óptimo, seguridad y una experiencia de desarrollo eficiente.
+## Características Principales
 
-| Tecnología | Propósito en el Proyecto |
-| :--- | :--- |
-| **Next.js 15 (App Router)** | Framework principal de React. Se utiliza el App Router para una arquitectura basada en componentes de servidor (RSC), rutas anidadas y layouts. |
-| **TypeScript** | Superset de JavaScript que añade tipado estático, mejorando la robustez del código y la experiencia del desarrollador. |
-| **Prisma ORM** | Capa de acceso a la base de datos. Se utiliza para definir el esquema, ejecutar migraciones y realizar consultas a la base de datos PostgreSQL de forma segura y tipada. |
-| **TailwindCSS & ShadCN/UI** | Utilizado para el diseño de la interfaz de usuario. TailwindCSS provee las clases de utilidad, mientras que ShadCN/UI ofrece un conjunto de componentes accesibles y reutilizables. |
-| **Server Actions** | Para ejecutar lógica de backend directamente desde los componentes, eliminando la necesidad de crear endpoints de API para operaciones como el login o la creación de propiedades. |
-| **Zod** | Librería para la validación de esquemas. Es fundamental para validar los datos de formularios y acciones de servidor, asegurando la integridad de los datos. |
-| **Jose & Bcrypt.js** | Utilizados para la seguridad de la autenticación. `bcrypt` se encarga de hashear contraseñas, y `jose` gestiona la creación y verificación de JSON Web Tokens (JWT) para la sesión. |
-| **Lucide React** | Librería de iconos SVG ligera y personalizable, usada en toda la interfaz de usuario. |
+- **Economía y Producción en Tiempo Real:** Gestión de recursos ilícitos (Dinero, Armas, Alcohol, Munición) calculados con un motor matemático determinista puro.
+- **Jerarquía y Familias:** Alianzas mafiosas, rangos de poder (`Leader`, `CoLeader`, `Member`), invitaciones y diplomacia entre sindicatos.
+- **Inmuebles y Operaciones:** Construcción y mejora progresiva de propiedades, laboratorios clandestinos, depósitos y centros de mando.
+- **Reclutamiento y Tácticas de Seguridad:** Entrenamiento de tropas de asalto, defensas de locales y misiones de intimidación.
+- **Simulador de Combate:** Herramientas de cálculo táctico y simulación de asedios.
+- **Seguridad y Sesión de Alto Nivel:** Autenticación protegida con JWT cifrado vía cookies `HttpOnly`, protección con Middleware perimetral y transacciones atómicas con Prisma.
 
-## Estructura del Proyecto
+---
 
-La organización del proyecto sigue las convenciones modernas de Next.js, promoviendo la modularidad y la claridad.
+## Requisitos Previos
+
+- **Node.js:** Versión `>= 20.x` (LTS recomendada).
+- **pnpm:** Versión `>= 9.x` (`corepack enable pnpm` o `npm install -g pnpm`).
+- **Base de Datos:** PostgreSQL o compatible (vía URL de conexión directa o pooling).
+
+---
+
+## Guía de Instalación y Ejecución Local
+
+Sigue estos pasos ordenados para levantar el entorno de desarrollo:
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/tallermchector/Vendetta0307.git
+cd Vendetta0307
+```
+
+### 2. Configurar variables de entorno
+Copia la plantilla de variables de entorno y ajusta tus credenciales de base de datos y secretos:
+```bash
+cp .env.example .env
+```
+
+### 3. Instalar dependencias con pnpm
+```bash
+pnpm install
+```
+
+### 4. Ejecutar migraciones de la base de datos
+Aplica el esquema de Prisma en tu base de datos local o remota:
+```bash
+pnpm exec prisma migrate dev
+```
+
+### 5. Sembrar datos iniciales (Seed)
+Inicializa los datos base del juego (edificios, tropas, unidades de seguridad y entrenamientos):
+```bash
+pnpm exec prisma db seed
+```
+
+### 6. Iniciar el servidor de desarrollo
+Inicia Next.js en modo desarrollo:
+```bash
+pnpm dev
+```
+
+Accede a la aplicación en [http://localhost:3000](http://localhost:3000) (o el puerto configurado).
+
+---
+
+## Estructura de Directorios (`src/`)
 
 ```
-/
-├── prisma/             # Esquema de la DB, migraciones y scripts de sembrado.
-├── public/             # Archivos estáticos (imágenes, fuentes, etc.).
-├── src/
-│   ├── app/            # Corazón de la aplicación (App Router).
-│   │   ├── (authenticated)/ # Grupo de rutas protegidas por sesión.
-│   │   ├── login/      # Página de inicio de sesión.
-│   │   ├── register/   # Páginas para el flujo de registro.
-│   │   ├── layout.tsx  # Layout raíz de la aplicación.
-│   │   └── page.tsx    # Página de inicio (landing).
-│   │
-│   ├── actions/        # Server Actions (lógica de backend).
-│   ├── components/     # Componentes de React reutilizables.
-│   ├── lib/            # Lógica central y utilidades (Prisma, sesión, etc.).
-│   └── middleware.ts   # Middleware para la protección de rutas.
+src/
+├── actions/                     # Server Actions (Mutaciones y lógica de negocio con Prisma)
+│   ├── auth.ts                  # Registro, login y cierre de sesión
+│   ├── buildings.ts             # Construcción y subida de nivel de edificios
+│   ├── family.ts                # Gestión de familias, rangos e invitaciones
+│   ├── property.ts              # Gestión de propiedades y cambio de sede activa
+│   ├── recruitment.ts           # Reclutamiento de unidades y tropas
+│   ├── security.ts              # Asignación de defensas e infraestructuras de guardia
+│   ├── training.ts              # Formación e investigación tecnológica
+│   └── user.ts                  # Actualizaciones de perfil y preferencias
 │
-├── docs/               # Documentación del proyecto.
-└── ...                 # Archivos de configuración (next.config.ts, tsconfig.json, etc.).
+├── ai/                          # Integraciones y agentes con IA / Genkit
+│
+├── app/                         # Enrutamiento principal (Next.js App Router)
+│   ├── (authenticated)/         # Rutas protegidas que requieren sesión activa
+│   │   ├── dashboard/           # Panel de mando principal del jugador
+│   │   │   ├── buildings/       # Vista de edificios y ampliaciones
+│   │   │   ├── family/          # Cuartel general de la Familia mafiosa
+│   │   │   ├── farms/           # Operaciones de producción agrícola e insumos
+│   │   │   ├── map/             # Mapa territorial y exploración
+│   │   │   ├── missions/        # Misiones, contratos y encargos
+│   │   │   ├── options/         # Configuración y preferencias de cuenta
+│   │   │   ├── rankings/        # Clasificación global de capos y familias
+│   │   │   ├── recruitment/     # Cuartel de reclutamiento de tropas
+│   │   │   ├── resources/       # Estado y desglose de producción de recursos
+│   │   │   ├── rooms/           # Salas operativas y cuarteles
+│   │   │   ├── rules/           # Reglamento y manual del juego
+│   │   │   ├── search/          # Búsqueda de objetivos y jugadores
+│   │   │   ├── security/        # Sistema de seguridad y vigilancia
+│   │   │   ├── simulator/       # Simulador táctico de combate
+│   │   │   ├── stats/           # Estadísticas de poder y economía
+│   │   │   ├── technologies/    # Árbol de investigación y avances
+│   │   │   ├── training/        # Campo de entrenamiento
+│   │   │   └── page.tsx         # Vista general del dashboard
+│   │   └── layout.tsx           # Layout persistente para usuarios autenticados
+│   ├── api/                     # Endpoints API REST y Webhooks
+│   ├── forgot-password/         # Flujo de recuperación de contraseñas
+│   ├── login/                   # Página de inicio de sesión
+│   ├── register/                # Flujo de registro en múltiples pasos
+│   ├── globals.css              # Estilos globales y tokens "Dark Mafia Modern"
+│   ├── layout.tsx               # Layout raíz HTML y providers
+│   └── page.tsx                 # Landing page pública y presentación
+│
+├── components/                  # Componentes reutilizables de React
+│   ├── dashboard/               # Widgets específicos del juego
+│   ├── forms/                   # Formularios de validación con Zod
+│   ├── layout/                  # Barras de navegación, barras laterales y cabeceras
+│   └── ui/                      # Biblioteca de primitivas de interfaz (Radix UI / Shadcn)
+│
+├── content/                     # Textos, reglas y descripciones estáticas
+│
+├── hooks/                       # Custom hooks de React para estado de cliente
+│
+├── lib/                         # Utilidades transversales y motor central
+│   ├── engine/                  # Motor de cálculo PURO (sin efectos secundarios ni BD)
+│   ├── auth.ts                  # Autenticación, protectPage y comprobación de permisos
+│   ├── constants.ts             # Constantes globales del juego
+│   ├── prisma.ts                # Instancia singleton del cliente de Prisma
+│   ├── production.ts            # Cálculo de ritmos y flujos de producción
+│   ├── serialize.ts             # Serialización segura de datos de servidor a cliente
+│   ├── session.ts               # Manejo de JWT, cookies de sesión y desencriptado
+│   ├── types.ts                 # Tipos de usuario autenticado y payloads de Prisma
+│   └── utils.ts                 # Utilidades generales (cn, formateadores)
+│
+├── types/                       # Definición estricta de tipos de dominio
+│   └── game.ts                  # Tipos del juego, recursos, tropas y resultados de acción
+│
+└── middleware.ts                # Interceptor perimetral para protección de rutas
 ```
 
-## Módulos Principales
+---
 
-La aplicación se estructura en varios módulos funcionales clave:
+## Reglas de Contribución
 
-1.  **Autenticación y Sesión:**
-    *   Registro de usuarios en dos pasos (credenciales y creación de la propiedad inicial).
-    *   Inicio y cierre de sesión.
-    *   Gestión de sesiones mediante JSON Web Tokens (JWT) almacenados en cookies `HttpOnly` y `Secure`.
-    *   Protección de rutas a través de middleware.
-
-2.  **Dashboard (Visión General):**
-    *   Es la vista principal para los usuarios autenticados.
-    *   Muestra un resumen del estado del jugador: recursos, información de la propiedad activa, datos de la familia y estadísticas clave.
-    *   Actúa como punto de entrada a las demás secciones del juego.
-
-3.  **Gestión de Propiedades y Habitaciones:**
-    *   Permite a los usuarios visualizar los niveles de los edificios en su propiedad.
-    *   Un selector en la barra lateral permite cambiar entre las diferentes propiedades que posea el jugador.
-
-## Flujo de Datos de Autenticación
-
-El flujo de autenticación es un ejemplo claro de la arquitectura del proyecto:
-
-1.  **Frontend:** El usuario introduce sus credenciales en un formulario (`LoginForm.tsx`).
-2.  **Server Action:** Al enviar, se invoca la `loginUser` Server Action (`src/actions/auth.ts`).
-3.  **Backend (Validación):** La acción valida los datos con `zod`, busca al usuario en la base de datos con `Prisma` y verifica la contraseña con `bcrypt`.
-4.  **Creación de Sesión:** Si las credenciales son válidas, `src/lib/session.ts` utiliza `jose` para crear un JWT y lo establece como una cookie `HttpOnly`.
-5.  **Middleware:** En la siguiente petición a una ruta protegida (ej. `/dashboard`), el `middleware.ts` intercepta la solicitud, valida el JWT de la cookie y decide si permite o deniega el acceso, redirigiendo a `/login` si es necesario.
-6.  **Renderizado del Servidor:** Dentro de los Server Components protegidos, se llama a la función `protectPage()` (`src/lib/auth.ts`), que obtiene los datos del usuario de forma segura para renderizar la página con la información correcta.
+Todo código nuevo debe cumplir rigurosamente las pautas descritas en [AGENTS.md](AGENTS.md):
+- **Funciones Puras:** El motor de cálculo en `src/lib/engine/` nunca debe invocar base de datos ni provocar efectos secundarios.
+- **Transacciones ACID:** Toda Server Action en `src/actions/` debe utilizar `prisma.$transaction` para asegurar la atomicidad de las operaciones.
+- **Tipado Estricto:** Prohibido el uso de `any`; todos los modelos del juego deben tiparse en `src/types/game.ts`.
